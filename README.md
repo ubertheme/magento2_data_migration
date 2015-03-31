@@ -1,57 +1,107 @@
-# magento2_data_migration
+<strong>Magento 2</strong> beta version has just been released not long ago with lots of huge improvements compared to the previous versions.
 
-# Magento 2 Data Migration Tool quick guide:
+Moving to the latest version is obviously beneficial for most Magento users.
 
-############ Following steps to work with UB Migrate Data Tool: ################
+However, the data migration may be troublesome for new users. In an attempt to help you with this, <strong>UberTheme</strong> is developing a handy migration tool to migrate data from old Magento version to Magento 2. Let’s see what we’ve got so far.
 
-IMPORTANT NOTE: This Tool was tested and compatible with Magento 1.9.x and Magento 2 0.42.0 - beta 6, 7, 8, 9, 10, 11
+Here is what we’ve learnt about <strong>Magento 2</strong> beta’s new structure so far.
+<h3>Key changes in the database structures.</h3>
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/magento-1.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-# Step1: Install a Magento 2 website
-    + Download the latest version of Magento2 at https://github.com/magento/magento2/releases
-    + Install Magento 2 by guide at http://devdocs.magento.com/guides/v1.0/install-gde/bk-install-guide.html
+</div>
+<h3>Changes in tables.</h3>
+<h4>+ Name change for some tables</h4>
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/changes-in-tables.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-# Step2: Clone source code of Tool, make and config Databases for this Tool
-    1 - Make a folder with named "magento2-data-migration" in your web root ( example: PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration)
-    and clone all source code of this Tool from Git repository at https://github.com/ubertheme/magento2_data_migration to folder you have just created.
-        + Create a folder with named 'assets' in folder path PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\
-        + Create a folder with named 'runtime' in folder path PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\protected\
-        and make write able for 'assets' and 'runtime' folders.
+</div>
+<h4>+ Change of Attributes</h4>
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/attributes.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-    2 - This Tool as a Website App, so we need to make a database for this Tool.
-        + Open your MySQL manager (example: phpMyAdmin ...) and create a database called 'magento2_data_migration'
-        and then import the file SQL in PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\protected\data\ub_tool.sql to this Database.
+</div>
+<h2>Our plan for the Magento 2 Migration tool</h2>
+This upcoming <strong>Magento 2</strong> migration tool will help to transfer your database from older versions to the latest <strong>Magento 2</strong> in some simple steps. Our aim is to make it the most handy as possible.
+<h4>Here are what the tool will help to migrate.</h4>
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/list.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-    3 - Open the config file at PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\protected\config\config.php
-    and find to line with comment text "//Database of tool" and put the Database information which you have just created in above step.
-    In this step you need focus to params: host, dbname, tablePrefix, username, password, ...
+</div>
+To use this migration tool, follow the steps below.
+<h4># Step1: Install Magento 2</h4>
++ Download the latest version of Magento2 from Github
 
-    4 - Config the Database information of your website with Magento1:
-        Open the config file at PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\protected\config\config.php
-        and find to comment text "//Database of Magento1" and put the correct Database information of Magento 1 website as above step.
++ Follow our <a href="http://www.ubertheme.com/magento-news/magento-2-0-installation-guide/">Installation guide</a> to Install Magento 2
+<h4># Step2: Configure the tool</h4>
+1 - Make a folder named "migrate_data_tool" in your web root. For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: http://dev.joomlart.com/svn/jadev/magento/mage_ext/migrate_data_tool to the folder you have just created.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/migrate.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-    5 - Config the Database information of your website with Magento2:
-        Open the config file at PATH_TO_YOUR_WEB_ROOT_FOLDER\magento2-data-migration\protected\config\config.php
-and find to comment text "//Database of Magento2" and put the correct your Database information of Magento2 website as above step.
+</div>
++ Create a folder named 'assets' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\</strong>
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/assets.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-# Step 3: Run this Tool in Browser to migrate data
-    1 - Open your browser and type the url to run this Tool.
-    Example: http://localhost/magento2-data-migration/
-    and press Enter key.
-    2 - Follow step by step to end step to migrate needed Data from Magento1 website to Magento2 website.
+</div>
++ Create a folder named 'runtime' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\</strong> and make it writeable for 'assets' and 'runtime' folders.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/run-time.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-# Step4: Do some task bellow to finish migration data.
-    1 - Re-save all Attribute Sets (Product Templates) migrated in the back-end of your Magento2 website. (Open the attribute set, edit if needed and click save button)
-    2 - Open the command line window and go to the folder:
-    PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell\
-    and type command line: php indexer.php reindexall
-    and press enter key to re-index all data in your Magento2 website.
-    3 - To migrate needed media files, copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog
-    and paste replace to
-    PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
-    4 (optional) - To migrate needed downloadable files, copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable
-        and paste replace to
-        PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+</div>
+2 - Our Magento data migration tool works as a website app, so we need to make a database for it.
 
-# Step5: Now you can test the data migrated in your Magento2 website from browser.
++ Open your MySQL manager (for example: phpMyAdmin ...) and create a database called <strong>ub_migrate_data</strong> then import the file SQL in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\data\ub_tool.sql</strong> to this Database.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/ub-tool.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
-################# GOOD LUCK!!!  ##########################
+</div>
+3 - Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
+and find the line with comment text "//Database of tool" and put the Database information which you have just created in the above step.
+In this step you need to focus on these params: host, dbname, username, password, etc.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/2.jpg" alt="Magento 2 Migration Data Tool" /></p>
+
+</div>
+4 - Configure the Database information of your website with Magento 1:
+
+Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
+and navigate to comment text "//Database of Magento1" and put the correct Database information of Magento 1 website as the above step.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/1.jpg" alt="Magento 2 Migration Data Tool" /></p>
+
+</div>
+5 - Configure the Database information of your website with Magento2:
+
+Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
+and navigate to comment text "//Database of Magento2" and put the correct your Database information of Magento2 website as above step.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/11.jpg" alt="Magento 2 Migration Data Tool" /></p>
+
+</div>
+<h4># Step 3: Run this tool in your browser to migrate your data</h4>
+1 - Open your browser and type in the url to run this tool.
+
+For example: go to http://localhost/migrate-data-tool/ and press Enter key.
+
+2 - Follow step by step to migrate needed Data from Magento 1 website to Magento2 website.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/step-2.jpg" alt="Magento 2 Migration Data Tool" /></p>
+
+</div>
+<h4># Step 4: Complete the tasks below to finish the data migration process.</h4>
+Re-save all the Attribute Sets (Product Template) migrated in the back-end of your Magento 2 website. (Open the attribute set, edit it if needed and click the save button)
+
+Open the command line window and go to the folder:
+<strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell\</strong>
+and type in the command line: php indexer.php reindexall
+then press enter key to re-index all data in your Magento 2 website.
+<div class="center">
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/img-2.jpg" alt="Magento 2 Migration Data Tool" /></p>
+
+</div>
+<h3>Copy media files to complete migration:</h3>
++ Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+
++ Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+<h4># Step 5: Now you can test the data which have been migrated into your Magento 2 website from the browser.</h4>
