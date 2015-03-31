@@ -34,7 +34,7 @@ To use this migration tool, follow the steps below.
 
 + Follow our <a href="http://www.ubertheme.com/magento-news/magento-2-0-installation-guide/">Installation guide</a> to Install Magento 2
 <h4># Step2: Configure the tool</h4>
-1 - Make a folder named "migrate_data_tool" in your web root. For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: http://dev.joomlart.com/svn/jadev/magento/mage_ext/migrate_data_tool to the folder you have just created.
+1 - Make a folder named "migrate_data_tool" in your web root. For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: https://github.com/ubertheme/magento2_data_migration to the folder you have just created.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/migrate.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
