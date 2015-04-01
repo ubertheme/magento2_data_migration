@@ -9,7 +9,7 @@ Here is what we’ve learnt about <strong>Magento 2</strong> beta’s new struct
 <!--more-->
 <h3>Key changes in the database structures.</h3>
 <div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/magento-1.jpg" alt="Magento 2 Migration Data Tool" /></p>
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/magento-1.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 
 </div>
 <h3>Changes in tables.</h3>
