@@ -5,6 +5,8 @@ Moving to the latest version is obviously beneficial for most Magento users.
 However, the data migration may be troublesome for new users. In an attempt to help you with this, <strong>UberTheme</strong> is developing a handy migration tool to migrate data from old Magento version to Magento 2. Let’s see what we’ve got so far.
 
 Here is what we’ve learnt about <strong>Magento 2</strong> beta’s new structure so far.
+
+<!--more-->
 <h3>Key changes in the database structures.</h3>
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/magento-1.jpg" alt="Magento 2 Migration Data Tool" /></p>
@@ -25,26 +27,28 @@ Here is what we’ve learnt about <strong>Magento 2</strong> beta’s new struct
 This upcoming <strong>Magento 2</strong> migration tool will help to transfer your database from older versions to the latest <strong>Magento 2</strong> in some simple steps. Our aim is to make it the most handy as possible.
 <h4>Here are what the tool will help to migrate.</h4>
 <div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/list.jpg" alt="Magento 2 Migration Data Tool" /></p>
+<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/list2.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
 </div>
+In this post, we are standing at process 1
+
 To use this migration tool, follow the steps below.
 <h4># Step1: Install Magento 2</h4>
 + Download the latest version of Magento2 from Github
 
 + Follow our <a href="http://www.ubertheme.com/magento-news/magento-2-0-installation-guide/">Installation guide</a> to Install Magento 2
 <h4># Step2: Configure the tool</h4>
-1 - Make a folder named "migrate_data_tool" in your web root. For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: https://github.com/ubertheme/magento2_data_migration to the folder you have just created.
+1 - Make a folder named "migrate_data_tool" in your web root. (For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: https://github.com/ubertheme/magento2_data_migration to the folder you have just created.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/migrate.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
 </div>
-+ Create a folder named 'assets' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\</strong>
++ Create a folder named 'assets' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool </strong>
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/assets.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
 </div>
-+ Create a folder named 'runtime' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\</strong> and make it writeable for 'assets' and 'runtime' folders.
++ Create a folder named 'runtime' in the folder path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected </strong> and make it writeable for 'assets' and 'runtime' folders.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/run-time.jpg" alt="Magento 2 Migration Data Tool" /></p>
 
@@ -93,7 +97,7 @@ For example: go to http://localhost/migrate-data-tool/ and press Enter key.
 Re-save all the Attribute Sets (Product Template) migrated in the back-end of your Magento 2 website. (Open the attribute set, edit it if needed and click the save button)
 
 Open the command line window and go to the folder:
-<strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell\</strong>
+<strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell </strong>
 and type in the command line: php indexer.php reindexall
 then press enter key to re-index all data in your Magento 2 website.
 <div class="center">

@@ -23,6 +23,7 @@
  * @property integer $is_wysiwyg_enabled
  * @property integer $is_used_for_promo_rules
  * @property integer $is_required_in_admin_store
+ * @property integer $search_weight
  *
  * The followings are the available model relations:
  * @property EavAttribute $attribute
@@ -46,11 +47,11 @@ class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('attribute_id', 'required'),
-			array('attribute_id, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store', 'numerical', 'integerOnly'=>true),
+			array('attribute_id, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store, search_weight', 'numerical', 'integerOnly'=>true),
 			array('frontend_input_renderer, apply_to', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('attribute_id, frontend_input_renderer, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, apply_to, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store', 'safe', 'on'=>'search'),
+			array('attribute_id, frontend_input_renderer, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, apply_to, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store, search_weight', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -91,6 +92,7 @@ class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
 			'is_wysiwyg_enabled' => 'Is Wysiwyg Enabled',
 			'is_used_for_promo_rules' => 'Is Used For Promo Rules',
 			'is_required_in_admin_store' => 'Is Required In Admin Store',
+            'search_weight' => 'Search Weight'
 		);
 	}
 
@@ -131,6 +133,7 @@ class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
 		$criteria->compare('is_wysiwyg_enabled',$this->is_wysiwyg_enabled);
 		$criteria->compare('is_used_for_promo_rules',$this->is_used_for_promo_rules);
 		$criteria->compare('is_required_in_admin_store',$this->is_required_in_admin_store);
+        $criteria->compare('search_weight',$this->search_weight);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

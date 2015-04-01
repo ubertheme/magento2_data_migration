@@ -471,6 +471,7 @@ class MigrateController extends Controller
                                     $catalog_eav_attribute2->is_wysiwyg_enabled = $catalog_eav_attribute->is_wysiwyg_enabled;
                                     $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
                                     $catalog_eav_attribute2->is_required_in_admin_store = 0;
+                                    $catalog_eav_attribute2->search_weight = $catalog_eav_attribute->search_weight;
                                     //this attribute removed in Magento2 beta11
                                     //$catalog_eav_attribute2->is_configurable = $catalog_eav_attribute->is_configurable;
                                     $catalog_eav_attribute2->save();
