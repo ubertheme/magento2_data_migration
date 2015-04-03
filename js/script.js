@@ -3,7 +3,7 @@
 
     $(document).ready(function ($){
 
-        //hide the message funtion
+        //hide the message function
         $.hideMessage = function(){
             if ($('#message').length){
                 $('#message').slideUp('slow');
@@ -33,6 +33,11 @@
             if ($('#product_type_simple').length) {
                 $('#product_type_simple').prop('checked', true);
             }
+        });
+
+        //check/un-check product types
+        $('INPUT[name="select_all_customer_group"]').on('change', function(){
+            $('INPUT[name="customer_group_ids[]"]').prop('checked', this.checked);
         });
 
         //reset event

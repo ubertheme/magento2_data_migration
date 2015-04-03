@@ -214,6 +214,24 @@ class MigrateSteps extends MigrateStepsPeer
         return $total;
     }
 
+    public static function getTotalCustomersByGroup($groupId = null){
+        $total = 0;
+        if ($groupId){
+            $migrated_website_ids = isset(Yii::app()->session['migrated_website_ids']) ? Yii::app()->session['migrated_website_ids'] : array();
+            $str_website_ids = implode(',', $migrated_website_ids);
+            $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+            $str_store_ids = implode(',', $migrated_store_ids);
+            $db = Yii::app()->mage1;
+            $tablePrefix = $db->tablePrefix;
+
+            $sql = "SELECT COUNT(DISTINCT  e.entity_id) AS total FROM {$tablePrefix}customer_entity e";
+            $sql .= " WHERE e.group_id = {$groupId} AND e.website_id IN ({$str_website_ids}) AND e.store_id IN ({$str_store_ids})";
+            $total = $db->createCommand($sql)->queryScalar();
+        }
+
+        return $total;
+    }
+
     public static function getTotalVisibleProductsAttr(){
         $tablePrefix = Yii::app()->mage1->tablePrefix;
 

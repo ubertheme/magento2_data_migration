@@ -57,6 +57,8 @@
             Copyright &copy; <?php echo date('Y'); ?> by UberTheme.<br/>
             All Rights Reserved.<br/>
             <?php echo Yii::powered(); ?>
+
+            <div id="report-bugs"><a target="_blank" href="https://github.com/ubertheme/magento2_data_migration/issues" title="<?php echo Yii::t('frontend', 'Report Bugs')?>"><?php echo Yii::t('frontend', 'Report Bugs')?></a></div>
         </div><!-- footer -->
 
     </div>

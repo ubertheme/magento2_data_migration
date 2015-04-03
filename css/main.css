@@ -6,7 +6,6 @@ body
 	font: normal 10pt Arial,Helvetica,sans-serif;
 	background: #EFEFEF;
 }
-
 #page
 {
 	margin-top: 5px;
@@ -14,7 +13,6 @@ body
 	background: white;
 	border: 1px solid #C9E0ED;
 }
-
 #header
 {
 	margin: 0px 0px 30px 0px;
@@ -22,17 +20,14 @@ body
 	border-top: 3px solid #C9E0ED;
     border-bottom:1px solid #eaeaea;
 }
-
 #content
 {
 	padding: 20px;
 }
-
 #sidebar
 {
 	padding: 20px;
 }
-
 #footer
 {
 	padding: 10px;
@@ -41,20 +36,17 @@ body
 	text-align: center;
 	border-top: 1px solid #C9E0ED;
 }
-
 #logo
 {
 	padding: 10px 20px;
 	font-size: 200%;
 }
-
 div.flash-error, div.flash-notice, div.flash-success
 {
 	padding:.8em;
 	margin-bottom:1em;
 	border:2px solid #ddd;
 }
-
 div.flash-error
 {
 	background:#FBE3E4;
@@ -62,7 +54,6 @@ div.flash-error
 	border-color:#FBC2C4;
     text-align: center;
 }
-
 div.flash-notice
 {
 	background:#FFF6BF;
@@ -70,7 +61,6 @@ div.flash-notice
 	border-color:#FFD324;
     text-align: center;
 }
-
 div.flash-success
 {
 	background:#E6EFC2;
@@ -78,33 +68,27 @@ div.flash-success
 	border-color:#C6D880;
     text-align: center;
 }
-
 div.flash-error a
 {
 	color:#8a1f11;
 }
-
 div.flash-notice a
 {
 	color:#514721;
 }
-
 div.flash-success a
 {
 	color:#264409;
 }
-
 div.breadcrumbs
 {
 	font-size: 0.9em;
 	padding: 5px 20px;
 }
-
 div.breadcrumbs span
 {
 	font-weight: bold;
 }
-
 .portlet-decoration
 {
 	padding: 3px 8px;
@@ -133,7 +117,6 @@ div.breadcrumbs span
 .progress-bar-success{color: #000;}
 blockquote{font-size: 12px;}
 #processor-box .loading-box{width: 300px !important; text-align: center;}
-
 /*start css for categories tree*/
 .tree span.root-category, .tree input {cursor: pointer;}
 .tree {
@@ -199,3 +182,4 @@ blockquote{font-size: 12px;}
 }
 .list-group input{cursor: pointer;}
 /* end css for categories tree*/
+#footer #report-bugs{display: block;}

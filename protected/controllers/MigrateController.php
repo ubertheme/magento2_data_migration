@@ -21,7 +21,9 @@ class MigrateController extends Controller
             'store_ids' => array(),
             'category_ids' => array(),
             'product_type_ids' => array(),
-            'product_ids' => array()
+            'product_ids' => array(),
+            'customer_group_ids' => array(),
+            'customer_ids' => array()
         );
         $migratedObj = (object) $migrated_data;
         //update migrated data
@@ -58,7 +60,7 @@ class MigrateController extends Controller
      */
     protected function afterAction($action)
     {
-        // SET FOREIGN_KEY_CHECKS=0;
+        // SET FOREIGN_KEY_CHECKS=1;
         $sql = "SET FOREIGN_KEY_CHECKS=1";
         Yii::app()->mage2->createCommand($sql)->execute();
 
@@ -471,8 +473,13 @@ class MigrateController extends Controller
                                     $catalog_eav_attribute2->is_wysiwyg_enabled = $catalog_eav_attribute->is_wysiwyg_enabled;
                                     $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
                                     $catalog_eav_attribute2->is_required_in_admin_store = 0;
-                                    $catalog_eav_attribute2->search_weight = $catalog_eav_attribute->search_weight;
-                                    //this attribute removed in Magento2 beta11
+
+                                    //This for Magento1 version < 1.9.1.0
+                                    if (isset($catalog_eav_attribute->search_weight)){
+                                        $catalog_eav_attribute2->search_weight = $catalog_eav_attribute->search_weight;
+                                    }
+
+                                    //this attribute removed from Magento2 0.42.0 beta11
                                     //$catalog_eav_attribute2->is_configurable = $catalog_eav_attribute->is_configurable;
                                     $catalog_eav_attribute2->save();
                                 }
@@ -1809,8 +1816,298 @@ class MigrateController extends Controller
         $step = MigrateSteps::model()->find("sorder = 5");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
+            //get all current customer groups
+            $customer_groups = Mage1CustomerGroup::model()->findAll();
 
-            $this->render("step{$step->sorder}", array('step' => $step));
+            //variables to log
+            $migrated_customer_group_ids = array();
+            $migrated_customer_ids = array();
+
+            if (Yii::app()->request->isPostRequest){
+
+                //reset database of this step if has
+                $is_reset = Yii::app()->request->getPost('reset');
+                if ($is_reset){
+                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
+                    $resetSQLFile = $dataPath . "step5_reset.sql";
+                    if (file_exists($resetSQLFile)) {
+                        $rs = MigrateSteps::executeFile($resetSQLFile);
+                        if ($rs){
+                            //reset step status
+                            $step->status = MigrateSteps::STATUS_NOT_DONE;
+                            $step->migrated_data = null;
+                            if ($step->update()){
+                                $this->refresh();
+                            }
+                        }
+                    }
+                }
+
+                $selected_group_ids = Yii::app()->request->getPost('customer_group_ids', array());
+                if ($selected_group_ids){
+                    foreach ($selected_group_ids as $group_id){
+                        //customer_group
+                        $customer_group1 = Mage1CustomerGroup::model()->findByPk($group_id);
+                        $customer_group2 = Mage2CustomerGroup::model()->find("customer_group_id = {$group_id} AND customer_group_code = '{$customer_group1->customer_group_code}'");
+                        if (!$customer_group2){
+                            $customer_group2 = new Mage2CustomerGroup();
+                            $customer_group2->customer_group_id = $group_id;
+                            $customer_group2->customer_group_code = $customer_group1->customer_group_code;
+                        }
+                        //update tax class_id if have exits
+                        $customer_group2->tax_class_id = $customer_group1->tax_class_id;
+
+                        if ($customer_group2->save()){
+                            $migrated_customer_group_ids[] = $customer_group2->customer_group_id;
+
+                            //we will migrate related tax_class here
+                            $tax_class1 = Mage1TaxClass::model()->findByPk($customer_group2->tax_class_id);
+                            if ($tax_class1){
+                                $tax_class2 = Mage2TaxClass::model()->findByPk($tax_class1->class_id);
+                                if (!$tax_class2){
+                                    $tax_class2 = new Mage2TaxClass();
+                                    $tax_class2->class_id = $tax_class1->class_id;
+                                }
+                                $tax_class2->class_type = $tax_class1->class_type;
+                                $tax_class2->class_name = $tax_class1->class_name;
+                                $tax_class2->save();
+                            }
+
+                            //migrate all customers of this customer group
+                            //customer_entity
+                            $customers = Mage1CustomerEntity::model()->findAll("group_id = {$group_id}");
+                            if ($customers){
+                                foreach ($customers as $customer){
+                                    $customer2 = Mage2CustomerEntity::model()->findByPk($customer->entity_id);
+                                    if (!$customer2){
+                                        $customer2 = new Mage2CustomerEntity();
+                                        $customer2->entity_id = $customer->entity_id;
+                                        $customer2->website_id = $customer->website_id;
+                                        $customer2->email = $customer->email;
+                                        $customer2->group_id = $customer->group_id;
+                                        $customer2->increment_id = $customer->increment_id;
+                                        $customer2->store_id = MigrateSteps::getMage2StoreId($customer->store_id);
+                                        $customer2->created_at = $customer->created_at;
+                                        $customer2->updated_at = $customer->updated_at;
+                                        $customer2->is_active = $customer->is_active;
+                                        $customer2->disable_auto_group_change = $customer->disable_auto_group_change;
+                                        if ($customer2->save()){
+                                            $migrated_customer_ids[] = $customer2->entity_id;
+
+                                            //customer_entity_datetime
+                                            $models = Mage1CustomerEntityDatetime::model()->findAll("entity_id = $customer->entity_id");
+                                            if ($models){
+                                                foreach ($models as $model){
+                                                    $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 1);
+                                                    // This because some system customer attribute_code was not using in Magento2
+                                                    if ($attribute_id2){
+                                                        $model2 = new Mage2CustomerEntityDatetime();
+                                                        $model2->value_id = $model->value_id;
+                                                        $model2->attribute_id = $attribute_id2;
+                                                        $model2->entity_id = $model->entity_id;
+                                                        $model2->value = $model->value;
+                                                        $model2->save();
+                                                    }
+                                                }
+                                            }
+                                            //customer_entity_decimal
+                                            $models = Mage1CustomerEntityDecimal::model()->findAll("entity_id = $customer->entity_id");
+                                            if ($models){
+                                                foreach ($models as $model){
+                                                    $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 1);
+                                                    // This because some system customer attribute_code was not using in Magento2
+                                                    if ($attribute_id2){
+                                                        $model2 = new Mage2CustomerEntityDecimal();
+                                                        $model2->value_id = $model->value_id;
+                                                        $model2->attribute_id = $attribute_id2;
+                                                        $model2->entity_id = $model->entity_id;
+                                                        $model2->value = $model->value;
+                                                        $model2->save();
+                                                    }
+                                                }
+                                            }
+                                            //customer_entity_int
+                                            $models = Mage1CustomerEntityInt::model()->findAll("entity_id = $customer->entity_id");
+                                            if ($models){
+                                                foreach ($models as $model){
+                                                    $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 1);
+                                                    // This because some system customer attribute_code was not using in Magento2
+                                                    //(example: reward_update_notification, reward_warning_notification)
+                                                    if ($attribute_id2){
+                                                        $model2 = new Mage2CustomerEntityInt();
+                                                        $model2->value_id = $model->value_id;
+                                                        $model2->attribute_id = $attribute_id2;
+                                                        $model2->entity_id = $model->entity_id;
+                                                        $model2->value = $model->value;
+                                                        $model2->save();
+                                                    }
+                                                }
+                                            }
+                                            //customer_entity_text
+                                            $models = Mage1CustomerEntityText::model()->findAll("entity_id = $customer->entity_id");
+                                            if ($models){
+                                                foreach ($models as $model){
+                                                    $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 1);
+                                                    // This because some system customer attribute_code was not using in Magento2
+                                                    if ($attribute_id2){
+                                                        $model2 = new Mage2CustomerEntityText();
+                                                        $model2->value_id = $model->value_id;
+                                                        $model2->attribute_id = $attribute_id2;
+                                                        $model2->entity_id = $model->entity_id;
+                                                        $model2->value = $model->value;
+                                                        $model2->save();
+                                                    }
+                                                }
+                                            }
+                                            //customer_entity_varchar
+                                            $models = Mage1CustomerEntityVarchar::model()->findAll("entity_id = $customer->entity_id");
+                                            if ($models){
+                                                foreach ($models as $model){
+                                                    $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 1);
+                                                    // This because some system customer attribute_code was not using in Magento2
+                                                    if ($attribute_id2){
+                                                        $model2 = new Mage2CustomerEntityVarchar();
+                                                        $model2->value_id = $model->value_id;
+                                                        $model2->attribute_id = $attribute_id2;
+                                                        $model2->entity_id = $model->entity_id;
+                                                        $model2->value = $model->value;
+                                                        $model2->save();
+                                                    }
+                                                }
+                                            }
+
+                                            //customer_address_entity
+                                            $address_entities = Mage1CustomerAddressEntity::model()->findAll("parent_id = {$customer->entity_id}");
+                                            if ($address_entities){
+                                                foreach($address_entities as $address_entity){
+                                                    $address_entity2 = new Mage2CustomerAddressEntity();
+                                                    $address_entity2->entity_id = $address_entity->entity_id;
+                                                    $address_entity2->increment_id = $address_entity->increment_id;
+                                                    $address_entity2->parent_id = $address_entity->parent_id;
+                                                    $address_entity2->created_at = $address_entity->created_at;
+                                                    $address_entity2->updated_at = $address_entity->updated_at;
+                                                    $address_entity2->is_active = $address_entity->is_active;
+                                                    if ($address_entity2->save()){
+                                                        //customer_address_entity_datetime
+                                                        $models = Mage1CustomerAddressEntityDatetime::model()->findAll("entity_id = $address_entity2->entity_id");
+                                                        if ($models){
+                                                            foreach ($models as $model){
+                                                                $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 2);
+                                                                // This because some system customer attribute_code was not using in Magento2
+                                                                if ($attribute_id2){
+                                                                    $model2 = new Mage2CustomerAddressEntityDatetime();
+                                                                    $model2->value_id = $model->value_id;
+                                                                    $model2->attribute_id = $attribute_id2;
+                                                                    $model2->entity_id = $model->entity_id;
+                                                                    $model2->value = $model->value;
+                                                                    $model2->save();
+                                                                }
+                                                            }
+                                                        }
+
+                                                        //customer_address_entity_decimal
+                                                        $models = Mage1CustomerAddressEntityDecimal::model()->findAll("entity_id = $address_entity2->entity_id");
+                                                        if ($models){
+                                                            foreach ($models as $model){
+                                                                $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 2);
+                                                                // This because some system customer attribute_code was not using in Magento2
+                                                                if ($attribute_id2){
+                                                                    $model2 = new Mage2CustomerAddressEntityDecimal();
+                                                                    $model2->value_id = $model->value_id;
+                                                                    $model2->attribute_id = $attribute_id2;
+                                                                    $model2->entity_id = $model->entity_id;
+                                                                    $model2->value = $model->value;
+                                                                    $model2->save();
+                                                                }
+                                                            }
+                                                        }
+
+                                                        //customer_address_entity_int
+                                                        $models = Mage1CustomerAddressEntityInt::model()->findAll("entity_id = $address_entity2->entity_id");
+                                                        if ($models){
+                                                            foreach ($models as $model){
+                                                                $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 2);
+                                                                // This because some system customer attribute_code was not using in Magento2
+                                                                if ($attribute_id2){
+                                                                    $model2 = new Mage2CustomerAddressEntityInt();
+                                                                    $model2->value_id = $model->value_id;
+                                                                    $model2->attribute_id = $attribute_id2;
+                                                                    $model2->entity_id = $model->entity_id;
+                                                                    $model2->value = $model->value;
+                                                                    $model2->save();
+                                                                }
+                                                            }
+                                                        }
+                                                        //customer_address_entity_text
+                                                        $models = Mage1CustomerAddressEntityText::model()->findAll("entity_id = $address_entity2->entity_id");
+                                                        if ($models){
+                                                            foreach ($models as $model){
+                                                                $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 2);
+                                                                // This because some system customer attribute_code was not using in Magento2
+                                                                if ($attribute_id2){
+                                                                    $model2 = new Mage2CustomerAddressEntityText();
+                                                                    $model2->value_id = $model->value_id;
+                                                                    $model2->attribute_id = $attribute_id2;
+                                                                    $model2->entity_id = $model->entity_id;
+                                                                    $model2->value = $model->value;
+                                                                    $model2->save();
+                                                                }
+                                                            }
+                                                        }
+                                                        //customer_address_entity_varchar
+                                                        $models = Mage1CustomerAddressEntityVarchar::model()->findAll("entity_id = $address_entity2->entity_id");
+                                                        if ($models){
+                                                            foreach ($models as $model){
+                                                                $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 2);
+                                                                // This because some system customer attribute_code was not using in Magento2
+                                                                if ($attribute_id2){
+                                                                    $model2 = new Mage2CustomerAddressEntityVarchar();
+                                                                    $model2->value_id = $model->value_id;
+                                                                    $model2->attribute_id = $attribute_id2;
+                                                                    $model2->entity_id = $model->entity_id;
+                                                                    $model2->value = $model->value;
+                                                                    $model2->save();
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }//end a customer entity address
+                                        } //and save a customer entity
+                                    }
+                                }
+                            }
+                        }//end save a customer group
+                    }
+
+                    //customer_eav_attribute
+                    //customer_eav_attribute_website
+                    //customer_form_attribute
+
+                }else{
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Customer Groups.'));
+                }
+
+                //Update step status
+                if ($migrated_customer_group_ids){
+                    $step->status = MigrateSteps::STATUS_DONE;
+                    $step->migrated_data = json_encode(array(
+                        'customer_group_ids' => $migrated_customer_group_ids,
+                        'customer_ids' => $migrated_customer_ids,
+                    ));
+                    if ($step->update()) {
+                        //update session
+                        Yii::app()->session['migrated_customer_group_ids'] = $migrated_customer_group_ids;
+                        Yii::app()->session['migrated_customer_ids'] = $migrated_customer_ids;
+
+                        $message = "Migrated successfully. Total Customer Groups migrated: %s1 and total Customers migrated: %s2.";
+                        $message = Yii::t('frontend', $message, array('%s1'=> sizeof($migrated_customer_group_ids), '%s2' => sizeof($migrated_customer_ids)));
+                        Yii::app()->user->setFlash('success', $message);
+                    }
+                }
+            }//end post request
+
+            $this->render("step{$step->sorder}", array('step' => $step, 'customer_groups' => $customer_groups));
         }else{
             Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
             $this->redirect(array($result['back_step']));
