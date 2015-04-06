@@ -97,8 +97,8 @@ then press enter key to re-index all data in your Magento 2 website.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/img-2.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 </div>
-<strong>- Copy media files to complete migration:</strong>
-1 - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
-2 - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+- Copy media files to complete migration:<br/>
+  - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+  - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
 
 <h4># Step 5: Now you can test the data which have been migrated into your Magento 2 website from the browser.</h4>
