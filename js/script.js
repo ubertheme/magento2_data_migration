@@ -12,7 +12,7 @@
         //set timeout to hide the message
         setTimeout(function(){
             $.hideMessage();
-        }, 10000);
+        }, 30000);
 
         //check/un-check website & stores on it
         $('INPUT[name="website_ids[]"]').on('change', function(){
@@ -35,10 +35,16 @@
             }
         });
 
-        //check/un-check product types
+        //check/un-check customer groups
         $('INPUT[name="select_all_customer_group"]').on('change', function(){
             $('INPUT[name="customer_group_ids[]"]').prop('checked', this.checked);
         });
+
+        //check/un-check sales objects
+        $('INPUT[name="select_all_sales_object"]').on('change', function(){
+            $('INPUT[name="selected_objects[]"]').prop('checked', this.checked);
+        });
+        $('INPUT[name="select_all_sales_object"]').prop('checked', true).trigger('change');
 
         //reset event
         $("button.reset").on('click', function(){

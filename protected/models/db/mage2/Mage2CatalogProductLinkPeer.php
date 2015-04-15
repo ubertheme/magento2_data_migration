@@ -8,14 +8,6 @@
  * @property string $product_id
  * @property string $linked_product_id
  * @property integer $link_type_id
- *
- * The followings are the available model relations:
- * @property CatalogProductEntity $linkedProduct
- * @property CatalogProductEntity $product
- * @property CatalogProductLinkType $linkType
- * @property CatalogProductLinkAttributeDecimal[] $catalogProductLinkAttributeDecimals
- * @property CatalogProductLinkAttributeInt[] $catalogProductLinkAttributeInts
- * @property CatalogProductLinkAttributeVarchar[] $catalogProductLinkAttributeVarchars
  */
 class Mage2CatalogProductLinkPeer extends Mage2ActiveRecord
 {
@@ -37,76 +29,7 @@ class Mage2CatalogProductLinkPeer extends Mage2ActiveRecord
 		return array(
 			array('link_type_id', 'numerical', 'integerOnly'=>true),
 			array('product_id, linked_product_id', 'length', 'max'=>10),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('link_id, product_id, linked_product_id, link_type_id', 'safe', 'on'=>'search'),
 		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'linkedProduct' => array(self::BELONGS_TO, 'CatalogProductEntity', 'linked_product_id'),
-			'product' => array(self::BELONGS_TO, 'CatalogProductEntity', 'product_id'),
-			'linkType' => array(self::BELONGS_TO, 'CatalogProductLinkType', 'link_type_id'),
-			'catalogProductLinkAttributeDecimals' => array(self::HAS_MANY, 'CatalogProductLinkAttributeDecimal', 'link_id'),
-			'catalogProductLinkAttributeInts' => array(self::HAS_MANY, 'CatalogProductLinkAttributeInt', 'link_id'),
-			'catalogProductLinkAttributeVarchars' => array(self::HAS_MANY, 'CatalogProductLinkAttributeVarchar', 'link_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'link_id' => 'Link',
-			'product_id' => 'Product',
-			'linked_product_id' => 'Linked Product',
-			'link_type_id' => 'Link Type',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('link_id',$this->link_id,true);
-		$criteria->compare('product_id',$this->product_id,true);
-		$criteria->compare('linked_product_id',$this->linked_product_id,true);
-		$criteria->compare('link_type_id',$this->link_type_id);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->mage2;
 	}
 
 	/**

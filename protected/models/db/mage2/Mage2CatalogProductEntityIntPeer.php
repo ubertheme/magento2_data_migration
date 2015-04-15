@@ -9,11 +9,6 @@
  * @property integer $store_id
  * @property string $entity_id
  * @property integer $value
- *
- * The followings are the available model relations:
- * @property Store $store
- * @property EavAttribute $attribute
- * @property CatalogProductEntity $entity
  */
 class Mage2CatalogProductEntityIntPeer extends Mage2ActiveRecord
 {
@@ -35,9 +30,6 @@ class Mage2CatalogProductEntityIntPeer extends Mage2ActiveRecord
 		return array(
 			array('attribute_id, store_id, value', 'numerical', 'integerOnly'=>true),
 			array('entity_id', 'length', 'max'=>10),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('value_id, attribute_id, store_id, entity_id, value', 'safe', 'on'=>'search'),
 		);
 	}
 

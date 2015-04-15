@@ -114,6 +114,7 @@ class MigrateSteps extends MigrateStepsPeer
         if (!isset($filePath)) return false;
 
         try {
+            $tablePrefix = Yii::app()->mage2->tablePrefix;
             $tempLine = '';
             $lines = file($filePath);
             // Loop through each line
@@ -127,6 +128,9 @@ class MigrateSteps extends MigrateStepsPeer
                 // If it has a semicolon at the end, it's the end of the query
                 if (substr(trim($line), -1, 1) == self::SQL_COMMAND_DELIMETER)
                 {
+                    //replace prefix
+                    $tempLine = str_replace ('#__', $tablePrefix, $tempLine);
+
                     // Perform the query
                     Yii::app()->mage2->createCommand($tempLine)->execute();
 
@@ -237,6 +241,45 @@ class MigrateSteps extends MigrateStepsPeer
 
         $sql = "SELECT COUNT(*) FROM `{$tablePrefix}eav_attribute` e INNER JOIN `{$tablePrefix}catalog_eav_attribute` ce ON e.attribute_id = ce.attribute_id WHERE e.entity_type_id = 4 AND ce.is_visible = 1";
         $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+
+        return $total;
+    }
+
+    public static function getTotalSalesChildObject($objectId){
+        $total = 0;
+        $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+        $str_store_ids = implode(',', $migrated_store_ids);
+        $migrated_customer_ids = isset(Yii::app()->session['migrated_customer_ids']) ? Yii::app()->session['migrated_customer_ids'] : array();
+        $str_customer_ids = implode(',', $migrated_customer_ids);
+        $tablePrefix = Yii::app()->mage1->tablePrefix;
+
+        switch ($objectId){
+            case 'order':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_order` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL) AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+            case 'quote':
+                //$sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_quote` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL) AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_quote` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+            case 'payment':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_order_payment`";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+            case 'invoice':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_invoice` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+            case 'shipment':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_shipment` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL) AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+            case 'credit':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_creditmemo` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                break;
+        }
 
         return $total;
     }

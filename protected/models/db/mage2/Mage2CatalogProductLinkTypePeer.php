@@ -6,10 +6,6 @@
  * The followings are the available columns in table 'catalog_product_link_type':
  * @property integer $link_type_id
  * @property string $code
- *
- * The followings are the available model relations:
- * @property CatalogProductLink[] $catalogProductLinks
- * @property CatalogProductLinkAttribute[] $catalogProductLinkAttributes
  */
 class Mage2CatalogProductLinkTypePeer extends Mage2ActiveRecord
 {
@@ -30,68 +26,7 @@ class Mage2CatalogProductLinkTypePeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('code', 'length', 'max'=>32),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('link_type_id, code', 'safe', 'on'=>'search'),
 		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'catalogProductLinks' => array(self::HAS_MANY, 'CatalogProductLink', 'link_type_id'),
-			'catalogProductLinkAttributes' => array(self::HAS_MANY, 'CatalogProductLinkAttribute', 'link_type_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'link_type_id' => 'Link Type',
-			'code' => 'Code',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('link_type_id',$this->link_type_id);
-		$criteria->compare('code',$this->code,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->mage2;
 	}
 
 	/**

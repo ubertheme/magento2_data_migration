@@ -11,11 +11,6 @@
  * @property string $qty
  * @property string $value
  * @property integer $website_id
- *
- * The followings are the available model relations:
- * @property CustomerGroup $customerGroup
- * @property CatalogProductEntity $entity
- * @property StoreWebsite $website
  */
 class Mage2CatalogProductEntityTierPricePeer extends Mage2ActiveRecord
 {
@@ -39,79 +34,7 @@ class Mage2CatalogProductEntityTierPricePeer extends Mage2ActiveRecord
 			array('all_groups, customer_group_id, website_id', 'numerical', 'integerOnly'=>true),
 			array('entity_id', 'length', 'max'=>10),
 			array('qty, value', 'length', 'max'=>12),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('value_id, entity_id, all_groups, customer_group_id, qty, value, website_id', 'safe', 'on'=>'search'),
 		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'customerGroup' => array(self::BELONGS_TO, 'CustomerGroup', 'customer_group_id'),
-			'entity' => array(self::BELONGS_TO, 'CatalogProductEntity', 'entity_id'),
-			'website' => array(self::BELONGS_TO, 'StoreWebsite', 'website_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'value_id' => 'Value',
-			'entity_id' => 'Entity',
-			'all_groups' => 'All Groups',
-			'customer_group_id' => 'Customer Group',
-			'qty' => 'Qty',
-			'value' => 'Value',
-			'website_id' => 'Website',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('value_id',$this->value_id);
-		$criteria->compare('entity_id',$this->entity_id,true);
-		$criteria->compare('all_groups',$this->all_groups);
-		$criteria->compare('customer_group_id',$this->customer_group_id);
-		$criteria->compare('qty',$this->qty,true);
-		$criteria->compare('value',$this->value,true);
-		$criteria->compare('website_id',$this->website_id);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->mage2;
 	}
 
 	/**

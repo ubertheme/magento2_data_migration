@@ -8,10 +8,6 @@
  * @property string $sample_id
  * @property integer $store_id
  * @property string $title
- *
- * The followings are the available model relations:
- * @property DownloadableSample $sample
- * @property Store $store
  */
 class Mage2DownloadableSampleTitlePeer extends Mage2ActiveRecord
 {
@@ -34,72 +30,7 @@ class Mage2DownloadableSampleTitlePeer extends Mage2ActiveRecord
 			array('store_id', 'numerical', 'integerOnly'=>true),
 			array('sample_id', 'length', 'max'=>10),
 			array('title', 'length', 'max'=>255),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('title_id, sample_id, store_id, title', 'safe', 'on'=>'search'),
 		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'sample' => array(self::BELONGS_TO, 'DownloadableSample', 'sample_id'),
-			'store' => array(self::BELONGS_TO, 'Store', 'store_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'title_id' => 'Title',
-			'sample_id' => 'Sample',
-			'store_id' => 'Store',
-			'title' => 'Title',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('title_id',$this->title_id,true);
-		$criteria->compare('sample_id',$this->sample_id,true);
-		$criteria->compare('store_id',$this->store_id);
-		$criteria->compare('title',$this->title,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->mage2;
 	}
 
 	/**

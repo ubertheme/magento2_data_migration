@@ -23,7 +23,13 @@ class MigrateController extends Controller
             'product_type_ids' => array(),
             'product_ids' => array(),
             'customer_group_ids' => array(),
-            'customer_ids' => array()
+            'customer_ids' => array(),
+            'sales_object_ids' => array(),
+            'sales_order_ids' => array(),
+            'sales_quote_ids' => array(),
+            'sales_invoice_ids' => array(),
+            'sales_shipment_ids' => array(),
+            'sales_credit_ids' => array()
         );
         $migratedObj = (object) $migrated_data;
         //update migrated data
@@ -135,11 +141,12 @@ class MigrateController extends Controller
                 if (sizeof($website_ids) > 0 AND sizeof($store_group_ids) > 0 AND sizeof($store_ids) > 0){
                     foreach ($websites as $website){
                         if (in_array($website->website_id, $website_ids)){
-                            $condition = "code = '{$website->code}'";
-                            $website2 = Mage2Website::model()->find($condition);
+
+                            $website2 = Mage2Website::model()->find("code = '{$website->code}'");
                             if (!$website2) { // if not found
                                 $website2 = new Mage2Website();
                             }
+
                             $website2->website_id = $website->website_id;
                             $website2->code = $website->code;
                             $website2->name = $website->name;
@@ -180,7 +187,6 @@ class MigrateController extends Controller
                                                     $stores = Mage1Store::model()->findAll($condition);
                                                     if ($stores){
                                                         foreach ($stores as $store){
-                                                            //$condition = "code = '{$store->code}' AND website_id = {$website->website_id} AND group_id = {$store->group_id}";
                                                             $condition = "code = '{$store->code}'";
                                                             $store2 = Mage2Store::model()->find($condition);
                                                             if (!$store2){
@@ -192,8 +198,7 @@ class MigrateController extends Controller
                                                             $store2->name = $store->name;
                                                             $store2->sort_order = $store->sort_order;
                                                             $store2->is_active = $store->is_active;
-                                                            if ($store2->save())
-                                                            {
+                                                            if ($store2->save()){
                                                                 //update to log
                                                                 $migrated_store_ids[] = $store->store_id;
                                                             }
@@ -363,7 +368,8 @@ class MigrateController extends Controller
                             $attribute2->backend_model = null;
                             $attribute2->backend_type = $attribute->backend_type;
                             $attribute2->backend_table = $attribute->backend_table;
-                            //$attribute2->frontend_model = $attribute->frontend_model; // note this was changed in magento2
+                            // note: this was changed in magento2, we don't migrate this field
+                            //$attribute2->frontend_model = $attribute->frontend_model;
                             $attribute2->frontend_model = null;
                             $attribute2->frontend_input = $attribute->frontend_input;
                             $attribute2->frontend_label = $attribute->frontend_label;
@@ -474,12 +480,12 @@ class MigrateController extends Controller
                                     $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
                                     $catalog_eav_attribute2->is_required_in_admin_store = 0;
 
-                                    //This for Magento1 version < 1.9.1.0
+                                    // note: This for Magento1 version < 1.9.1.0
                                     if (isset($catalog_eav_attribute->search_weight)){
                                         $catalog_eav_attribute2->search_weight = $catalog_eav_attribute->search_weight;
                                     }
 
-                                    //this attribute removed from Magento2 0.42.0 beta11
+                                    // note: this attribute removed from Magento2 0.42.0 beta11
                                     //$catalog_eav_attribute2->is_configurable = $catalog_eav_attribute->is_configurable;
                                     $catalog_eav_attribute2->save();
                                 }
@@ -508,7 +514,6 @@ class MigrateController extends Controller
                             $entity_attribute2 = Mage2EntityAttribute::model()->find($condition);
                             if (!$entity_attribute2) {
                                 $entity_attribute2 = new Mage2EntityAttribute();
-                                //$entity_attribute2->entity_attribute_id = $entity_attribute->entity_attribute_id;
                                 $entity_attribute2->entity_type_id = $entity_attribute->entity_type_id;
                                 $entity_attribute2->attribute_set_id = $entity_attribute->attribute_set_id;
                                 $entity_attribute2->attribute_group_id = $entity_attribute->attribute_group_id;
@@ -645,7 +650,7 @@ class MigrateController extends Controller
                                     $models = Mage1CatalogCategoryEntityDatetime::model()->findAll($condition);
                                     if ($models){
                                         foreach ($models as $model){
-                                            //we have to get correct attribute_id & store_id migrated
+                                            //note: we have to get correct attribute_id & store_id migrated
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 3);
                                             if ($attribute_id2){
@@ -656,7 +661,7 @@ class MigrateController extends Controller
                                                     $model2->attribute_id = $attribute_id2;
                                                     $model2->store_id = $store_id2;
                                                     $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
+                                                    //note: we need check and fixed for some attributes
                                                     if (in_array($model->attribute_id, $keyCheckList)){
                                                         $model2->value = $checkList[$model->attribute_id];
                                                     } else {
@@ -720,7 +725,7 @@ class MigrateController extends Controller
                                                     $model2->attribute_id = $attribute_id2;
                                                     $model2->store_id = $store_id2;
                                                     $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
+                                                    //note: we need check and fixed for some attributes
                                                     if (in_array($model->attribute_id, $keyCheckList)){
                                                         $model2->value = $checkList[$model->attribute_id];
                                                     } else {
@@ -741,7 +746,7 @@ class MigrateController extends Controller
                                     $models = Mage1CatalogCategoryEntityText::model()->findAll($condition);
                                     if ($models){
                                         foreach ($models as $model){
-                                            //we have to get correct attribute_id & store_id migrated
+                                            //note: we have to get correct attribute_id & store_id migrated
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 3);
                                             if ($attribute_id2){
@@ -773,7 +778,7 @@ class MigrateController extends Controller
                                     $models = Mage1CatalogCategoryEntityVarchar::model()->findAll($condition);
                                     if ($models){
                                         foreach ($models as $model){
-                                            //we have to get correct attribute_id & store_id migrated
+                                            //note: we have to get correct attribute_id & store_id migrated
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 3);
                                             if ($attribute_id2){
@@ -924,22 +929,18 @@ class MigrateController extends Controller
                 if ($selected_product_types){
                     foreach ($selected_product_types as $type_id){
                         // get products by type_id
-                        // catalog_product_entity
+                        //catalog_product_entity
                         $products = Mage1CatalogProductEntity::model()->findAll("type_id = '{$type_id}'");
                         if ($products){
                             foreach ($products as $product){
-                                $product2 = Mage2CatalogProductEntity::model()->find("entity_id = $product->entity_id");
-                                if (!$product2){
-                                    $product2 = new Mage2CatalogProductEntity();
-                                    $product2->entity_id = $product->entity_id;
-                                    $product2->attribute_set_id = $product->attribute_set_id;
-                                    $product2->type_id = $type_id;
-                                    $product2->sku = $product->sku;
-                                    $product2->has_options = $product->has_options;
-                                    $product2->required_options = $product->required_options;
-                                    $product2->created_at = $product->created_at;
-                                    $product2->updated_at = $product->updated_at;
+
+                                $product2 = new Mage2CatalogProductEntity();
+                                foreach ($product2->attributes as $key => $value){
+                                    if (isset($product->$key)){
+                                        $product2->$key = $product->$key;
+                                    }
                                 }
+
                                 //save or update
                                 if ($product2->save()){
                                     //update to log
@@ -959,21 +960,17 @@ class MigrateController extends Controller
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){ // if exists
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityInt::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityInt();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
-                                                    if (in_array($model->attribute_id, $keyCheckList)){
-                                                        $model2->value = $checkList[$model->attribute_id];
-                                                    } else {
-                                                        $model2->value = $model->value;
-                                                    }
-                                                    $model2->save();
+                                                $model2 = new Mage2CatalogProductEntityInt();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                //we need check and fixed for some attributes
+                                                if (in_array($model->attribute_id, $keyCheckList)){
+                                                    $model2->value = $checkList[$model->attribute_id];
+                                                } else {
+                                                    $model2->value = $model->value;
                                                 }
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -987,25 +984,21 @@ class MigrateController extends Controller
                                     $models = Mage1CatalogProductEntityText::model()->findAll($condition);
                                     if ($models){
                                         foreach ($models as $model){
-                                            //we have to get correct attribute_id & store_id migrated
+                                            //note: we have to get correct attribute_id & store_id migrated
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityText::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityText();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
-                                                    if (in_array($model->attribute_id, $keyCheckList)){
-                                                        $model2->value = $checkList[$model->attribute_id];
-                                                    } else {
-                                                        $model2->value = $model->value;
-                                                    }
-                                                    $model2->save();
+                                                $model2 = new Mage2CatalogProductEntityText();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                //we need check and fixed for some attributes
+                                                if (in_array($model->attribute_id, $keyCheckList)){
+                                                    $model2->value = $checkList[$model->attribute_id];
+                                                } else {
+                                                    $model2->value = $model->value;
                                                 }
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -1019,25 +1012,21 @@ class MigrateController extends Controller
                                     $models = Mage1CatalogProductEntityVarchar::model()->findAll($condition);
                                     if ($models){
                                         foreach ($models as $model){
-                                            //we have to get correct attribute_id & store_id migrated
+                                            //note: we have to get correct attribute_id & store_id migrated
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityVarchar::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityVarchar();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
-                                                    if (in_array($model->attribute_id, $keyCheckList)){
-                                                        $model2->value = $checkList[$model->attribute_id];
-                                                    } else {
-                                                        $model2->value = $model->value;
-                                                    }
-                                                    $model2->save();
+                                                $model2 = new Mage2CatalogProductEntityVarchar();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                //we need check and fixed for some attributes
+                                                if (in_array($model->attribute_id, $keyCheckList)){
+                                                    $model2->value = $checkList[$model->attribute_id];
+                                                } else {
+                                                    $model2->value = $model->value;
                                                 }
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -1055,21 +1044,17 @@ class MigrateController extends Controller
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityDatetime::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityDatetime();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
-                                                    if (in_array($model->attribute_id, $keyCheckList)){
-                                                        $model2->value = $checkList[$model->attribute_id];
-                                                    } else {
-                                                        $model2->value = $model->value;
-                                                    }
-                                                    $model2->save();
+                                                $model2 = new Mage2CatalogProductEntityDatetime();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                //we need check and fixed for some attributes
+                                                if (in_array($model->attribute_id, $keyCheckList)){
+                                                    $model2->value = $checkList[$model->attribute_id];
+                                                } else {
+                                                    $model2->value = $model->value;
                                                 }
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -1087,21 +1072,17 @@ class MigrateController extends Controller
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityDecimal::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityDecimal();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    //we need check and fixed for some attributes
-                                                    if (in_array($model->attribute_id, $keyCheckList)){
-                                                        $model2->value = $checkList[$model->attribute_id];
-                                                    } else {
-                                                        $model2->value = $model->value;
-                                                    }
-                                                    $model2->save();
+                                                $model2 = new Mage2CatalogProductEntityDecimal();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                //we need check and fixed for some attributes
+                                                if (in_array($model->attribute_id, $keyCheckList)){
+                                                    $model2->value = $checkList[$model->attribute_id];
+                                                } else {
+                                                    $model2->value = $model->value;
                                                 }
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -1119,17 +1100,13 @@ class MigrateController extends Controller
                                             $store_id2 = MigrateSteps::getMage2StoreId($model->store_id);
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $condition = "entity_id= {$model->entity_id} AND attribute_id = {$attribute_id2} AND store_id = {$store_id2}";
-                                                $model2 = Mage2CatalogProductEntityGallery::model()->find($condition);
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityGallery();
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->store_id = $store_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    $model2->position = $model->position;
-                                                    $model2->value = $model->value;
-                                                    $model2->save();
-                                                }
+                                                $model2 = new Mage2CatalogProductEntityGallery();
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->store_id = $store_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                $model2->position = $model->position;
+                                                $model2->value = $model->value;
+                                                $model2->save();
                                             }
                                         }
                                     }
@@ -1142,33 +1119,27 @@ class MigrateController extends Controller
                                             //we have to get correct attribute_id migrated
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
                                             if ($attribute_id2){
-                                                $model2 = Mage2CatalogProductEntityMediaGallery::model()->find("value_id = {$model->value_id}");
-                                                if (!$model2){
-                                                    $model2 = new Mage2CatalogProductEntityMediaGallery();
-                                                    $model2->value_id = $model->value_id;
-                                                    $model2->attribute_id = $attribute_id2;
-                                                    $model2->entity_id = $model->entity_id;
-                                                    $model2->value = $model->value;
-                                                    if ($model2->save()){
-                                                        //catalog_product_entity_media_gallery_value
-                                                        //we have migrate by migrated stores
-                                                        if ($migrated_store_ids){
-                                                            foreach ($migrated_store_ids as $store_id){
-                                                                $store_id2 = MigrateSteps::getMage2StoreId($store_id);
-                                                                $gallery_value = Mage1CatalogProductEntityMediaGalleryValue::model()->find("value_id = {$model->value_id} AND store_id = {$store_id}");
-                                                                if ($gallery_value){
-                                                                    $gallery_value2 = Mage2CatalogProductEntityMediaGalleryValue::model()->find("value_id = {$model->value_id} AND store_id = {$store_id2}");
-                                                                    if (!$gallery_value2){
-                                                                        $gallery_value2 = new Mage2CatalogProductEntityMediaGalleryValue();
-                                                                        $gallery_value2->value_id = $gallery_value->value_id;
-                                                                        $gallery_value2->store_id = $store_id2;
-                                                                        $gallery_value2->entity_id = $model->entity_id;
-                                                                        $gallery_value2->label = $gallery_value->label;
-                                                                        $gallery_value2->position = $gallery_value->position;
-                                                                        $gallery_value2->disabled = $gallery_value->disabled;
-                                                                        $gallery_value2->save();
-                                                                    }
-                                                                }
+                                                $model2 = new Mage2CatalogProductEntityMediaGallery();
+                                                $model2->value_id = $model->value_id;
+                                                $model2->attribute_id = $attribute_id2;
+                                                $model2->entity_id = $model->entity_id;
+                                                $model2->value = $model->value;
+                                                if ($model2->save()){
+                                                    //catalog_product_entity_media_gallery_value
+                                                    //we have migrate by migrated stores
+                                                    if ($migrated_store_ids){
+                                                        foreach ($migrated_store_ids as $store_id){
+                                                            $store_id2 = MigrateSteps::getMage2StoreId($store_id);
+                                                            $gallery_value = Mage1CatalogProductEntityMediaGalleryValue::model()->find("value_id = {$model->value_id} AND store_id = {$store_id}");
+                                                            if ($gallery_value){
+                                                                $gallery_value2 = new Mage2CatalogProductEntityMediaGalleryValue();
+                                                                $gallery_value2->value_id = $gallery_value->value_id;
+                                                                $gallery_value2->store_id = $store_id2;
+                                                                $gallery_value2->entity_id = $model->entity_id;
+                                                                $gallery_value2->label = $gallery_value->label;
+                                                                $gallery_value2->position = $gallery_value->position;
+                                                                $gallery_value2->disabled = $gallery_value->disabled;
+                                                                $gallery_value2->save();
                                                             }
                                                         }
                                                     }
@@ -1182,112 +1153,94 @@ class MigrateController extends Controller
                                     $product_options = Mage1CatalogProductOption::model()->findAll($condition);
                                     if ($product_options){
                                         foreach ($product_options as $product_option){
-                                            $condition = "option_id = {$product_option->option_id}";
-                                            $product_option2 = Mage2CatalogProductOption::model()->find($condition);
-                                            if (!$product_option2){
-                                                $product_option2 = new Mage2CatalogProductOption();
-                                                $product_option2->option_id = $product_option->option_id;
-                                                $product_option2->product_id = $product_option->product_id;
-                                                $product_option2->type = $product_option->type;
-                                                $product_option2->is_require = $product_option->is_require;
-                                                $product_option2->sku = $product_option->sku;
-                                                $product_option2->max_characters = $product_option->max_characters;
-                                                $product_option2->file_extension = $product_option->file_extension;
-                                                $product_option2->image_size_x = $product_option->image_size_x;
-                                                $product_option2->image_size_y = $product_option->image_size_y;
-                                                $product_option2->sort_order = $product_option->sort_order;
-                                                if ($product_option2->save()){
+                                            $product_option2 = new Mage2CatalogProductOption();
+                                            foreach ($product_option2->attributes as $key => $value){
+                                                if (isset($product_option->$key)){
+                                                    $product_option2->$key = $product_option->$key;
+                                                }
+                                            }
+                                            if ($product_option2->save()){
 
-                                                    //catalog_product_option_type_value
-                                                    $condition = "option_id = {$product_option->option_id}";
-                                                    $option_type_values = Mage1CatalogProductOptionTypeValue::model()->findAll($condition);
-                                                    if ($option_type_values){
-                                                        foreach ($option_type_values as $option_type_value){
-                                                            $option_type_value2 = Mage2CatalogProductOptionTypeValue::model()->find("option_type_id = {$option_type_value->option_type_id}");
-                                                            if (!$option_type_value2){
-                                                                $option_type_value2 = new Mage2CatalogProductOptionTypeValue();
-                                                                $option_type_value2->option_type_id = $option_type_value->option_type_id;
-                                                                $option_type_value2->option_id = $option_type_value->option_id;
-                                                                $option_type_value2->sku = $option_type_value->sku;
-                                                                $option_type_value2->sort_order = $option_type_value->sort_order;
-                                                                if ($option_type_value2->save()){
-                                                                    //catalog_product_option_type_price & catalog_product_option_type_title
-                                                                    if ($migrated_store_ids){
-                                                                        foreach ($migrated_store_ids as $store_id){
-                                                                            $store_id2 = MigrateSteps::getMage2StoreId($store_id);
+                                                //catalog_product_option_type_value
+                                                $condition = "option_id = {$product_option->option_id}";
+                                                $option_type_values = Mage1CatalogProductOptionTypeValue::model()->findAll($condition);
+                                                if ($option_type_values){
+                                                    foreach ($option_type_values as $option_type_value){
+                                                        $option_type_value2 = new Mage2CatalogProductOptionTypeValue();
+                                                        foreach ($option_type_value2->attributes as $key => $value){
+                                                            if (isset($option_type_value->$key)){
+                                                                $option_type_value2->$key = $option_type_value->$key;
+                                                            }
+                                                        }
 
-                                                                            //catalog_product_option_type_price
-                                                                            $condition = "option_type_id = {$option_type_value->option_type_id} AND store_id = {$store_id}";
-                                                                            $option_type_price = Mage1CatalogProductOptionTypePrice::model()->find($condition);
-                                                                            if ($option_type_price){
-                                                                                $condition = "option_type_id = {$option_type_value->option_type_id} AND store_id = {$store_id2}";
-                                                                                $option_type_price2 = Mage2CatalogProductOptionTypePrice::model()->find($condition);
-                                                                                if (!$option_type_price2){
-                                                                                    $option_type_price2 = new Mage2CatalogProductOptionTypePrice();
-                                                                                    $option_type_price2->option_type_price_id = $option_type_price->option_type_price_id;
-                                                                                    $option_type_price2->option_type_id = $option_type_price->option_type_id;
-                                                                                    $option_type_price2->store_id = $store_id2;
-                                                                                    $option_type_price2->price = $option_type_price->price;
-                                                                                    $option_type_price2->price_type = $option_type_price->price_type;
-                                                                                    $option_type_price2->save();
-                                                                                }
-                                                                            }
+                                                        if ($option_type_value2->save()){
+                                                            //catalog_product_option_type_price & catalog_product_option_type_title
+                                                            if ($migrated_store_ids){
+                                                                foreach ($migrated_store_ids as $store_id){
+                                                                    $store_id2 = MigrateSteps::getMage2StoreId($store_id);
 
-                                                                            //catalog_product_option_type_title
-                                                                            $condition = "option_type_id = {$option_type_value->option_type_id} AND store_id = {$store_id}";
-                                                                            $option_type_title = Mage1CatalogProductOptionTypeTitle::model()->find($condition);
-                                                                            if ($option_type_title){
-                                                                                $condition = "option_type_id = {$option_type_title->option_type_id} AND store_id = {$store_id2}";
-                                                                                $option_type_title2 = Mage2CatalogProductOptionTypeTitle::model()->find($condition);
-                                                                                if (!$option_type_title2){
-                                                                                    $option_type_title2 = new Mage2CatalogProductOptionTypeTitle();
-                                                                                    $option_type_title2->option_type_title_id = $option_type_title->option_type_title_id;
-                                                                                    $option_type_title2->option_type_id = $option_type_title->option_type_id;
-                                                                                    $option_type_title2->store_id = $store_id2;
-                                                                                    $option_type_title2->title = $option_type_title->title;
-                                                                                    $option_type_title2->save();
-                                                                                }
+                                                                    //catalog_product_option_type_price
+                                                                    $condition = "option_type_id = {$option_type_value->option_type_id} AND store_id = {$store_id}";
+                                                                    $option_type_price = Mage1CatalogProductOptionTypePrice::model()->find($condition);
+                                                                    if ($option_type_price){
+                                                                        $option_type_price2 = new Mage2CatalogProductOptionTypePrice();
+                                                                        foreach ($option_type_price2->attributes as $key => $value){
+                                                                            if (isset($option_type_price->$key)){
+                                                                                $option_type_price2->$key = $option_type_price->$key;
                                                                             }
                                                                         }
+                                                                        $option_type_price2->store_id = $store_id2;
+                                                                        $option_type_price2->save();
+                                                                    }
+
+                                                                    //catalog_product_option_type_title
+                                                                    $condition = "option_type_id = {$option_type_value->option_type_id} AND store_id = {$store_id}";
+                                                                    $option_type_title = Mage1CatalogProductOptionTypeTitle::model()->find($condition);
+                                                                    if ($option_type_title){
+                                                                        $option_type_title2 = new Mage2CatalogProductOptionTypeTitle();
+                                                                        foreach ($option_type_title2->attributes as $key => $value){
+                                                                            if (isset($option_type_title->$key)){
+                                                                                $option_type_title2->$key = $option_type_title->$key;
+                                                                            }
+                                                                        }
+                                                                        $option_type_title2->store_id = $store_id2;
+                                                                        $option_type_title2->save();
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     }
+                                                }
 
-                                                    //we have to migrate by migrated stores
-                                                    if ($migrated_store_ids){
-                                                        foreach ($migrated_store_ids as $store_id){
-                                                            $store_id2 = MigrateSteps::getMage2StoreId($store_id);
+                                                //we have to migrate by migrated stores
+                                                if ($migrated_store_ids){
+                                                    foreach ($migrated_store_ids as $store_id){
+                                                        $store_id2 = MigrateSteps::getMage2StoreId($store_id);
 
-                                                            //catalog_product_option_price
-                                                            $option_price = Mage1CatalogProductOptionPrice::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id}");
-                                                            if ($option_price){
-                                                                $option_price2 = Mage2CatalogProductOptionPrice::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id2}");
-                                                                if (!$option_price2){
-                                                                    $option_price2 = new Mage2CatalogProductOptionPrice();
-                                                                    $option_price2->option_price_id = $option_price->option_price_id;
-                                                                    $option_price2->option_id = $option_price->option_id;
-                                                                    $option_price2->store_id = $store_id2;
-                                                                    $option_price2->price = $option_price->price;
-                                                                    $option_price2->price_type = $option_price->price_type;
-                                                                    $option_price2->save();
+                                                        //catalog_product_option_price
+                                                        $option_price = Mage1CatalogProductOptionPrice::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id}");
+                                                        if ($option_price){
+                                                            $option_price2 = new Mage2CatalogProductOptionPrice();
+                                                            foreach ($option_price2->attributes as $key => $value){
+                                                                if (isset($option_price->$key)){
+                                                                    $option_price2->$key = $option_price->$key;
                                                                 }
                                                             }
+                                                            $option_price2->store_id = $store_id2;
+                                                            $option_price2->save();
+                                                        }
 
-                                                            //catalog_product_option_title
-                                                            $option_title = Mage1CatalogProductOptionTitle::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id}");
-                                                            if ($option_title){
-                                                                $option_title2 = Mage2CatalogProductOptionTitle::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id2}");
-                                                                if (!$option_title2){
-                                                                    $option_title2 = new Mage2CatalogProductOptionTitle();
-                                                                    $option_title2->option_title_id = $option_title->option_title_id;
-                                                                    $option_title2->option_id = $option_title->option_id;
-                                                                    $option_title2->store_id = $store_id2;
-                                                                    $option_title2->title = $option_title->title;
-                                                                    $option_title2->save();
+                                                        //catalog_product_option_title
+                                                        $option_title = Mage1CatalogProductOptionTitle::model()->find("option_id = {$product_option->option_id} AND store_id = {$store_id}");
+                                                        if ($option_title){
+                                                            $option_title2 = new Mage2CatalogProductOptionTitle();
+                                                            foreach ($option_title2->attributes as $key => $value){
+                                                                if (isset($option_title->$key)){
+                                                                    $option_title2->$key = $option_title->$key;
                                                                 }
                                                             }
+                                                            $option_title2->store_id = $store_id2;
+                                                            $option_title2->save();
                                                         }
                                                     }
                                                 }
@@ -1301,26 +1254,24 @@ class MigrateController extends Controller
                                             $models = Mage1StockStatus::model()->findAll("website_id = {$website_id} AND product_id = {$product->entity_id}");
                                             if ($models){
                                                 foreach ($models as $model){
-                                                    $model2 = Mage2StockStatus::model()->find("website_id = {$model->website_id} AND product_id = {$model->product_id}");
-                                                    if (!$model2){
-                                                        $model2 = new Mage2StockStatus();
-                                                        $model2->product_id = $model->product_id;
-                                                        $model2->website_id = $model->website_id;
-                                                        $model2->stock_id = $model->stock_id;
-                                                        $model2->qty = $model->qty;
-                                                        $model2->stock_status = $model->stock_status;
-                                                        if ($model2->save()){
-                                                            //cataloginventory_stock_item
-                                                            $stock_item = Mage1StockItem::model()->find("product_id = {$model->product_id} AND stock_id = {$model->stock_id}");
-                                                            if ($stock_item){
-                                                                $stock_item2 = Mage2StockItem::model()->find("product_id = {$model->product_id} AND website_id = {$website_id}");
-                                                                if (!$stock_item2){
-                                                                    $stock_item2 = new Mage2StockItem();
-                                                                    $stock_item2->attributes = $stock_item->attributes;
-                                                                    $stock_item2->website_id = $website_id;
-                                                                    $stock_item2->save();
+                                                    $model2 = new Mage2StockStatus();
+                                                    foreach ($model2->attributes as $key => $value){
+                                                        if (isset($model->$key)){
+                                                            $model2->$key = $model->$key;
+                                                        }
+                                                    }
+                                                    if ($model2->save()){
+                                                        //cataloginventory_stock_item
+                                                        $stock_item = Mage1StockItem::model()->find("product_id = {$model->product_id} AND stock_id = {$model->stock_id}");
+                                                        if ($stock_item){
+                                                            $stock_item2 = new Mage2StockItem();
+                                                            foreach ($stock_item2->attributes as $key => $value){
+                                                                if (isset($stock_item->$key)){
+                                                                    $stock_item2->$key = $stock_item->$key;
                                                                 }
                                                             }
+                                                            $stock_item2->website_id = $website_id;
+                                                            $stock_item2->save();
                                                         }
                                                     }
                                                 }
@@ -1338,35 +1289,27 @@ class MigrateController extends Controller
                                     if ($urls){
                                         foreach ($urls as $url){
                                             $store_id2 = MigrateSteps::getMage2StoreId($url->store_id);
-                                            $condition = "store_id = {$store_id2} AND entity_id = {$url->product_id} AND entity_type = 'product'";
-                                            $url2 = Mage2UrlRewrite::model()->find($condition);
-                                            if (!$url2) {
-                                                $url2 = new Mage2UrlRewrite();
-                                                $url2->url_rewrite_id = $url->url_rewrite_id;
-                                                $url2->entity_type = 'product';
-                                                $url2->entity_id = $url->product_id;
-                                                $url2->request_path = $url->request_path;
-                                                $url2->target_path = $url->target_path;
-                                                $url2->redirect_type = 0;
-                                                $url2->store_id = $store_id2;
-                                                $url2->description = $url->description;
-                                                $url2->is_autogenerated = $url->is_system;
-                                                if ($url->category_id)
-                                                    $url2->metadata = serialize(array('category_id'=>$url->category_id));
-                                                else
-                                                    $url2->metadata = null;
-                                                if ($url2->save()) {
-                                                    //catalog_url_rewrite_product_category
-                                                    $condition = "url_rewrite_id = {$url->url_rewrite_id}";
-                                                    $catalog_url2 = Mage2CatalogUrlRewriteProductCategory::model()->find($condition);
-                                                    if (!$catalog_url2) {
-                                                        $catalog_url2 = new Mage2CatalogUrlRewriteProductCategory();
-                                                        $catalog_url2->url_rewrite_id = $url->url_rewrite_id;
-                                                        $catalog_url2->category_id = $url->category_id;
-                                                        $catalog_url2->product_id = $url->product_id;
-                                                        $catalog_url2->save();
-                                                    }
-                                                }
+                                            $url2 = new Mage2UrlRewrite();
+                                            $url2->url_rewrite_id = $url->url_rewrite_id;
+                                            $url2->entity_type = 'product';
+                                            $url2->entity_id = $url->product_id;
+                                            $url2->request_path = $url->request_path;
+                                            $url2->target_path = $url->target_path;
+                                            $url2->redirect_type = 0;
+                                            $url2->store_id = $store_id2;
+                                            $url2->description = $url->description;
+                                            $url2->is_autogenerated = $url->is_system;
+                                            if ($url->category_id)
+                                                $url2->metadata = serialize(array('category_id'=>$url->category_id));
+                                            else
+                                                $url2->metadata = null;
+                                            if ($url2->save()) {
+                                                //catalog_url_rewrite_product_category
+                                                $catalog_url2 = new Mage2CatalogUrlRewriteProductCategory();
+                                                $catalog_url2->url_rewrite_id = $url->url_rewrite_id;
+                                                $catalog_url2->category_id = $url->category_id;
+                                                $catalog_url2->product_id = $url->product_id;
+                                                $catalog_url2->save();
                                             }
                                         }
                                     }
@@ -1392,14 +1335,10 @@ class MigrateController extends Controller
                             $models = Mage1CatalogProductWebsite::model()->findAll($condition);
                             if ($models){
                                 foreach ($models as $model){
-                                    $condition = "product_id = {$model->product_id} AND website_id = {$model->website_id}";
-                                    $model2 = Mage2CatalogProductWebsite::model()->find($condition);
-                                    if (!$model2){
-                                        $model2 = new Mage2CatalogProductWebsite();
-                                        $model2->product_id = $model->product_id;
-                                        $model2->website_id = $model->website_id;
-                                        $model2->save();
-                                    }
+                                    $model2 = new Mage2CatalogProductWebsite();
+                                    $model2->product_id = $model->product_id;
+                                    $model2->website_id = $model->website_id;
+                                    $model2->save();
                                 }
                             }
                         }
@@ -1411,14 +1350,11 @@ class MigrateController extends Controller
                                 $models = Mage1CatalogCategoryProduct::model()->findAll($condition);
                                 if ($models){
                                     foreach ($models as $model){
-                                        $model2 = Mage2CatalogCategoryProduct::model()->find("category_id = {$model->category_id} AND product_id = {$model->product_id}");
-                                        if (!$model2){
-                                            $model2 = new Mage2CatalogCategoryProduct();
-                                            $model2->category_id = $model->category_id;
-                                            $model2->product_id = $model->product_id;
-                                            $model2->position = $model->position;
-                                            $model2->save();
-                                        }
+                                        $model2 = new Mage2CatalogCategoryProduct();
+                                        $model2->category_id = $model->category_id;
+                                        $model2->product_id = $model->product_id;
+                                        $model2->position = $model->position;
+                                        $model2->save();
                                     }
                                 }
                             }
@@ -1446,65 +1382,49 @@ class MigrateController extends Controller
                         $models = Mage1CatalogProductLink::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
-                                $condition = "link_id = {$model->link_id}";
-                                $model2 = Mage2CatalogProductLink::model()->find($condition);
-                                if (!$model2) {
-                                    $model2 = new Mage2CatalogProductLink();
-                                    $model2->link_id = $model->link_id;
-                                    $model2->product_id = $model->product_id;
-                                    $model2->linked_product_id = $model->linked_product_id;
-                                    $model2->link_type_id = $model->link_type_id;
-                                    if ($model2->save()){
-                                        //catalog_product_link_attribute_decimal
-                                        $condition = "link_id = {$model2->link_id}";
-                                        $items = Mage1CatalogProductLinkAttributeDecimal::model()->findAll($condition);
-                                        if ($items){
-                                            foreach ($items as $item){
-                                                $condition = "value_id = {$item->value_id}";
-                                                $item2 = Mage2CatalogProductLinkAttributeDecimal::model()->find($condition);
-                                                if (!$item2){
-                                                    $item2 = new Mage2CatalogProductLinkAttributeDecimal();
-                                                    $item2->value_id = $item->value_id;
-                                                    $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
-                                                    $item2->link_id = $item->link_id;
-                                                    $item2->value = $item->value;
-                                                    $item2->save();
-                                                }
-                                            }
+                                $model2 = new Mage2CatalogProductLink();
+                                $model2->link_id = $model->link_id;
+                                $model2->product_id = $model->product_id;
+                                $model2->linked_product_id = $model->linked_product_id;
+                                $model2->link_type_id = $model->link_type_id;
+                                if ($model2->save()){
+                                    //catalog_product_link_attribute_decimal
+                                    $condition = "link_id = {$model2->link_id}";
+                                    $items = Mage1CatalogProductLinkAttributeDecimal::model()->findAll($condition);
+                                    if ($items){
+                                        foreach ($items as $item){
+                                            $item2 = new Mage2CatalogProductLinkAttributeDecimal();
+                                            $item2->value_id = $item->value_id;
+                                            $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
+                                            $item2->link_id = $item->link_id;
+                                            $item2->value = $item->value;
+                                            $item2->save();
                                         }
-                                        //catalog_product_link_attribute_int
-                                        $condition = "link_id = {$model2->link_id}";
-                                        $items = Mage1CatalogProductLinkAttributeInt::model()->findAll($condition);
-                                        if ($items){
-                                            foreach ($items as $item){
-                                                $condition = "value_id = {$item->value_id}";
-                                                $item2 = Mage2CatalogProductLinkAttributeInt::model()->find($condition);
-                                                if (!$item2){
-                                                    $item2 = new Mage2CatalogProductLinkAttributeInt();
-                                                    $item2->value_id = $item->value_id;
-                                                    $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
-                                                    $item2->link_id = $item->link_id;
-                                                    $item2->value = $item->value;
-                                                    $item2->save();
-                                                }
-                                            }
+                                    }
+                                    //catalog_product_link_attribute_int
+                                    $condition = "link_id = {$model2->link_id}";
+                                    $items = Mage1CatalogProductLinkAttributeInt::model()->findAll($condition);
+                                    if ($items){
+                                        foreach ($items as $item){
+                                            $item2 = new Mage2CatalogProductLinkAttributeInt();
+                                            $item2->value_id = $item->value_id;
+                                            $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
+                                            $item2->link_id = $item->link_id;
+                                            $item2->value = $item->value;
+                                            $item2->save();
                                         }
-                                        //catalog_product_link_attribute_varchar
-                                        $condition = "link_id = {$model2->link_id}";
-                                        $items = Mage1CatalogProductLinkAttributeVarchar::model()->findAll($condition);
-                                        if ($items){
-                                            foreach ($items as $item){
-                                                $condition = "value_id = {$item->value_id}";
-                                                $item2 = Mage2CatalogProductLinkAttributeVarchar::model()->find($condition);
-                                                if (!$item2){
-                                                    $item2 = new Mage2CatalogProductLinkAttributeVarchar();
-                                                    $item2->value_id = $item->value_id;
-                                                    $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
-                                                    $item2->link_id = $item->link_id;
-                                                    $item2->value = $item->value;
-                                                    $item2->save();
-                                                }
-                                            }
+                                    }
+                                    //catalog_product_link_attribute_varchar
+                                    $condition = "link_id = {$model2->link_id}";
+                                    $items = Mage1CatalogProductLinkAttributeVarchar::model()->findAll($condition);
+                                    if ($items){
+                                        foreach ($items as $item){
+                                            $item2 = new Mage2CatalogProductLinkAttributeVarchar();
+                                            $item2->value_id = $item->value_id;
+                                            $item2->product_link_attribute_id = MigrateSteps::getMage2ProductLinkAttrId($item->product_link_attribute_id);
+                                            $item2->link_id = $item->link_id;
+                                            $item2->value = $item->value;
+                                            $item2->save();
                                         }
                                     }
                                 }
@@ -1518,16 +1438,11 @@ class MigrateController extends Controller
                             $models = Mage1CatalogProductSuperLink::model()->findAll($condition);
                             if ($models) {
                                 foreach ($models as $model) {
-                                    //$condition = "product_id = {$model->product_id} AND parent_id = {$model->parent_id}";
-                                    $condition = "link_id = {$model->link_id}";
-                                    $model2 = Mage2CatalogProductSuperLink::model()->find($condition);
-                                    if (!$model2) {
-                                        $model2 = new Mage2CatalogProductSuperLink();
-                                        $model2->link_id = $model->link_id;
-                                        $model2->product_id = $model->product_id;
-                                        $model2->parent_id = $model->parent_id;
-                                        $model2->save();
-                                    }
+                                    $model2 = new Mage2CatalogProductSuperLink();
+                                    $model2->link_id = $model->link_id;
+                                    $model2->product_id = $model->product_id;
+                                    $model2->parent_id = $model->parent_id;
+                                    $model2->save();
                                 }
                             }
 
@@ -1536,14 +1451,10 @@ class MigrateController extends Controller
                             $models = Mage1CatalogProductRelation::model()->findAll($condition);
                             if ($models){
                                 foreach ($models as $model){
-                                    $condition = "parent_id = {$model->parent_id} AND child_id = {$model->child_id}";
-                                    $model2 = Mage2CatalogProductRelation::model()->find($condition);
-                                    if (!$model2){
-                                        $model2 = new Mage2CatalogProductRelation();
-                                        $model2->parent_id = $model->parent_id;
-                                        $model2->child_id = $model->child_id;
-                                        $model2->save();
-                                    }
+                                    $model2 = new Mage2CatalogProductRelation();
+                                    $model2->parent_id = $model->parent_id;
+                                    $model2->child_id = $model->child_id;
+                                    $model2->save();
                                 }
                             }
 
@@ -1552,61 +1463,49 @@ class MigrateController extends Controller
                             $models = Mage1CatalogProductSuperAttribute::model()->findAll($condition);
                             if ($models) {
                                 foreach ($models as $model){
-                                    $condition = "product_super_attribute_id = {$model->product_super_attribute_id}";
-                                    $model2 = Mage2CatalogProductSuperAttribute::model()->find($condition);
-                                    if (!$model2) {
-                                        $model2 = new Mage2CatalogProductSuperAttribute();
-                                        $model2->product_super_attribute_id = $model->product_super_attribute_id;
-                                        $model2->product_id = $model->product_id;
-                                        $model2->attribute_id = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
-                                        $model2->position = $model->position;
-                                        if ($model2->save()) {
-                                            //catalog_product_super_attribute_label
-                                            $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
-                                            if ($migrated_store_ids) {
-                                                $str_store_ids = implode(',', $migrated_store_ids);
-                                                $condition .= " AND store_id IN ({$str_store_ids})";
+                                    $model2 = new Mage2CatalogProductSuperAttribute();
+                                    $model2->product_super_attribute_id = $model->product_super_attribute_id;
+                                    $model2->product_id = $model->product_id;
+                                    $model2->attribute_id = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
+                                    $model2->position = $model->position;
+                                    if ($model2->save()) {
+                                        //catalog_product_super_attribute_label
+                                        $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
+                                        if ($migrated_store_ids) {
+                                            $str_store_ids = implode(',', $migrated_store_ids);
+                                            $condition .= " AND store_id IN ({$str_store_ids})";
+                                        }
+                                        $super_attribute_labels = Mage1CatalogProductSuperAttributeLabel::model()->findAll($condition);
+                                        if ($super_attribute_labels) {
+                                            foreach ($super_attribute_labels as $super_attribute_label) {
+                                                $store_id2 = MigrateSteps::getMage2StoreId($super_attribute_label->store_id);
+                                                $super_attribute_label2 = new Mage2CatalogProductSuperAttributeLabel();
+                                                $super_attribute_label2->value_id = $super_attribute_label->value_id;
+                                                $super_attribute_label2->product_super_attribute_id = $super_attribute_label->product_super_attribute_id;
+                                                $super_attribute_label2->store_id = $store_id2;
+                                                $super_attribute_label2->use_default = $super_attribute_label->use_default;
+                                                $super_attribute_label2->value = $super_attribute_label->value;
+                                                $super_attribute_label2->save();
                                             }
-                                            $super_attribute_labels = Mage1CatalogProductSuperAttributeLabel::model()->findAll($condition);
-                                            if ($super_attribute_labels) {
-                                                foreach ($super_attribute_labels as $super_attribute_label) {
-                                                    $store_id2 = MigrateSteps::getMage2StoreId($super_attribute_label->store_id);
-                                                    $condition = "value_id = {$super_attribute_label->value_id}";
-                                                    $super_attribute_label2 = Mage2CatalogProductSuperAttributeLabel::model()->find($condition);
-                                                    if (!$super_attribute_label2) {
-                                                        $super_attribute_label2 = new Mage2CatalogProductSuperAttributeLabel();
-                                                        $super_attribute_label2->value_id = $super_attribute_label->value_id;
-                                                        $super_attribute_label2->product_super_attribute_id = $super_attribute_label->product_super_attribute_id;
-                                                        $super_attribute_label2->store_id = $store_id2;
-                                                        $super_attribute_label2->use_default = $super_attribute_label->use_default;
-                                                        $super_attribute_label2->value = $super_attribute_label->value;
-                                                        $super_attribute_label2->save();
-                                                    }
-                                                }
-                                            }
+                                        }
 
-                                            //catalog_product_super_attribute_pricing
-                                            $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
-                                            if ($migrated_website_ids) {
-                                                $str_website_ids = implode(',', $migrated_website_ids);
-                                                $condition .= " AND website_id IN ({$str_website_ids})";
-                                            }
-                                            $super_attribute_pricing_models = Mage1CatalogProductSuperAttributePricing::model()->findAll($condition);
-                                            if ($super_attribute_pricing_models) {
-                                                foreach ($super_attribute_pricing_models as $super_attribute_pricing) {
-                                                    $condition = "value_id = {$super_attribute_pricing->value_id}";
-                                                    $super_attribute_pricing2 = Mage2CatalogProductSuperAttributePricing::model()->find($condition);
-                                                    if (!$super_attribute_pricing2) {
-                                                        $super_attribute_pricing2 = new Mage2CatalogProductSuperAttributePricing();
-                                                        $super_attribute_pricing2->value_id = $super_attribute_pricing->value_id;
-                                                        $super_attribute_pricing2->product_super_attribute_id = $super_attribute_pricing->product_super_attribute_id;
-                                                        $super_attribute_pricing2->value_index = $super_attribute_pricing->value_index;
-                                                        $super_attribute_pricing2->is_percent = $super_attribute_pricing->is_percent;
-                                                        $super_attribute_pricing2->pricing_value = $super_attribute_pricing->pricing_value;
-                                                        $super_attribute_pricing2->website_id = $super_attribute_pricing->website_id;
-                                                        $super_attribute_pricing2->save();
-                                                    }
-                                                }
+                                        //catalog_product_super_attribute_pricing
+                                        $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
+                                        if ($migrated_website_ids) {
+                                            $str_website_ids = implode(',', $migrated_website_ids);
+                                            $condition .= " AND website_id IN ({$str_website_ids})";
+                                        }
+                                        $super_attribute_pricing_models = Mage1CatalogProductSuperAttributePricing::model()->findAll($condition);
+                                        if ($super_attribute_pricing_models) {
+                                            foreach ($super_attribute_pricing_models as $super_attribute_pricing) {
+                                                $super_attribute_pricing2 = new Mage2CatalogProductSuperAttributePricing();
+                                                $super_attribute_pricing2->value_id = $super_attribute_pricing->value_id;
+                                                $super_attribute_pricing2->product_super_attribute_id = $super_attribute_pricing->product_super_attribute_id;
+                                                $super_attribute_pricing2->value_index = $super_attribute_pricing->value_index;
+                                                $super_attribute_pricing2->is_percent = $super_attribute_pricing->is_percent;
+                                                $super_attribute_pricing2->pricing_value = $super_attribute_pricing->pricing_value;
+                                                $super_attribute_pricing2->website_id = $super_attribute_pricing->website_id;
+                                                $super_attribute_pricing2->save();
                                             }
                                         }
                                     }
@@ -1621,76 +1520,60 @@ class MigrateController extends Controller
                             $models = Mage1CatalogProductBundleOption::model()->findAll($condition);
                             if ($models){
                                 foreach ($models as $model){
-                                    $condition = "option_id = {$model->option_id}";
-                                    $model2 = Mage2CatalogProductBundleOption::model()->find($condition);
-                                    if (!$model2) {
-                                        $model2 = new Mage2CatalogProductBundleOption();
-                                        $model2->option_id = $model->option_id;
-                                        $model2->parent_id = $model->parent_id;
-                                        $model2->required = $model->required;
-                                        $model2->position = $model->position;
-                                        $model2->type = $model->type;
-                                        if ($model2->save()) {
-                                            //catalog_product_bundle_option_value
-                                            $condition = "option_id = {$model2->option_id}";
-                                            if ($migrated_store_ids) {
-                                                $str_store_ids = implode(',', $migrated_store_ids);
-                                                $condition .= " AND store_id IN ({$str_store_ids})";
+                                    $model2 = new Mage2CatalogProductBundleOption();
+                                    $model2->option_id = $model->option_id;
+                                    $model2->parent_id = $model->parent_id;
+                                    $model2->required = $model->required;
+                                    $model2->position = $model->position;
+                                    $model2->type = $model->type;
+                                    if ($model2->save()) {
+                                        //catalog_product_bundle_option_value
+                                        $condition = "option_id = {$model2->option_id}";
+                                        if ($migrated_store_ids) {
+                                            $str_store_ids = implode(',', $migrated_store_ids);
+                                            $condition .= " AND store_id IN ({$str_store_ids})";
+                                        }
+                                        $bundle_option_values = Mage1CatalogProductBundleOptionValue::model()->findAll($condition);
+                                        if ($bundle_option_values){
+                                            foreach ($bundle_option_values as $bundle_option_value) {
+                                                $bundle_option_value2 = new Mage2CatalogProductBundleOptionValue();
+                                                $bundle_option_value2->value_id = $bundle_option_value->value_id;
+                                                $bundle_option_value2->option_id = $bundle_option_value->option_id;
+                                                $bundle_option_value2->store_id = MigrateSteps::getMage2StoreId($bundle_option_value->store_id);
+                                                $bundle_option_value2->title = $bundle_option_value->title;
+                                                $bundle_option_value2->save();
                                             }
-                                            $bundle_option_values = Mage1CatalogProductBundleOptionValue::model()->findAll($condition);
-                                            if ($bundle_option_values){
-                                                foreach ($bundle_option_values as $bundle_option_value) {
-                                                    $condition = "value_id = {$bundle_option_value->value_id}";
-                                                    $bundle_option_value2 = Mage2CatalogProductBundleOptionValue::model()->find($condition);
-                                                    if (!$bundle_option_value2){
-                                                        $bundle_option_value2 = new Mage2CatalogProductBundleOptionValue();
-                                                        $bundle_option_value2->value_id = $bundle_option_value->value_id;
-                                                        $bundle_option_value2->option_id = $bundle_option_value->option_id;
-                                                        $bundle_option_value2->store_id = MigrateSteps::getMage2StoreId($bundle_option_value->store_id);
-                                                        $bundle_option_value2->title = $bundle_option_value->title;
-                                                        $bundle_option_value2->save();
-                                                    }
-                                                }
-                                            }
-                                            //catalog_product_bundle_selection
-                                            $condition = "option_id = {$model2->option_id} AND product_id IN ({$str_product_ids})";
-                                            $bundle_selections = Mage1CatalogProductBundleSelection::model()->findAll($condition);
-                                            if ($bundle_selections){
-                                                foreach ($bundle_selections as $bundle_selection){
-                                                    $condition = "selection_id = {$bundle_selection->selection_id}";
-                                                    $bundle_selection2 = Mage2CatalogProductBundleSelection::model()->find($condition);
-                                                    if (!$bundle_selection2){
-                                                        $bundle_selection2 = new Mage2CatalogProductBundleSelection();
-                                                        $bundle_selection2->selection_id = $bundle_selection->selection_id;
-                                                        $bundle_selection2->option_id = $bundle_selection->option_id;
-                                                        $bundle_selection2->parent_product_id = $bundle_selection->parent_product_id;
-                                                        $bundle_selection2->product_id = $bundle_selection->product_id;
-                                                        $bundle_selection2->position = $bundle_selection->position;
-                                                        $bundle_selection2->is_default = $bundle_selection->is_default;
-                                                        $bundle_selection2->selection_price_type = $bundle_selection->selection_price_type;
-                                                        $bundle_selection2->selection_price_value = $bundle_selection->selection_price_value;
-                                                        $bundle_selection2->selection_qty = $bundle_selection->selection_qty;
-                                                        $bundle_selection2->selection_can_change_qty = $bundle_selection->selection_can_change_qty;
-                                                        if ($bundle_selection2->save()) {
-                                                            if ($migrated_website_ids){
-                                                                $str_website_ids = implode(',', $migrated_website_ids);
-                                                                //catalog_product_bundle_selection_price
-                                                                $condition = "selection_id = {$bundle_selection2->selection_id} AND website_id IN ({$str_website_ids})";
-                                                                $selection_prices = Mage1CatalogProductBundleSelectionPrice::model()->findAll($condition);
-                                                                if ($selection_prices) {
-                                                                    foreach ($selection_prices as $selection_price){
-                                                                        $condition = "selection_id = {$selection_price->selection_id} AND website_id = {$selection_price->website_id}";
-                                                                        $selection_price2 = Mage2CatalogProductBundleSelectionPrice::model()->find($condition);
-                                                                        if (!$selection_price2) {
-                                                                            $selection_price2 = new Mage2CatalogProductBundleSelectionPrice();
-                                                                            $selection_price2->selection_id = $selection_price->selection_id;
-                                                                            $selection_price2->website_id = $selection_price->website_id;
-                                                                            $selection_price2->selection_price_type = $selection_price->selection_price_type;
-                                                                            $selection_price2->selection_price_value = $selection_price->selection_price_value;
-                                                                            $selection_price2->save();
-                                                                        }
-                                                                    }
-                                                                }
+                                        }
+                                        //catalog_product_bundle_selection
+                                        $condition = "option_id = {$model2->option_id} AND product_id IN ({$str_product_ids})";
+                                        $bundle_selections = Mage1CatalogProductBundleSelection::model()->findAll($condition);
+                                        if ($bundle_selections){
+                                            foreach ($bundle_selections as $bundle_selection){
+                                                $bundle_selection2 = new Mage2CatalogProductBundleSelection();
+                                                $bundle_selection2->selection_id = $bundle_selection->selection_id;
+                                                $bundle_selection2->option_id = $bundle_selection->option_id;
+                                                $bundle_selection2->parent_product_id = $bundle_selection->parent_product_id;
+                                                $bundle_selection2->product_id = $bundle_selection->product_id;
+                                                $bundle_selection2->position = $bundle_selection->position;
+                                                $bundle_selection2->is_default = $bundle_selection->is_default;
+                                                $bundle_selection2->selection_price_type = $bundle_selection->selection_price_type;
+                                                $bundle_selection2->selection_price_value = $bundle_selection->selection_price_value;
+                                                $bundle_selection2->selection_qty = $bundle_selection->selection_qty;
+                                                $bundle_selection2->selection_can_change_qty = $bundle_selection->selection_can_change_qty;
+                                                if ($bundle_selection2->save()) {
+                                                    if ($migrated_website_ids){
+                                                        $str_website_ids = implode(',', $migrated_website_ids);
+                                                        //catalog_product_bundle_selection_price
+                                                        $condition = "selection_id = {$bundle_selection2->selection_id} AND website_id IN ({$str_website_ids})";
+                                                        $selection_prices = Mage1CatalogProductBundleSelectionPrice::model()->findAll($condition);
+                                                        if ($selection_prices) {
+                                                            foreach ($selection_prices as $selection_price){
+                                                                $selection_price2 = new Mage2CatalogProductBundleSelectionPrice();
+                                                                $selection_price2->selection_id = $selection_price->selection_id;
+                                                                $selection_price2->website_id = $selection_price->website_id;
+                                                                $selection_price2->selection_price_type = $selection_price->selection_price_type;
+                                                                $selection_price2->selection_price_value = $selection_price->selection_price_value;
+                                                                $selection_price2->save();
                                                             }
                                                         }
                                                     }
@@ -1709,64 +1592,46 @@ class MigrateController extends Controller
                             $models = Mage1DownloadableLink::model()->findAll($condition);
                             if ($models){
                                 foreach ($models as $model){
-                                    $condition = "link_id = {$model->link_id}";
-                                    $model2 = Mage2DownloadableLink::model()->find($condition);
-                                    if (!$model2){
-                                        $model2 = new Mage2DownloadableLink();
-                                        $model2->link_id = $model->link_id;
-                                        $model2->product_id = $model->product_id;
-                                        $model2->sort_order = $model->sort_order;
-                                        $model2->number_of_downloads = $model->number_of_downloads;
-                                        $model2->is_shareable = $model->is_shareable;
-                                        $model2->link_url = $model->link_url;
-                                        $model2->link_file = $model->link_file;
-                                        $model2->link_type = $model->link_type;
-                                        $model2->sample_url = $model->sample_url;
-                                        $model2->sample_file = $model->sample_file;
-                                        $model2->sample_type = $model2->sample_type;
-                                        if ($model2->save()) {
-                                            if ($migrated_website_ids){
-                                                //downloadable_link_price
-                                                $str_website_ids = implode(',', $migrated_website_ids);
-                                                $condition = "link_id = {$model2->link_id} AND website_id IN ({$str_website_ids})";
-                                                $link_prices = Mage1DownloadableLinkPrice::model()->findAll($condition);
-                                                if ($link_prices){
-                                                    foreach ($link_prices as $link_price){
-                                                        $condition = "price_id = {$link_price->price_id}";
-                                                        $link_price2 = Mage2DownloadableLinkPrice::model()->find($condition);
-                                                        if (!$link_price2){
-                                                            $link_price2 = new Mage2DownloadableLinkPrice();
-                                                            $link_price2->price_id = $link_price->price_id;
-                                                            $link_price2->link_id = $link_price->link_id;
-                                                            $link_price2->website_id = $link_price->website_id;
-                                                            $link_price2->price = $link_price->price;
-                                                            $link_price2->save();
-                                                        }
-                                                    }
+                                    $model2 = new Mage2DownloadableLink();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
+                                    if ($model2->save()) {
+                                        if ($migrated_website_ids){
+                                            //downloadable_link_price
+                                            $str_website_ids = implode(',', $migrated_website_ids);
+                                            $condition = "link_id = {$model2->link_id} AND website_id IN ({$str_website_ids})";
+                                            $link_prices = Mage1DownloadableLinkPrice::model()->findAll($condition);
+                                            if ($link_prices){
+                                                foreach ($link_prices as $link_price){
+                                                    $link_price2 = new Mage2DownloadableLinkPrice();
+                                                    $link_price2->price_id = $link_price->price_id;
+                                                    $link_price2->link_id = $link_price->link_id;
+                                                    $link_price2->website_id = $link_price->website_id;
+                                                    $link_price2->price = $link_price->price;
+                                                    $link_price2->save();
                                                 }
-                                                //downloadable_link_title
-                                                if ($migrated_store_ids) {
-                                                    $str_store_ids = implode(',', $migrated_store_ids);
-                                                    $condition = "link_id = {$model2->link_id} AND store_id IN ({$str_store_ids})";
-                                                    $link_titles = Mage1DownloadableLinkTitle::model()->findAll($condition);
-                                                    if ($link_titles) {
-                                                        foreach ($link_titles as $link_title){
-                                                            $condition = "title_id = {$link_title->title_id}";
-                                                            $link_title2 = Mage2DownloadableLinkTitle::model()->find($condition);
-                                                            if (!$link_title2){
-                                                                $link_title2 = new Mage2DownloadableLinkTitle();
-                                                                $link_title2->title_id = $link_title->title_id;
-                                                                $link_title2->link_id = $link_title->link_id;
-                                                                $link_title2->store_id = MigrateSteps::getMage2StoreId($link_title->store_id);
-                                                                $link_title2->title = $link_title->title;
-                                                                $link_title2->save();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                //downloadable_sample
-                                                //downloadable_sample_title
                                             }
+                                            //downloadable_link_title
+                                            if ($migrated_store_ids) {
+                                                $str_store_ids = implode(',', $migrated_store_ids);
+                                                $condition = "link_id = {$model2->link_id} AND store_id IN ({$str_store_ids})";
+                                                $link_titles = Mage1DownloadableLinkTitle::model()->findAll($condition);
+                                                if ($link_titles) {
+                                                    foreach ($link_titles as $link_title){
+                                                        $link_title2 = new Mage2DownloadableLinkTitle();
+                                                        $link_title2->title_id = $link_title->title_id;
+                                                        $link_title2->link_id = $link_title->link_id;
+                                                        $link_title2->store_id = MigrateSteps::getMage2StoreId($link_title->store_id);
+                                                        $link_title2->title = $link_title->title;
+                                                        $link_title2->save();
+                                                    }
+                                                }
+                                            }
+                                            //downloadable_sample
+                                            //downloadable_sample_title
                                         }
                                     }
                                 }
@@ -1881,16 +1746,13 @@ class MigrateController extends Controller
                                     $customer2 = Mage2CustomerEntity::model()->findByPk($customer->entity_id);
                                     if (!$customer2){
                                         $customer2 = new Mage2CustomerEntity();
-                                        $customer2->entity_id = $customer->entity_id;
-                                        $customer2->website_id = $customer->website_id;
-                                        $customer2->email = $customer->email;
-                                        $customer2->group_id = $customer->group_id;
-                                        $customer2->increment_id = $customer->increment_id;
+                                        foreach ($customer2->attributes as $key => $value){
+                                            if (isset($customer->$key)){
+                                                $customer2->$key = $customer->$key;
+                                            }
+                                        }
                                         $customer2->store_id = MigrateSteps::getMage2StoreId($customer->store_id);
-                                        $customer2->created_at = $customer->created_at;
-                                        $customer2->updated_at = $customer->updated_at;
-                                        $customer2->is_active = $customer->is_active;
-                                        $customer2->disable_auto_group_change = $customer->disable_auto_group_change;
+
                                         if ($customer2->save()){
                                             $migrated_customer_ids[] = $customer2->entity_id;
 
@@ -1902,10 +1764,12 @@ class MigrateController extends Controller
                                                     // This because some system customer attribute_code was not using in Magento2
                                                     if ($attribute_id2){
                                                         $model2 = new Mage2CustomerEntityDatetime();
-                                                        $model2->value_id = $model->value_id;
+                                                        foreach ($model2->attributes as $key => $value){
+                                                            if (isset($model->$key)){
+                                                                $model2->$key = $model->$key;
+                                                            }
+                                                        }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->entity_id = $model->entity_id;
-                                                        $model2->value = $model->value;
                                                         $model2->save();
                                                     }
                                                 }
@@ -1918,10 +1782,12 @@ class MigrateController extends Controller
                                                     // This because some system customer attribute_code was not using in Magento2
                                                     if ($attribute_id2){
                                                         $model2 = new Mage2CustomerEntityDecimal();
-                                                        $model2->value_id = $model->value_id;
+                                                        foreach ($model2->attributes as $key => $value){
+                                                            if (isset($model->$key)){
+                                                                $model2->$key = $model->$key;
+                                                            }
+                                                        }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->entity_id = $model->entity_id;
-                                                        $model2->value = $model->value;
                                                         $model2->save();
                                                     }
                                                 }
@@ -1935,10 +1801,12 @@ class MigrateController extends Controller
                                                     //(example: reward_update_notification, reward_warning_notification)
                                                     if ($attribute_id2){
                                                         $model2 = new Mage2CustomerEntityInt();
-                                                        $model2->value_id = $model->value_id;
+                                                        foreach ($model2->attributes as $key => $value){
+                                                            if (isset($model->$key)){
+                                                                $model2->$key = $model->$key;
+                                                            }
+                                                        }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->entity_id = $model->entity_id;
-                                                        $model2->value = $model->value;
                                                         $model2->save();
                                                     }
                                                 }
@@ -1951,10 +1819,12 @@ class MigrateController extends Controller
                                                     // This because some system customer attribute_code was not using in Magento2
                                                     if ($attribute_id2){
                                                         $model2 = new Mage2CustomerEntityText();
-                                                        $model2->value_id = $model->value_id;
+                                                        foreach ($model2->attributes as $key => $value){
+                                                            if (isset($model->$key)){
+                                                                $model2->$key = $model->$key;
+                                                            }
+                                                        }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->entity_id = $model->entity_id;
-                                                        $model2->value = $model->value;
                                                         $model2->save();
                                                     }
                                                 }
@@ -1967,10 +1837,12 @@ class MigrateController extends Controller
                                                     // This because some system customer attribute_code was not using in Magento2
                                                     if ($attribute_id2){
                                                         $model2 = new Mage2CustomerEntityVarchar();
-                                                        $model2->value_id = $model->value_id;
+                                                        foreach ($model2->attributes as $key => $value){
+                                                            if (isset($model->$key)){
+                                                                $model2->$key = $model->$key;
+                                                            }
+                                                        }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->entity_id = $model->entity_id;
-                                                        $model2->value = $model->value;
                                                         $model2->save();
                                                     }
                                                 }
@@ -1981,12 +1853,11 @@ class MigrateController extends Controller
                                             if ($address_entities){
                                                 foreach($address_entities as $address_entity){
                                                     $address_entity2 = new Mage2CustomerAddressEntity();
-                                                    $address_entity2->entity_id = $address_entity->entity_id;
-                                                    $address_entity2->increment_id = $address_entity->increment_id;
-                                                    $address_entity2->parent_id = $address_entity->parent_id;
-                                                    $address_entity2->created_at = $address_entity->created_at;
-                                                    $address_entity2->updated_at = $address_entity->updated_at;
-                                                    $address_entity2->is_active = $address_entity->is_active;
+                                                    foreach ($address_entity2->attributes as $key => $value){
+                                                        if (isset($address_entity->$key)){
+                                                            $address_entity2->$key = $address_entity->$key;
+                                                        }
+                                                    }
                                                     if ($address_entity2->save()){
                                                         //customer_address_entity_datetime
                                                         $models = Mage1CustomerAddressEntityDatetime::model()->findAll("entity_id = $address_entity2->entity_id");
@@ -1996,10 +1867,12 @@ class MigrateController extends Controller
                                                                 // This because some system customer attribute_code was not using in Magento2
                                                                 if ($attribute_id2){
                                                                     $model2 = new Mage2CustomerAddressEntityDatetime();
-                                                                    $model2->value_id = $model->value_id;
+                                                                    foreach ($model2->attributes as $key => $value){
+                                                                        if (isset($model->$key)){
+                                                                            $model2->$key = $model->$key;
+                                                                        }
+                                                                    }
                                                                     $model2->attribute_id = $attribute_id2;
-                                                                    $model2->entity_id = $model->entity_id;
-                                                                    $model2->value = $model->value;
                                                                     $model2->save();
                                                                 }
                                                             }
@@ -2013,10 +1886,12 @@ class MigrateController extends Controller
                                                                 // This because some system customer attribute_code was not using in Magento2
                                                                 if ($attribute_id2){
                                                                     $model2 = new Mage2CustomerAddressEntityDecimal();
-                                                                    $model2->value_id = $model->value_id;
+                                                                    foreach ($model2->attributes as $key => $value){
+                                                                        if (isset($model->$key)){
+                                                                            $model2->$key = $model->$key;
+                                                                        }
+                                                                    }
                                                                     $model2->attribute_id = $attribute_id2;
-                                                                    $model2->entity_id = $model->entity_id;
-                                                                    $model2->value = $model->value;
                                                                     $model2->save();
                                                                 }
                                                             }
@@ -2030,10 +1905,12 @@ class MigrateController extends Controller
                                                                 // This because some system customer attribute_code was not using in Magento2
                                                                 if ($attribute_id2){
                                                                     $model2 = new Mage2CustomerAddressEntityInt();
-                                                                    $model2->value_id = $model->value_id;
+                                                                    foreach ($model2->attributes as $key => $value){
+                                                                        if (isset($model->$key)){
+                                                                            $model2->$key = $model->$key;
+                                                                        }
+                                                                    }
                                                                     $model2->attribute_id = $attribute_id2;
-                                                                    $model2->entity_id = $model->entity_id;
-                                                                    $model2->value = $model->value;
                                                                     $model2->save();
                                                                 }
                                                             }
@@ -2046,10 +1923,12 @@ class MigrateController extends Controller
                                                                 // This because some system customer attribute_code was not using in Magento2
                                                                 if ($attribute_id2){
                                                                     $model2 = new Mage2CustomerAddressEntityText();
-                                                                    $model2->value_id = $model->value_id;
+                                                                    foreach ($model2->attributes as $key => $value){
+                                                                        if (isset($model->$key)){
+                                                                            $model2->$key = $model->$key;
+                                                                        }
+                                                                    }
                                                                     $model2->attribute_id = $attribute_id2;
-                                                                    $model2->entity_id = $model->entity_id;
-                                                                    $model2->value = $model->value;
                                                                     $model2->save();
                                                                 }
                                                             }
@@ -2062,10 +1941,12 @@ class MigrateController extends Controller
                                                                 // This because some system customer attribute_code was not using in Magento2
                                                                 if ($attribute_id2){
                                                                     $model2 = new Mage2CustomerAddressEntityVarchar();
-                                                                    $model2->value_id = $model->value_id;
+                                                                    foreach ($model2->attributes as $key => $value){
+                                                                        if (isset($model->$key)){
+                                                                            $model2->$key = $model->$key;
+                                                                        }
+                                                                    }
                                                                     $model2->attribute_id = $attribute_id2;
-                                                                    $model2->entity_id = $model->entity_id;
-                                                                    $model2->value = $model->value;
                                                                     $model2->save();
                                                                 }
                                                             }
@@ -2108,6 +1989,768 @@ class MigrateController extends Controller
             }//end post request
 
             $this->render("step{$step->sorder}", array('step' => $step, 'customer_groups' => $customer_groups));
+        }else{
+            Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
+            $this->redirect(array($result['back_step']));
+        }
+    }
+
+    /**
+     * Migrate Data from:
+     * Sales Orders, Sales Quote, Sales Payments, Sales Invoices, Sales Shipments
+     */
+    public function actionStep6()
+    {
+        $step = MigrateSteps::model()->find("sorder = 6");
+        $result = MigrateSteps::checkStep($step->sorder);
+        if ($result['allowed']){
+            //declare objects to migrate
+            $sales_objects = array(
+                'order' => Yii::t('frontend', 'Sales Orders'),
+                'quote' => Yii::t('frontend', 'Sales Quote'),
+                'payment' => Yii::t('frontend', 'Sales Payments'),
+                'invoice' => Yii::t('frontend', 'Sales Invoices'),
+                'shipment' => Yii::t('frontend', 'Sales Shipments'),
+                'credit' => Yii::t('frontend', 'Sales Credit Memo')
+            );
+
+            //variables to log
+            $migrated_sales_object_ids = array();
+            $migrated_order_ids = $migrated_quote_ids = $migrated_payment_ids = $migrated_invoice_ids = $migrated_shipment_ids = $migrated_credit_ids = array();
+            $migrated_order_statuses = array();
+
+            if (Yii::app()->request->isPostRequest){
+
+                //reset database of this step if has
+                $is_reset = Yii::app()->request->getPost('reset');
+                if ($is_reset){
+                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
+                    $resetSQLFile = $dataPath . "step6_reset.sql";
+                    if (file_exists($resetSQLFile)) {
+                        $rs = MigrateSteps::executeFile($resetSQLFile);
+                        if ($rs){
+                            //reset step status
+                            $step->status = MigrateSteps::STATUS_NOT_DONE;
+                            $step->migrated_data = null;
+                            if ($step->update()){
+                                $this->refresh();
+                            }
+                        }
+                    }
+                }
+
+                $selected_objects = Yii::app()->request->getPost('selected_objects', array());
+                if ($selected_objects){
+                    //get migrated data from first step in session
+                    $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+                    $str_store_ids = implode(',', $migrated_store_ids);
+                    $migrated_customer_ids = isset(Yii::app()->session['migrated_customer_ids']) ? Yii::app()->session['migrated_customer_ids'] : array();
+                    $str_customer_ids = implode(',', $migrated_customer_ids);
+
+                    if (in_array('order', $selected_objects)){
+                        //sales_order_status
+                        $models = Mage1SalesOrderStatus::model()->findAll();
+                        if ($models) {
+                            foreach ($models as $model){
+                                $model2 = Mage2SalesOrderStatus::model()->find("status = '{$model->status}'");
+                                if (!$model2){
+                                    $model2 = new Mage2SalesOrderStatus();
+                                    $model2->status = $model->status;
+                                }
+                                $model2->label = $model->label;
+
+                                if ($model2->save()){
+                                    $migrated_order_statuses[] = $model->status;
+
+                                    //sales_order_status_label
+                                    $condition = "status = '{$model->status}'";
+                                    if ($str_store_ids) {
+                                        $condition .= " AND store_id IN ({$str_store_ids})";
+                                    }
+                                    $models = Mage1SalesOrderStatusLabel::model()->findAll($condition);
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderStatusLabel();
+                                            $model2->attributes = $model->attributes;
+                                            if ($model2->store_id){
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                    //sales_order_status_state
+                                    $condition = "status = '{$model->status}'";
+                                    $models = Mage1SalesOrderStatusState::model()->findAll($condition);
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = Mage2SalesOrderStatusState::model()->find("status = '{$model->status}' AND state = '{$model->state}'");
+                                            if (!$model2){
+                                                $model2 = new Mage2SalesOrderStatusState();
+                                                $model2->status = $model->status;
+                                                $model2->state = $model->state;
+                                                //this field not exists in Magento1
+                                                $model2->visible_on_front = 0;
+                                            }
+                                            $model2->is_default = $model->is_default;
+                                            $model2->save();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //sales_order
+                        $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL ) AND ( customer_id IN ({$str_customer_ids}) OR customer_id IS NULL )";
+                        $sales_orders = Mage1SalesOrder::model()->findAll($condition);
+                        if ($sales_orders){
+                            foreach ($sales_orders as $sales_order){
+                                $sales_order2 = new Mage2SalesOrder();
+                                foreach ($sales_order2->attributes as $key => $value){
+                                    if (isset($sales_order->$key)){
+                                        $sales_order2->$key = $sales_order->$key;
+                                    }
+                                }
+                                //we have changed store_id in magento2
+                                if ($sales_order2->store_id){
+                                    $sales_order2->store_id = MigrateSteps::getMage2StoreId($sales_order2->store_id);
+                                }
+                                if ($sales_order2->save()){
+                                    $migrated_order_ids[] = $sales_order->entity_id;
+
+                                    //sales_order_address
+                                    $models = Mage1SalesOrderAddress::model()->findAll("parent_id = {$sales_order->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderAddress();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                    //sales_order_grid
+                                    $models = Mage1SalesOrderGrid::model()->findAll("entity_id = {$sales_order->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderGrid();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            //we have changed store_id in magento2
+                                            if ($model2->store_id){
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                    //sales_order_item
+                                    $models = Mage1SalesOrderItem::model()->findAll("order_id = {$sales_order->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderItem();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            if ($model2->store_id){
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                    //sales_order_status_history
+                                    $models = Mage1SalesOrderStatusHistory::model()->findAll("parent_id = {$sales_order->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderStatusHistory();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                    //sales_order_tax
+                                    $models = Mage1SalesOrderTax::model()->findAll("order_id = {$sales_order->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesOrderTax();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            if ($model2->save()){
+                                                //sales_order_tax_item
+                                                $items = Mage1SalesOrderTaxItem::model()->findAll("tax_id = {$model->tax_id}");
+                                                if ($items){
+                                                    foreach ($items as $item){
+                                                        $item2 = new Mage2SalesOrderTaxItem();
+                                                        foreach ($item2->attributes as $key => $value){
+                                                            if (isset($item->$key)){
+                                                                $item2->$key = $item->$key;
+                                                            }
+                                                        }
+                                                        //bellow fields was not exists in Magento1 -> note
+                                                        $item2->amount = 0;
+                                                        $item2->base_amount = 0;
+                                                        $item2->real_amount = 0;
+                                                        $item2->real_base_amount = 0;
+                                                        $item2->associated_item_id = null;
+                                                        $item2->taxable_item_type = '';
+                                                        $item2->save();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }//end save a sales order
+                            }
+                        }
+
+                        //sales_order_aggregated_created
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id is NULL";
+                        $models = Mage1SalesOrderAggregatedCreated::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesOrderAggregatedCreated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->store_id){
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                }
+                                $model2->save();
+                            }
+                        }
+                        //sales_order_aggregated_updated
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id is NULL";
+                        $models = Mage1SalesOrderAggregatedUpdated::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesOrderAggregatedUpdated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->store_id){
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                }
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_sales_object_ids[] = 'order';
+                    }//end migrate orders
+
+                    //Sales Quote
+                    if (in_array('quote', $selected_objects)){
+                        //quote
+                        //$condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL ) AND ( customer_id IN ({$str_customer_ids}) OR customer_id IS NULL )";
+                        $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
+                        $quotes = Mage1SalesQuote::model()->findAll($condition);
+                        if ($quotes){
+                            foreach ($quotes as $quote){
+                                $quote2 = new Mage2SalesQuote();
+                                foreach ($quote2->attributes as $key => $value){
+                                    if (isset($quote->$key)){
+                                        $quote2->$key = $quote->$key;
+                                    }
+                                }
+                                $quote2->store_id = MigrateSteps::getMage2StoreId($quote->store_id);
+                                if ($quote2->save()){
+                                    $migrated_quote_ids[] = $quote->entity_id;
+
+                                    //quote_address
+                                    $models = Mage1SalesQuoteAddress::model()->findAll("quote_id = {$quote->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesQuoteAddress();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            if ($model2->save()){
+                                                //quote_address_item
+                                                $address_items = Mage1SalesQuoteAddressItem::model()->findAll("quote_address_id = {$model->address_id}");
+                                                if ($address_items){
+                                                    foreach ($address_items as $address_item){
+                                                        $address_item2 = new Mage2SalesQuoteAddressItem();
+                                                        foreach ($address_item2->attributes as $key => $value){
+                                                            if (isset($address_item->$key)){
+                                                                $address_item2->$key = $address_item->$key;
+                                                            }
+                                                        }
+                                                        $address_item2->save();
+                                                    }
+                                                }
+                                                //quote_shipping_rate
+                                                $shipping_rates = Mage1SalesQuoteShippingRate::model()->findAll("address_id = {$model->address_id}");
+                                                if ($shipping_rates){
+                                                    foreach ($shipping_rates as $shipping_rate){
+                                                        $shipping_rate2 = new Mage2SalesQuoteShippingRate();
+                                                        foreach ($shipping_rate2->attributes as $key => $value){
+                                                            if (isset($shipping_rate->$key)){
+                                                                $shipping_rate2->$key = $shipping_rate->$key;
+                                                            }
+                                                        }
+                                                        $shipping_rate2->save();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //quote_item
+                                    $models = Mage1SalesQuoteItem::model()->findAll("quote_id = {$quote->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesQuoteItem();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                            if ($model2->save()){
+                                                //quote_item_option
+                                                $item_options = Mage1SalesQuoteItemOption::model()->findAll("item_id = {$model->item_id}");
+                                                if ($item_options){
+                                                    foreach ($item_options as $item_option){
+                                                        $item_option2 = new Mage2SalesQuoteItemOption();
+                                                        foreach ($item_option2->attributes as $key => $value){
+                                                            if (isset($item_option->$key)){
+                                                                $item_option2->$key = $item_option->$key;
+                                                            }
+                                                        }
+                                                        $item_option2->save();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //quote_payment
+                                    $models = Mage1SalesQuotePayment::model()->findAll("quote_id = {$quote->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesQuotePayment();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            $model2->save();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $migrated_sales_object_ids[] = 'quote';
+                    }//end sales quote
+
+                    if (in_array('payment', $selected_objects)){
+                        if ($migrated_order_ids){
+                            $str_order_ids = implode(',', $migrated_order_ids);
+                            $condition = "parent_id IN ({$str_order_ids})";
+                            //sales_order_payment
+                            $sales_payments = Mage1SalesOrderPayment::model()->findAll($condition);
+                            if ($sales_payments){
+                                foreach ($sales_payments as $sales_payment){
+                                    $sales_payment2 = new Mage2SalesOrderPayment();
+                                    foreach($sales_payment2->attributes as $key => $value){
+                                        if (isset($sales_payment->$key)){
+                                            $sales_payment2->$key = $sales_payment->$key;
+                                        }
+                                    }
+                                    //because the this field name was changed in Magento 2
+                                    $sales_payment2->cc_last_4 = isset($sales_payment->cc_last4) ? $sales_payment->cc_last4 : null;
+                                    if ($sales_payment2->save()){
+                                        //sales_payment_transaction
+                                        $models = Mage1SalesPaymentTransaction::model()->findAll("payment_id = {$sales_payment->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesPaymentTransaction();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //sales_refunded_aggregated
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                        $models = Mage1SalesRefundedAggregated::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesRefundedAggregated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //sales_refunded_aggregated_order
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                        $models = Mage1SalesRefundedAggregatedOrder::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesRefundedAggregatedOrder();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_sales_object_ids[] = 'payment';
+                    }//end sales payment
+
+                    if (in_array('invoice', $selected_objects)){
+                        if ($migrated_order_ids){
+                            $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
+                            $str_order_ids = implode(',', $migrated_order_ids);
+                            $condition .= " AND order_id IN ({$str_order_ids})";
+
+                            //sales_invoice
+                            $sales_invoices = Mage1SalesInvoice::model()->findAll($condition);
+                            if ($sales_invoices){
+                                foreach ($sales_invoices as $sales_invoice){
+                                    $sales_invoice2 = new Mage2SalesInvoice();
+                                    foreach ($sales_invoice2->attributes as $key => $value){
+                                        if (isset($sales_invoice->$key)){
+                                            $sales_invoice2->$key = $sales_invoice->$key;
+                                        }
+                                    }
+                                    $sales_invoice2->store_id = MigrateSteps::getMage2StoreId($sales_invoice->store_id);
+                                    if ($sales_invoice2->save()){
+                                        $migrated_invoice_ids[] = $sales_invoice->entity_id;
+
+                                        //sales_invoice_grid
+                                        $condition = "entity_id = {$sales_invoice->entity_id}";
+                                        $models = Mage1SalesInvoiceGrid::model()->findAll($condition);
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesInvoiceGrid();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                                //this field was not exists in Magento1
+                                                $model2->updated_at = null;
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_invoice_item
+                                        $condition = "parent_id = {$sales_invoice->entity_id}";
+                                        $models = Mage1SalesInvoiceItem::model()->findAll($condition);
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesInvoiceItem();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                //this field was not exists in Magento1
+                                                $model2->tax_ratio = null;
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_invoice_comment
+                                        $condition = "parent_id = {$sales_invoice->entity_id}";
+                                        $models = Mage1SalesInvoiceComment::model()->findAll($condition);
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesInvoiceComment();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //sales_invoiced_aggregated
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                        $models = Mage1SalesInvoicedAggregated::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesInvoicedAggregated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //sales_invoiced_aggregated_order
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                        $models = Mage1SalesInvoicedAggregatedOrder::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2SalesInvoicedAggregatedOrder();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_sales_object_ids[] = 'invoice';
+                    }//end sales invoice migration
+
+                    //Sales shipments migration
+                    if (in_array('shipment', $selected_objects)){
+                        if ($migrated_order_ids){
+                            $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
+                            $str_order_ids = implode(',', $migrated_order_ids);
+                            $condition .= " AND order_id IN ({$str_order_ids})";
+
+                            //sales_shipment
+                            $sales_shipments = Mage1SalesShipment::model()->findAll($condition);
+                            if ($sales_shipments){
+                                foreach($sales_shipments as $sales_shipment){
+                                    $sales_shipment2 = new Mage2SalesShipment();
+                                    foreach ($sales_shipment2->attributes as $key => $value){
+                                        if (isset($sales_shipment->$key)){
+                                            $sales_shipment2->$key = $sales_shipment->$key;
+                                        }
+                                    }
+                                    $sales_shipment2->store_id = MigrateSteps::getMage2StoreId($sales_shipment->store_id);
+                                    if ($sales_shipment2->save()){
+                                        $migrated_shipment_ids[] = $sales_shipment->entity_id;
+
+                                        //sales_shipment_grid
+                                        $models = Mage1SalesShipmentGrid::model()->findAll("entity_id = {$sales_shipment->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesShipmentGrid();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                                //this field was not exists in Magento 1
+                                                $model2->updated_at = null;
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_shipment_item
+                                        $models = Mage1SalesShipmentItem::model()->findAll("parent_id = {$sales_shipment->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesShipmentItem();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_shipment_track
+                                        $models = Mage1SalesShipmentTrack::model()->findAll("parent_id = {$sales_shipment->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesShipmentTrack();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_shipment_comment
+                                        $models = Mage1SalesShipmentComment::model()->findAll("parent_id = {$sales_shipment->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesShipmentComment();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //sales_shipping_aggregated
+                            $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                            $models = Mage1SalesShippingAggregated::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesShippingAggregated();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    $model2->save();
+                                }
+                            }
+                            //sales_shipping_aggregated_order
+                            $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                            $models = Mage1SalesShippingAggregatedOrder::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesShippingAggregatedOrder();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    $model2->save();
+                                }
+                            }
+
+                            $migrated_sales_object_ids[] = 'shipment';
+                        }
+                    }//end sales shipment migration
+
+                    //Sales credit memo migration
+                    if (in_array('credit', $selected_objects)){
+                        if ($migrated_order_ids){
+                            $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
+                            $str_order_ids = implode(',', $migrated_order_ids);
+                            $condition .= " AND order_id IN ({$str_order_ids})";
+
+                            //sales_creditmemo
+                            $sales_credits = Mage1SalesCreditmemo::model()->findAll($condition);
+                            if ($sales_credits){
+                                foreach ($sales_credits as $sales_credit){
+                                    $sales_credit2 = new Mage2SalesCreditmemo();
+                                    foreach ($sales_credit2->attributes as $key => $value){
+                                        if (isset($sales_credit->$key)){
+                                            $sales_credit2->$key = $sales_credit->$key;
+                                        }
+                                    }
+                                    $sales_credit2->store_id = MigrateSteps::getMage2StoreId($sales_credit->store_id);
+                                    if ($sales_credit2->save()){
+                                        //this for log
+                                        $migrated_credit_ids[] = $sales_credit->store_id;
+
+                                        //sales_creditmemo_grid
+                                        $models = Mage1SalesCreditmemoGrid::model()->findAll("entity_id = {$sales_credit->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesCreditmemoGrid();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                                //this field was not exists in Magento 1
+                                                $model2->updated_at = null;
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_creditmemo_item
+                                        $models = Mage1SalesCreditmemoItem::model()->findAll("parent_id = {$sales_credit->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesCreditmemoItem();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                //this field was not exists in Magento1
+                                                $model2->tax_ratio = null;
+                                                $model2->save();
+                                            }
+                                        }
+                                        //sales_creditmemo_comment
+                                        $models = Mage1SalesCreditmemoComment::model()->findAll("parent_id = {$sales_credit->entity_id}");
+                                        if ($models){
+                                            foreach ($models as $model){
+                                                $model2 = new Mage2SalesCreditmemoComment();
+                                                foreach ($model2->attributes as $key => $value){
+                                                    if (isset($model->$key)){
+                                                        $model2->$key = $model->$key;
+                                                    }
+                                                }
+                                                $model2->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            $migrated_sales_object_ids[] = 'credit';
+                        }
+                    }//End Sales credit memo migration
+                }else{
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
+                }
+
+                //Update step status
+                if ($migrated_sales_object_ids && $migrated_order_ids){
+                    $step->status = MigrateSteps::STATUS_DONE;
+                    $step->migrated_data = json_encode(array(
+                        'sales_object_ids' => $migrated_sales_object_ids,
+                        'sales_order_ids' => $migrated_order_ids,
+                        'sales_quote_ids' => $migrated_quote_ids,
+                        'sales_invoice_ids' => $migrated_invoice_ids,
+                        'sales_shipment_ids' => $migrated_shipment_ids,
+                        'sales_credit_ids' => $migrated_credit_ids
+                    ));
+                    if ($step->update()) {
+                        //update session
+                        Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;
+                        Yii::app()->session['migrated_sales_order_ids'] = $migrated_order_ids;
+
+                        $message = Yii::t('frontend', 'Migrated successfully');
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids)));
+
+                        Yii::app()->user->setFlash('success', $message);
+                    }
+                }
+            }//end post request
+
+            $this->render("step{$step->sorder}", array('step' => $step, 'sale_objects' => $sales_objects));
         }else{
             Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
             $this->redirect(array($result['back_step']));

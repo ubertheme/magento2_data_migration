@@ -32,74 +32,7 @@ class Mage2CatalogProductEntityMediaGalleryValuePeer extends Mage2ActiveRecord
 			array('store_id, disabled', 'numerical', 'integerOnly'=>true),
 			array('value_id, entity_id, position', 'length', 'max'=>10),
 			array('label', 'length', 'max'=>255),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('value_id, store_id, entity_id, label, position, disabled', 'safe', 'on'=>'search'),
 		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'value_id' => 'Value',
-			'store_id' => 'Store',
-			'entity_id' => 'Entity',
-			'label' => 'Label',
-			'position' => 'Position',
-			'disabled' => 'Disabled',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('value_id',$this->value_id,true);
-		$criteria->compare('store_id',$this->store_id);
-		$criteria->compare('entity_id',$this->entity_id,true);
-		$criteria->compare('label',$this->label,true);
-		$criteria->compare('position',$this->position,true);
-		$criteria->compare('disabled',$this->disabled);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->mage2;
 	}
 
 	/**
