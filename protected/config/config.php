@@ -5,7 +5,7 @@ return array(
 
         //Database of tool
         'db' => array(
-            'connectionString' => 'mysql:host=localhost;dbname=ub_migrate_data',
+            'connectionString' => 'mysql:host=localhost;dbname=ub_tool',
             'emulatePrepare' => true,
             'username' => 'root',
             'password' => '',
@@ -27,7 +27,7 @@ return array(
 
         //Database of Magento2 beta
         'mage2' => array(
-            'connectionString' => 'mysql:host=localhost;dbname=magento2_beta11_test',
+            'connectionString' => 'mysql:host=localhost;dbname=magento2_74_beta4',
             'emulatePrepare' => true,
             'username' => 'root',
             'password' => '',
@@ -48,7 +48,7 @@ return array(
         'application.models.mage1.*',
 
         //This can change for your magento1 version
-        'application.models.db.mage1901.*',
+        'application.models.db.mage19x.*',
     ),
 
     // application-level parameters that can be accessed
