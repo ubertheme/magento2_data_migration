@@ -69,6 +69,7 @@
         $.showProcessorBox = function(){
             if ($('#processor-box').length){
                 $('#processor-box').modal('show');
+                $(window).trigger('resize');
             }
         }
         $.hideProcessorBox = function(){
@@ -76,6 +77,13 @@
                 $('#processor-box').modal('hide');
             }
         }
+
+        $(window).resize(function(){
+            if ($('.loading-box').length){
+                var tmp = (parseInt($(window).height()) - parseInt($('.modal-content').height()))/2;
+                $('.loading-box').attr('style', 'margin: '+tmp+'px auto !important');
+            }
+        });
     });
 
 })(jQuery);

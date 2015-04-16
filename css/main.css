@@ -1,103 +1,85 @@
-body
-{
+body{
 	margin: 0;
 	padding: 0;
 	color: #555;
 	font: normal 10pt Arial,Helvetica,sans-serif;
 	background: #EFEFEF;
 }
-#page
-{
+#page{
 	margin-top: 5px;
 	margin-bottom: 5px;
 	background: white;
 	border: 1px solid #C9E0ED;
 }
-#header
-{
+#header{
 	margin: 0px 0px 30px 0px;
 	padding: 0px;
 	border-top: 3px solid #C9E0ED;
     border-bottom:1px solid #eaeaea;
 }
-#content
-{
+#content{
 	padding: 20px;
 }
-#sidebar
-{
+#sidebar{
 	padding: 20px;
 }
-#footer
-{
+#footer{
 	padding: 10px;
 	margin: 10px 20px;
 	font-size: 0.8em;
 	text-align: center;
 	border-top: 1px solid #C9E0ED;
 }
-#logo
-{
+#logo{
 	padding: 10px 20px;
 	font-size: 200%;
 }
-div.flash-error, div.flash-notice, div.flash-success
-{
+div.flash-error, div.flash-notice, div.flash-success{
 	padding:.8em;
 	margin-bottom:1em;
 	border:2px solid #ddd;
 }
-div.flash-error
-{
+div.flash-error{
 	background:#FBE3E4;
 	color:#8a1f11;
 	border-color:#FBC2C4;
     text-align: center;
 }
-div.flash-notice
-{
+div.flash-notice{
 	background:#FFF6BF;
 	color:#514721;
 	border-color:#FFD324;
     text-align: center;
 }
-div.flash-success
-{
+div.flash-success{
 	background:#E6EFC2;
 	color:#264409;
 	border-color:#C6D880;
     text-align: center;
 }
-div.flash-error a
-{
+div.flash-error a{
 	color:#8a1f11;
 }
-div.flash-notice a
-{
+div.flash-notice a{
 	color:#514721;
 }
-div.flash-success a
-{
+div.flash-success a{
 	color:#264409;
 }
-div.breadcrumbs
-{
+div.breadcrumbs{
 	font-size: 0.9em;
 	padding: 5px 20px;
 }
-div.breadcrumbs span
-{
+div.breadcrumbs span{
 	font-weight: bold;
 }
-.portlet-decoration
-{
+.portlet-decoration{
 	padding: 3px 8px;
 	background: #B7D6E7;
 	border-left: 5px solid #6FACCF;
     margin: 20px 0;
 }
-.portlet-title
-{
+.portlet-title{
 	font-size: 12px;
 	font-weight: bold;
 	padding: 0;

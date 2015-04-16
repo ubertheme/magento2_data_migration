@@ -15,7 +15,7 @@ class Mage2TaxClassPeer extends Mage2ActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'tax_class';
+		return '{{tax_class}}';
 	}
 
 	/**

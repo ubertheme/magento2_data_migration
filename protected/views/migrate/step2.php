@@ -73,7 +73,7 @@
                 <?php if ($step->status == MigrateSteps::STATUS_DONE): ?>
                     <span class="glyphicon glyphicon-ok-sign text-success"></span>
                 <?php endif; ?>
-                <?php echo Yii::t('frontend', 'Product Attributes'); ?> (<?php echo MigrateSteps::getTotalVisibleProductsAttr(); ?>)
+                <?php echo Yii::t('frontend', 'Product Attributes'); ?> (<?php echo Mage1Attribute::model()->count("entity_type_id = 4");?> attributes. There are <?php echo MigrateSteps::getTotalVisibleProductsAttr(); ?> attributes visible in back-end.)
             </h3>
         </li>
     </ul>

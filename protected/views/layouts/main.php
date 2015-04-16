@@ -54,7 +54,7 @@
         <?php echo $content; ?>
 
         <div id="footer">
-            Copyright &copy; <?php echo date('Y'); ?> by UberTheme.<br/>
+            Copyright &copy; <?php echo date('Y'); ?> by <a href="http://www.ubertheme.com/" target="_blank">UberTheme</a>.<br/>
             All Rights Reserved.<br/>
             <?php echo Yii::powered(); ?>
 
