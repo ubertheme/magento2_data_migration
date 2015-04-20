@@ -2,106 +2,92 @@
 
 <h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
 
-<form role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
+<form id="frm-settings" data-toggle="validator" role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
 
-<div id="step-content">
-    <blockquote> <p class="tip"> <?php echo Yii::t('frontend', $step->descriptions); ?> </p> </blockquote>
+    <div id="step-content">
+        <blockquote> <p class="tip"> <?php echo Yii::t('frontend', $step->descriptions); ?> </p> </blockquote>
 
-    <!--    Form Buttons-->
-    <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-        <div class="step-controls">
-            <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
-        </div>
-    <?php else: ?>
-        <div class="step-controls">
-            <input type="hidden" id="reset" name="reset" value="0" />
-            <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
-            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-        </div>
-    <?php endif; ?>
-    <!--//    Form Buttons-->
-
-    <?php
-    //get migrated website ids from session if has
-    $migrated_website_ids = isset(Yii::app()->session['migrated_website_ids']) ? Yii::app()->session['migrated_website_ids'] : array();
-    ?>
-    <?php foreach ($websites as $website): ?>
-    <ul class="list-group">
-        <li class="list-group-item">
-            <h4 class="list-group-item-heading">
-                <label class="checkbox-inline">
-                    <?php if ($checked = in_array($website->website_id, $migrated_website_ids)): ?>
-                        <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                    <?php endif; ?>
-                    <input type="checkbox" id="website-<?php echo $website->website_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="website_ids[]" value="<?=$website->website_id?>" />
-                    <?php echo $website->name; ?>
-                </label>
-            </h4>
-
-            <?php
-                //Get list store groups of current website
-                $storeGroups = Mage1StoreGroup::model()->findAll("website_id = {$website->website_id}");
-                // Get migrated store group ids from session
-                $migrated_store_group_ids = isset(Yii::app()->session['migrated_store_group_ids']) ? Yii::app()->session['migrated_store_group_ids'] : array();
-            ?>
-
-            <?php if ($storeGroups): ?>
-            <ul class="list-group">
-                <?php foreach ($storeGroups as $storeGroup): ?>
-                    <li class="list-group-item">
-                        <h5 class="list-group-item-heading">
-                        <label class="checkbox-inline">
-                            <?php if ($checked = in_array($storeGroup->group_id, $migrated_store_group_ids)): ?>
-                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                            <?php endif; ?>
-                            <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?=$storeGroup->group_id?>" />
-                            <?php echo $storeGroup->name; ?>
-                        </label>
-                        </h5>
-
-                        <?php
-                            //Get list stores of current store group
-                            $stores = Mage1Store::model()->findAll("website_id = {$website->website_id} AND group_id = {$storeGroup->group_id}");
-
-                            //Get migrated store ids from session
-                            $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
-                        ?>
-                        <?php if ($stores): ?>
-                            <ul class="list-group">
-                                <?php foreach ($stores as $store): ?>
-                                    <li class="list-group-item">
-                                        <label class="checkbox-inline">
-                                            <?php if ($checked = in_array($store->store_id, $migrated_store_ids)): ?>
-                                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                                            <?php endif; ?>
-                                            <input type="checkbox" id="store-<?php echo $store->store_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_ids[<?php echo $storeGroup->group_id; ?>][]" class="store-<?php echo $storeGroup->group_id; ?>" value="<?=$store->store_id?>" />
-                                            <?php echo $store->name; ?>
-                                        </label>
-                                    </li>
+        <div style="width: 45%;display: inline-block;">
+            <h3><?php echo Yii::t('frontend', 'Magento 1.x');?></h3>
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="mg1-version"><?php echo Yii::t('frontend', 'Version');?>:</label>
+                            <select class="form-control" id="mg1-version" name="mg1_version">
+                                <?php $options = MigrateSteps::getMG1VersionOptions()?>
+                                <?php foreach ($options as $value => $label):?>
+                                    <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
                                 <?php endforeach; ?>
-                            </ul>
-                        <?php endif; ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-            <?php endif; ?>
-        </li>
-    </ul>
-    <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mg1-host" class="control-label"><?php echo Yii::t('frontend', 'Database Server Host');?></label>
+                            <input type="text" class="form-control" id="mg1-host" name="mg1_host" value="<?php echo isset($settings->mg1_host) ? $settings->mg1_host : '' ?>" placeholder="localhost" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="mg1-db-user" class="control-label"><?php echo Yii::t('frontend', 'Database Server Username');?></label>
+                            <input type="text" class="form-control" id="mg1-db-user" name="mg1_db_user" value="<?php echo isset($settings->mg1_db_user) ? $settings->mg1_db_user : '' ?>" placeholder="username" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg1-db-pass" class="control-label"><?php echo Yii::t('frontend', 'Database Server Password');?></label>
+                            <input type="password" class="form-control" id="mg1-db-pass" name="mg1_db_pass" value="<?php echo isset($settings->mg1_db_pass) ? $settings->mg1_db_pass : '' ?>" placeholder="optional" />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg1-db-name" class="control-label"><?php echo Yii::t('frontend', 'Database Name');?></label>
+                            <input type="text" class="form-control" id="mg1-db-name" name="mg1_db_name" value="<?php echo isset($settings->mg1_db_name) ? $settings->mg1_db_name : '' ?>" placeholder="database name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg1-db-prefix" class="control-label"><?php echo Yii::t('frontend', 'Table Prefix');?></label>
+                            <input type="text" class="form-control" id="mg1-db-prefix" name="mg1_db_prefix" value="<?php echo isset($settings->mg1_db_prefix) ? $settings->mg1_db_prefix : '' ?>" placeholder="optional" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!--    Form Buttons-->
-    <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-        <div class="step-controls">
-            <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
+        <div style="width: 45%;display: inline-block;float: right;">
+            <h3><?php echo Yii::t('frontend', 'Magento 2');?></h3>
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="mg2-host" class="control-label"><?php echo Yii::t('frontend', 'Database Server Host');?></label>
+                            <input type="text" class="form-control" id="mg2-host" name="mg2_host" value="<?php echo isset($settings->mg2_host) ? $settings->mg2_host : '' ?>" placeholder="localhost" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="mg2-db-user" class="control-label"><?php echo Yii::t('frontend', 'Database Server Username');?></label>
+                            <input type="text" class="form-control" id="mg2-db-user" name="mg2_db_user" value="<?php echo isset($settings->mg2_db_user) ? $settings->mg2_db_user : '' ?>" placeholder="username" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg2-db-pass" class="control-label"><?php echo Yii::t('frontend', 'Database Server Password');?></label>
+                            <input type="password" class="form-control" id="mg2-db-pass" name="mg2_db_pass" value="<?php echo isset($settings->mg2_db_pass) ? $settings->mg2_db_pass : '' ?>" placeholder="optional" />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg2-db-name" class="control-label"><?php echo Yii::t('frontend', 'Database Name');?></label>
+                            <input type="text" class="form-control" id="mg2-db-name" name="mg2_db_name" value="<?php echo isset($settings->mg2_db_name) ? $settings->mg2_db_name : '' ?>" placeholder="database name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="mg2-db-prefix" class="control-label"><?php echo Yii::t('frontend', 'Table Prefix');?></label>
+                            <input type="text" class="form-control" id="mg2-db-prefix" name="mg2_db_prefix" value="<?php echo isset($settings->mg2_db_prefix) ? $settings->mg2_db_prefix : '' ?>" placeholder="optional" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    <?php else: ?>
-        <div class="step-controls">
-            <input type="hidden" id="reset" name="reset" value="0" />
-            <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
-            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-        </div>
-    <?php endif; ?>
-    <!--//    Form Buttons-->
-</div>
+
+        <!--    Form Buttons-->
+        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
+            <div class="step-controls">
+                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-primary need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
+            </div>
+        <?php else: ?>
+            <div class="step-controls">
+                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
+                <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
+            </div>
+        <?php endif; ?>
+        <!--//    Form Buttons-->
+    </div>
 
 </form>

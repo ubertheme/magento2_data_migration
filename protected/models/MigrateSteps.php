@@ -18,6 +18,17 @@ class MigrateSteps extends MigrateStepsPeer
     const STATUS_NOT_DONE = 0;
     const SQL_COMMAND_DELIMETER = ';';
 
+    //entity type const
+    const CUSTOMER_TYPE_CODE = 'customer';
+    const CUSTOMER_ADDRESS_TYPE_CODE = 'customer_address';
+    const CATEGORY_TYPE_CODE = 'catalog_category';
+    const PRODUCT_TYPE_CODE = 'catalog_product';
+    const ORDER_TYPE_CODE = 'order';
+    const INVOICE_TYPE_CODE = 'invoice';
+    const CREDIT_MEMO_TYPE_CODE = 'creditmemo';
+    const SHIPMENT_TYPE_CODE = 'shipment';
+
+
     public static function getNextSteps(){
         $step = null;
         $criteria = new CDbCriteria();
@@ -173,14 +184,29 @@ class MigrateSteps extends MigrateStepsPeer
      * @return null|string
      */
     public static function getMage1CategoryName($category_id){
-        $attribute_id = 41;
         $name = null;
-        $model = Mage1CatalogCategoryEntityVarchar::model()->find("entity_id = {$category_id} AND attribute_id = {$attribute_id}");
-        if ($model){
-            $name = $model->value;
+        if ($category_id){
+            $entity_type_id = MigrateSteps::getMage1EntityTypeId(self::CATEGORY_TYPE_CODE);
+            $attribute_id = MigrateSteps::getMage1AttributeId('name', $entity_type_id);
+            $model = Mage1CatalogCategoryEntityVarchar::model()->find("entity_id = {$category_id} AND attribute_id = {$attribute_id}");
+            if ($model){
+                $name = $model->value;
+            }
         }
 
         return $name;
+    }
+
+    public static function getMage1EntityTypeId($entity_type_code){
+        $id = null;
+        if ($entity_type_code){
+            $db = Yii::app()->mage1;
+            $tablePrefix = $db->tablePrefix;
+            $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+            $id = $db->createCommand($query)->queryScalar();
+        }
+
+        return $id;
     }
 
     /**
@@ -282,5 +308,12 @@ class MigrateSteps extends MigrateStepsPeer
         }
 
         return $total;
+    }
+
+    public static function getMG1VersionOptions(){
+        $options = array(
+            'mage19x' => Yii::t('frontend', 'Magento 1.9.x')
+        );
+        return $options;
     }
 }

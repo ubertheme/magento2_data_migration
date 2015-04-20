@@ -18,5 +18,12 @@
     <?php endif; ?>
 </ul>
 <div id="btn-reset">
-    <a href="<?php echo Yii::app()->createUrl("migrate/resetAll"); ?>" title="<?php echo Yii::t('frontend', 'Click to reset all steps.'); ?>" class="btn btn-danger"><?php echo Yii::t('frontend', 'Reset All'); ?></a>
+    <?php
+        if(MigrateSteps::model()->count("status =".MigrateSteps::STATUS_DONE) > 0){
+            $class = "btn btn-danger";
+        }else{
+            $class = "btn btn-danger disabled";
+        }
+    ?>
+    <a href="<?php echo Yii::app()->createUrl("migrate/resetAll"); ?>" title="<?php echo Yii::t('frontend', 'Click to reset all steps.'); ?>" class="<?php echo $class; ?>"><?php echo Yii::t('frontend', 'Reset All'); ?></a>
 </div>

@@ -55,13 +55,15 @@
 
         //add disabled class after click on a button
         $(".btn").on('click', function(){
-            $.showProcessorBox();
-            $(this).addClass("disabled");
-            if ($(this).prop("tagName") == 'A'){
-                $(this).attr('disabled', true)
-            }
-            else if ($(this).prop("tagName") == 'BUTTON') {
-                $(this).prop('disabled', true);
+            if (!$(this).hasClass('need-validate-form')){
+                $.showProcessorBox();
+                $(this).addClass("disabled");
+                if ($(this).prop("tagName") == 'A'){
+                    $(this).attr('disabled', true)
+                }
+                else if ($(this).prop("tagName") == 'BUTTON') {
+                    $(this).prop('disabled', true);
+                }
             }
         });
 
@@ -84,6 +86,7 @@
                 $('.loading-box').attr('style', 'margin: '+tmp+'px auto !important');
             }
         });
+
     });
 
 })(jQuery);

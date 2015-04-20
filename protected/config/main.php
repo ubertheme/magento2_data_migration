@@ -20,7 +20,6 @@ return CMap::mergeArray(
             ),
 
             'errorHandler'=>array(
-                // use 'site/error' action to display errors
                 'errorAction'=>'migrate/error',
             ),
             'urlManager'=>array(
@@ -43,6 +42,43 @@ return CMap::mergeArray(
 //                    ),
                 ),
             ),
+
+            //Database of tool
+//            'db' => array(
+//                'connectionString' => 'mysql:host=localhost;dbname=ub_tool',
+//                'emulatePrepare' => true,
+//                'username' => 'root',
+//                'password' => '',
+//                'charset' => 'utf8',
+//                'tablePrefix' => 'ub_',
+//                'class' => 'CDbConnection'
+//            ),
+            'db'=>array(
+                'connectionString' => 'sqlite:protected/data/ub_tool.db',
+                'tablePrefix' => 'ub_',
+            )
         ),
+
+        // auto loading model and component classes
+        'import'=>array(
+            'application.components.*',
+            'application.models.*',
+            'application.models.db.*',
+            'application.models.db.mage2.*',
+
+            'application.models.mage2.*',
+            'application.models.mage1.*'
+        ),
+
+        // application-level parameters that can be accessed
+        // using Yii::app()->params['paramName']
+        'params'=> array(
+            // this is displayed in the header section
+            'title'=>'Migrate Data Tool for Magento - UberTheme',
+            // this is used in error pages
+            'adminEmail'=>'quynhvv@joomsolutions.com',
+            // the copyright information displayed in the footer section
+            'copyrightInfo'=>'Copyright &copy; 2015 by Ubertheme.com',
+        )
     )
 );

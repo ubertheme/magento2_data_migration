@@ -5,56 +5,59 @@ class MigrateController extends Controller
 	public $layout = '2column_left';
 
     protected function beforeAction($action) {
-        //increase the max execution time
-        @ini_set('max_execution_time', -1);
+        if ($action->id != 'step1'){
 
-        // SET FOREIGN_KEY_CHECKS=0;
-        $sql = "SET FOREIGN_KEY_CHECKS=0";
-        Yii::app()->mage2->createCommand($sql)->execute();
+            //increase the max execution time
+            @ini_set('max_execution_time', -1);
+
+            // SET FOREIGN_KEY_CHECKS=0;
+            $sql = "SET FOREIGN_KEY_CHECKS=0";
+            Yii::app()->mage2->createCommand($sql)->execute();
 
 
-        //initial needed session variables
-        //needed session variables
-        $migrated_data = array(
-            'website_ids' => array(),
-            'store_group_ids' => array(),
-            'store_ids' => array(),
-            'category_ids' => array(),
-            'product_type_ids' => array(),
-            'product_ids' => array(),
-            'customer_group_ids' => array(),
-            'customer_ids' => array(),
-            'sales_object_ids' => array(),
-            'sales_order_ids' => array(),
-            'sales_quote_ids' => array(),
-            'sales_invoice_ids' => array(),
-            'sales_shipment_ids' => array(),
-            'sales_credit_ids' => array()
-        );
-        $migratedObj = (object) $migrated_data;
-        //update migrated data
-        $steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
-        if ($steps){
-            foreach ($steps as $step) {
-                $migrated_data = json_decode($step->migrated_data);
-                if ($migrated_data) {
-                    $attributes = get_object_vars($migrated_data);
-                    if ($attributes){
-                        foreach ($attributes as $attr => $value){
-                            $migratedObj->$attr = $value;
+            //initial needed session variables
+            //needed session variables
+            $migrated_data = array(
+                'website_ids' => array(),
+                'store_group_ids' => array(),
+                'store_ids' => array(),
+                'category_ids' => array(),
+                'product_type_ids' => array(),
+                'product_ids' => array(),
+                'customer_group_ids' => array(),
+                'customer_ids' => array(),
+                'sales_object_ids' => array(),
+                'sales_order_ids' => array(),
+                'sales_quote_ids' => array(),
+                'sales_invoice_ids' => array(),
+                'sales_shipment_ids' => array(),
+                'sales_credit_ids' => array()
+            );
+            $migratedObj = (object) $migrated_data;
+            //update migrated data
+            $steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
+            if ($steps){
+                foreach ($steps as $step) {
+                    $migrated_data = json_decode($step->migrated_data);
+                    if ($migrated_data) {
+                        $attributes = get_object_vars($migrated_data);
+                        if ($attributes){
+                            foreach ($attributes as $attr => $value){
+                                $migratedObj->$attr = $value;
+                            }
                         }
                     }
                 }
             }
-        }
-        //initial session
-        $attributes = get_object_vars($migratedObj);
-        if ($attributes){
-            foreach ($attributes as $attr => $value){
-                Yii::app()->session['migrated_'.$attr] = $value;
+            //initial session
+            $attributes = get_object_vars($migratedObj);
+            if ($attributes){
+                foreach ($attributes as $attr => $value){
+                    Yii::app()->session['migrated_'.$attr] = $value;
+                }
             }
+            //end initial needed session variables
         }
-        //end initial needed session variables
 
         return parent::beforeAction($action);
     }
@@ -66,26 +69,28 @@ class MigrateController extends Controller
      */
     protected function afterAction($action)
     {
-        // SET FOREIGN_KEY_CHECKS=1;
-        $sql = "SET FOREIGN_KEY_CHECKS=1";
-        Yii::app()->mage2->createCommand($sql)->execute();
+        if ($action->id != 'step1'){
+            // SET FOREIGN_KEY_CHECKS=1;
+            $sql = "SET FOREIGN_KEY_CHECKS=1";
+            Yii::app()->mage2->createCommand($sql)->execute();
+        }
 
         return parent::afterAction($action);
     }
 
-	/**
-	 * This is the action to handle external exceptions.
-	 */
-	public function actionError()
-	{
-	    if($error=Yii::app()->errorHandler->error)
-	    {
-	    	if(Yii::app()->request->isAjaxRequest)
-	    		echo $error['message'];
-	    	else
-	        	$this->render('error', $error);
-	    }
-	}
+    /**
+     * This is the action to handle external exceptions.
+     */
+    public function actionError()
+    {
+        if($error=Yii::app()->errorHandler->error)
+        {
+            if(Yii::app()->request->isAjaxRequest)
+                echo $error['message'];
+            else
+                $this->render('error', $error);
+        }
+    }
 
 	/**
 	 * Displays the index page
@@ -97,11 +102,96 @@ class MigrateController extends Controller
 	}
 
     /**
-     * Migrate Websites & Store groups & Store views
+     * Database settings
      */
     public function actionStep1()
     {
         $step = MigrateSteps::model()->find("sorder = 1");
+        if (Yii::app()->request->isPostRequest){
+
+            $step->migrated_data = json_encode($_POST);
+
+            //validate database
+            $err_msg = array();
+            $validate = @mysql_connect($_POST['mg1_host'], $_POST['mg1_db_user'], $_POST['mg1_db_pass']);
+            if (!$validate){
+                $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 1 database.");
+            }else{
+                if (!mysql_select_db( $_POST['mg1_db_name'], $validate)){
+                    $err_msg[] = Yii::t('frontend', "Database Name of Magento 1 was not found in database.");
+                    $validate = false;
+                }else{
+                    //validate magento2
+                    mysql_close($validate);
+                    $validate = @mysql_connect($_POST['mg2_host'], $_POST['mg2_db_user'], $_POST['mg2_db_pass']);
+                    if (!$validate){
+                        $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 2 database.");
+                    }else{
+                        if (!mysql_select_db( $_POST['mg2_db_name'], $validate)){
+                            $err_msg[] = Yii::t('frontend', "Database Name of Magento 2 was not found in database.");
+                            $validate = false;
+                        } else{
+                            mysql_close($validate);
+                        }
+                    }
+                }
+            }
+
+            if ($validate){
+                //save to config file
+                $configTemplate = Yii::app()->basePath .DIRECTORY_SEPARATOR. "config".DIRECTORY_SEPARATOR."config.template";
+                $configFilePath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "config".DIRECTORY_SEPARATOR."config.php";
+                if (file_exists($configTemplate)){
+                    if (file_exists($configFilePath) && is_writable($configFilePath)){
+                        $configs = file_get_contents($configTemplate);
+                        //replace needed configs
+                        $configs = str_replace('{MG1_HOST}', $_POST['mg1_host'], $configs);
+                        $configs = str_replace('{MG1_DB_NAME}', $_POST['mg1_db_name'], $configs);
+                        $configs = str_replace('{MG1_DB_USER}', $_POST['mg1_db_user'], $configs);
+                        $configs = str_replace('{MG1_DB_PASS}', $_POST['mg1_db_pass'], $configs);
+                        $configs = str_replace('{MG1_DB_PREFIX}', $_POST['mg1_db_prefix'], $configs);
+                        $configs = str_replace('{MG1_VERSION}', $_POST['mg1_version'], $configs);
+                        //Mage2
+                        $configs = str_replace('{MG2_HOST}', $_POST['mg2_host'], $configs);
+                        $configs = str_replace('{MG2_DB_NAME}', $_POST['mg2_db_name'], $configs);
+                        $configs = str_replace('{MG2_DB_USER}', $_POST['mg2_db_user'], $configs);
+                        $configs = str_replace('{MG2_DB_PASS}', $_POST['mg2_db_pass'], $configs);
+                        $configs = str_replace('{MG2_DB_PREFIX}', $_POST['mg2_db_prefix'], $configs);
+
+                        //save
+                        if (file_put_contents($configFilePath, $configs)){
+                            //save settings to database
+                            $step->status = MigrateSteps::STATUS_DONE;
+                            if ($step->save()){
+                                //alert message
+                                Yii::app()->user->setFlash('success', Yii::t('frontend', "Your settings was saved successfully."));
+                            }
+                        }
+                    }else{
+                        Yii::app()->user->setFlash('note', Yii::t('frontend', "The config file was not exists or not ablewrite permission.<br/>Please make writeable for config file and try again."));
+                    }
+                }else{
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "The config.template file was not exists."));
+                }
+            }else{
+                Yii::app()->user->setFlash('error', implode('</br>', $err_msg));
+            }
+        }
+
+        $settings = (object)json_decode($step->migrated_data);
+        $assign_data = array(
+            'step' => $step,
+            'settings' => $settings
+        );
+        $this->render("step{$step->sorder}", $assign_data);
+    }
+
+    /**
+     * Migrate Websites & Store groups & Store views
+     */
+    public function actionStep2()
+    {
+        $step = MigrateSteps::model()->find("sorder = 2");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
 
@@ -118,7 +208,7 @@ class MigrateController extends Controller
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step1_reset.sql";
+                    $resetSQLFile = $dataPath . "step2_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -262,9 +352,9 @@ class MigrateController extends Controller
     /**
      * Migrate Attributes
      */
-    public function actionStep2()
+    public function actionStep3()
     {
-        $step = MigrateSteps::model()->find("sorder = 2");
+        $step = MigrateSteps::model()->find("sorder = 3");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
 
@@ -274,21 +364,22 @@ class MigrateController extends Controller
             $total_attribute_set = $total_attribute_group = $total_attribute = $total_entity_attribute = 0;
             $migrated_attribute_set_ids = $migrated_attribute_group_ids = $migrated_attribute_ids = array();
 
+            //get product entity type id
+            $product_entity_type_id = MigrateSteps::getMage1EntityTypeId(MigrateSteps::PRODUCT_TYPE_CODE);
+
             //get all product attribute sets in magento1
-            $condition = "entity_type_id = 4";
-            $attribute_sets = Mage1AttributeSet::model()->findAll($condition);
+            $attribute_sets = Mage1AttributeSet::model()->findAll("entity_type_id = {$product_entity_type_id}");
 
             //get all product attributes
-            //$condition = "entity_type_id = 4 AND is_user_defined = 1";
-            $condition = "entity_type_id = 4";
-            $attributes = Mage1Attribute::model()->findAll($condition);
+            //$condition = "entity_type_id = {$product_entity_type_id} AND is_user_defined = 1";
+            $attributes = Mage1Attribute::model()->findAll("entity_type_id = {$product_entity_type_id}");
 
             if (Yii::app()->request->isPostRequest){
 
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step2_reset.sql";
+                    $resetSQLFile = $dataPath . "step3_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -358,7 +449,7 @@ class MigrateController extends Controller
                         else
                             $attribute_code2 = $attribute->attribute_code;
 
-                        $condition = "entity_type_id = 4 AND attribute_code = '{$attribute_code2}'";
+                        $condition = "entity_type_id = {$product_entity_type_id} AND attribute_code = '{$attribute_code2}'";
                         $attribute2 = Mage2Attribute::model()->find($condition);
                         if (!$attribute2){
                             $attribute2 = new Mage2Attribute();
@@ -501,7 +592,7 @@ class MigrateController extends Controller
                     $str_migrated_attribute_ids = implode(',', $migrated_attribute_ids);
                     $str_migrated_attribute_set_ids = implode(',', $migrated_attribute_set_ids);
                     $str_migrated_attribute_group_ids = implode(',', $migrated_attribute_group_ids);
-                    $condition = "entity_type_id = 4 AND attribute_id IN ($str_migrated_attribute_ids)";
+                    $condition = "entity_type_id = {$product_entity_type_id} AND attribute_id IN ($str_migrated_attribute_ids)";
                     $condition .= " AND attribute_set_id IN ({$str_migrated_attribute_set_ids})";
                     $condition .= " AND attribute_group_id IN ({$str_migrated_attribute_group_ids})";
                     $entity_attributes = Mage1EntityAttribute::model()->findAll($condition);
@@ -554,9 +645,9 @@ class MigrateController extends Controller
     /**
      * Migrate Categories
      */
-    public function actionStep3()
+    public function actionStep4()
     {
-        $step = MigrateSteps::model()->find("sorder = 3");
+        $step = MigrateSteps::model()->find("sorder = 4");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
 
@@ -575,7 +666,7 @@ class MigrateController extends Controller
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step3_reset.sql";
+                    $resetSQLFile = $dataPath . "step4_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -599,16 +690,17 @@ class MigrateController extends Controller
                  * Get black list attribute ids
                  * We do not migrate bellow attributes
                 */
+                $entity_type_id = MigrateSteps::getMage1EntityTypeId(MigrateSteps::CATEGORY_TYPE_CODE);
                 $checkList = array(
-                    MigrateSteps::getMage1AttributeId('display_mode', 3) => 'PRODUCTS',
-                    MigrateSteps::getMage1AttributeId('landing_page', 3) => '',
-                    MigrateSteps::getMage1AttributeId('custom_design', 3) => '',
-                    MigrateSteps::getMage1AttributeId('custom_design_from', 3) => null,
-                    MigrateSteps::getMage1AttributeId('custom_design_to', 3) => null,
-                    MigrateSteps::getMage1AttributeId('page_layout', 3) => '',
-                    MigrateSteps::getMage1AttributeId('custom_layout_update', 3) => '',
-                    MigrateSteps::getMage1AttributeId('custom_apply_to_products', 3) => 1,
-                    MigrateSteps::getMage1AttributeId('custom_use_parent_settings', 3) => 1,
+                    MigrateSteps::getMage1AttributeId('display_mode', $entity_type_id) => 'PRODUCTS',
+                    MigrateSteps::getMage1AttributeId('landing_page', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_design', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_design_from', $entity_type_id) => null,
+                    MigrateSteps::getMage1AttributeId('custom_design_to', $entity_type_id) => null,
+                    MigrateSteps::getMage1AttributeId('page_layout', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_layout_update', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_apply_to_products', $entity_type_id) => 1,
+                    MigrateSteps::getMage1AttributeId('custom_use_parent_settings', $entity_type_id) => 1,
                 );
                 $keyCheckList = array_keys($checkList);
 
@@ -868,9 +960,9 @@ class MigrateController extends Controller
     /**
      * Migrate Products
      */
-    public function actionStep4()
+    public function actionStep5()
     {
-        $step = MigrateSteps::model()->find("sorder = 4");
+        $step = MigrateSteps::model()->find("sorder = 5");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
             //get migrated website ids from session if has
@@ -895,7 +987,7 @@ class MigrateController extends Controller
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step4_reset.sql";
+                    $resetSQLFile = $dataPath . "step5_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -916,12 +1008,13 @@ class MigrateController extends Controller
                  * Get black list attribute ids
                  * We do not migrate bellow attributes
                 */
+                $entity_type_id = MigrateSteps::getMage1EntityTypeId(MigrateSteps::PRODUCT_TYPE_CODE);
                 $checkList = array(
-                    MigrateSteps::getMage1AttributeId('custom_design', 4) => '',
-                    MigrateSteps::getMage1AttributeId('custom_design_from', 4) => null,
-                    MigrateSteps::getMage1AttributeId('custom_design_to', 4) => null,
-                    MigrateSteps::getMage1AttributeId('page_layout', 4) => '',
-                    MigrateSteps::getMage1AttributeId('custom_layout_update', 4) => null,
+                    MigrateSteps::getMage1AttributeId('custom_design', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_design_from', $entity_type_id) => null,
+                    MigrateSteps::getMage1AttributeId('custom_design_to', $entity_type_id) => null,
+                    MigrateSteps::getMage1AttributeId('page_layout', $entity_type_id) => '',
+                    MigrateSteps::getMage1AttributeId('custom_layout_update', $entity_type_id) => null,
                 );
                 $keyCheckList = array_keys($checkList);
 
@@ -1676,9 +1769,9 @@ class MigrateController extends Controller
     /**
      * Migrate Customers
      */
-    public function actionStep5()
+    public function actionStep6()
     {
-        $step = MigrateSteps::model()->find("sorder = 5");
+        $step = MigrateSteps::model()->find("sorder = 6");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
             //get all current customer groups
@@ -1694,7 +1787,7 @@ class MigrateController extends Controller
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step5_reset.sql";
+                    $resetSQLFile = $dataPath . "step6_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -1999,9 +2092,9 @@ class MigrateController extends Controller
      * Migrate Data from:
      * Sales Orders, Sales Quote, Sales Payments, Sales Invoices, Sales Shipments
      */
-    public function actionStep6()
+    public function actionStep7()
     {
-        $step = MigrateSteps::model()->find("sorder = 6");
+        $step = MigrateSteps::model()->find("sorder = 7");
         $result = MigrateSteps::checkStep($step->sorder);
         if ($result['allowed']){
             //declare objects to migrate
@@ -2025,7 +2118,7 @@ class MigrateController extends Controller
                 $is_reset = Yii::app()->request->getPost('reset');
                 if ($is_reset){
                     $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step6_reset.sql";
+                    $resetSQLFile = $dataPath . "step7_reset.sql";
                     if (file_exists($resetSQLFile)) {
                         $rs = MigrateSteps::executeFile($resetSQLFile);
                         if ($rs){
@@ -2765,6 +2858,14 @@ class MigrateController extends Controller
         $steps = MigrateSteps::model()->findAll();
         if ($steps){
             foreach ($steps as $step){
+                //only for step1
+                if($step->sorder == 1){
+                    $step->status = MigrateSteps::STATUS_NOT_DONE;
+                    $step->migrated_data = null;
+                    $step->update();
+                }
+
+                //other steps
                 $resetSQLFile = $dataPath . "step{$step->sorder}_reset.sql";
                 if (file_exists($resetSQLFile)) {
                     $rs = MigrateSteps::executeFile($resetSQLFile);

@@ -19,64 +19,75 @@
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
         </div>
     <?php endif; ?>
-    <!--//   Form Buttons-->
+    <!--//    Form Buttons-->
 
+    <?php
+    //get migrated website ids from session if has
+    $migrated_website_ids = isset(Yii::app()->session['migrated_website_ids']) ? Yii::app()->session['migrated_website_ids'] : array();
+    ?>
+    <?php foreach ($websites as $website): ?>
     <ul class="list-group">
         <li class="list-group-item">
-            <h3 class="list-group-item-heading">
-                <?php if ($step->status == MigrateSteps::STATUS_DONE): ?>
-                    <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                <?php endif; ?>
-                <?php echo Yii::t('frontend', 'Product Attribute Sets'); ?> (<?php echo sizeof($attribute_sets); ?>)
-            </h3>
+            <h4 class="list-group-item-heading">
+                <label class="checkbox-inline">
+                    <?php if ($checked = in_array($website->website_id, $migrated_website_ids)): ?>
+                        <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                    <?php endif; ?>
+                    <input type="checkbox" id="website-<?php echo $website->website_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="website_ids[]" value="<?=$website->website_id?>" />
+                    <?php echo $website->name; ?>
+                </label>
+            </h4>
 
-            <!--
-            <?php if ($attribute_sets): ?>
-            <ul class="list-group" style="display: none;">
-            <?php foreach ($attribute_sets as $attribute_set): ?>
-            <li class="list-group-item">
-                <h4 class="list-group-item-heading">
-                    <label class="checkbox-inline">
-                        <input type="checkbox" id="attribute-set-<?php echo $attribute_set->attribute_set_id; ?>" name="attribute_set_ids[]" value="<?php echo $attribute_set->attribute_set_id; ?>" />
-                        <?php echo $attribute_set->attribute_set_name; ?>
-                    </label>
-                </h4>
+            <?php
+                //Get list store groups of current website
+                $storeGroups = Mage1StoreGroup::model()->findAll("website_id = {$website->website_id}");
+                // Get migrated store group ids from session
+                $migrated_store_group_ids = isset(Yii::app()->session['migrated_store_group_ids']) ? Yii::app()->session['migrated_store_group_ids'] : array();
+            ?>
 
-                <?php
-                    //get all attribute groups of current attribute set
-                    $condition = "attribute_set_id = {$attribute_set->attribute_set_id}";
-                    $attribute_groups = Mage1AttributeGroup::model()->findAll($condition);
-                ?>
-
-                <?php if ($attribute_groups): ?>
-                <ul class="list-group">
-                    <?php foreach ($attribute_groups as $attribute_group): ?>
+            <?php if ($storeGroups): ?>
+            <ul class="list-group">
+                <?php foreach ($storeGroups as $storeGroup): ?>
                     <li class="list-group-item">
                         <h5 class="list-group-item-heading">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" id="attribute-group-<?php echo $attribute_group->attribute_group_id; ?>" name="attribute_group_ids[<?php echo $attribute_set->attribute_set_id; ?>][]" class="attribute-group-<?php echo $attribute_set->attribute_set_id; ?>" value="<?=$attribute_group->attribute_group_id?>" />
-                                <?php echo $attribute_group->attribute_group_name; ?>
-                            </label>
+                        <label class="checkbox-inline">
+                            <?php if ($checked = in_array($storeGroup->group_id, $migrated_store_group_ids)): ?>
+                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                            <?php endif; ?>
+                            <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?=$storeGroup->group_id?>" />
+                            <?php echo $storeGroup->name; ?>
+                        </label>
                         </h5>
+
+                        <?php
+                            //Get list stores of current store group
+                            $stores = Mage1Store::model()->findAll("website_id = {$website->website_id} AND group_id = {$storeGroup->group_id}");
+
+                            //Get migrated store ids from session
+                            $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+                        ?>
+                        <?php if ($stores): ?>
+                            <ul class="list-group">
+                                <?php foreach ($stores as $store): ?>
+                                    <li class="list-group-item">
+                                        <label class="checkbox-inline">
+                                            <?php if ($checked = in_array($store->store_id, $migrated_store_ids)): ?>
+                                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                                            <?php endif; ?>
+                                            <input type="checkbox" id="store-<?php echo $store->store_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_ids[<?php echo $storeGroup->group_id; ?>][]" class="store-<?php echo $storeGroup->group_id; ?>" value="<?=$store->store_id?>" />
+                                            <?php echo $store->name; ?>
+                                        </label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
                     </li>
-                    <?php endforeach; ?>
-                </ul>
-                <?php endif;?>
-            </li>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
             </ul>
             <?php endif; ?>
-            -->
-        </li>
-        <li class="list-group-item">
-            <h3 class="list-group-item-heading">
-                <?php if ($step->status == MigrateSteps::STATUS_DONE): ?>
-                    <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                <?php endif; ?>
-                <?php echo Yii::t('frontend', 'Product Attributes'); ?> (<?php echo Mage1Attribute::model()->count("entity_type_id = 4");?> attributes. There are <?php echo MigrateSteps::getTotalVisibleProductsAttr(); ?> attributes visible in back-end.)
-            </h3>
         </li>
     </ul>
+    <?php endforeach; ?>
 
     <!--    Form Buttons-->
     <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
@@ -90,6 +101,7 @@
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
         </div>
     <?php endif; ?>
-    <!--//   Form Buttons-->
+    <!--//    Form Buttons-->
 </div>
+
 </form>

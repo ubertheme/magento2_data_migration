@@ -39,7 +39,7 @@ To use this migration tool, follow the steps below.
 - Follow our <a href="http://www.ubertheme.com/magento-news/magento-2-0-installation-guide/">Installation guide</a> to Install Magento 2
 
 <h4># Step2: Configure the tool</h4>
-1 - Make a folder named "migrate_data_tool" in your web root. (For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: https://github.com/ubertheme/magento2_data_migration to the folder you have just created.
+- Make a folder named "migrate_data_tool" in your web root. (For example: PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool) and clone all source code of this tool from Git repository at: https://github.com/ubertheme/magento2_data_migration to the folder you have just created.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/migrate.jpg" alt="Magento 2 Migration Data Tool" /></p>
 </div>
@@ -51,39 +51,12 @@ To use this migration tool, follow the steps below.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/run-time.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 </div>
-
-2 - Our Magento data migration tool works as a website app, so we need to make a database for it.
-- Open your MySQL manager (for example: phpMyAdmin ...) and create a database called <strong>ub_migrate_data</strong> then import the file SQL in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\data\ub_tool.sql</strong> to this Database.
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/ub-tool.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-</div>
-
-3 - Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
-and find the line with comment text "//Database of tool" and put the Database information which you have just created in the above step.
-In this step you need to focus on these params: host, dbname, username, password, etc.
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/2.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-</div>
-
-4 - Configure the Database information of your website with Magento 1:
-Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
-and navigate to comment text "//Database of Magento1" and put the correct Database information of Magento 1 website as the above step.
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/1.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-</div>
-
-5 - Configure the Database information of your website with Magento2:
-Open the config file at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
-and navigate to comment text "//Database of Magento2" and put the correct your Database information of Magento2 website as above step.
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/11.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-</div>
+- Make writeable permission for config file at path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
 
 <h4># Step 3: Run this tool in your browser to migrate your data</h4>
-1 - Open your browser and type in the url to run this tool.
+- Open your browser and type in the url to run this tool.
 For example: go to http://localhost/migrate-data-tool/ and press Enter key.
-
-2 - Follow step by step to migrate needed Data from Magento 1 website to Magento2 website.
+- Follow step by step to migrate needed Data from Magento 1 website to Magento2 website.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/step-2.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 </div>
