@@ -43,8 +43,11 @@ To use this migration tool, follow the steps below.
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/migrate.jpg" alt="Magento 2 Migration Data Tool" /></p>
 </div>
-- Make writeable permission for folders at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\assets and folder at <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\runtime
-- Make writeable permission for config file at path <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php</strong>
+- Make writeable permission for folders at:
+    - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\assets </strong>
+    - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\runtime </strong>
+- Make writeable permission for config file at:
+    - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php </strong>
 
 <h4># Step 3: Run this tool in your browser to migrate your data</h4>
 - Open your browser and type in the url to run this tool.
