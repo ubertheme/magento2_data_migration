@@ -78,6 +78,7 @@
  * @property integer $customer_group_id
  * @property integer $edit_increment
  * @property integer $email_sent
+ * @property integer $send_email
  * @property integer $forced_shipment_with_invoice
  * @property integer $payment_auth_expiration
  * @property integer $quote_address_id
@@ -160,7 +161,7 @@ class Mage2SalesOrderPeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('created_at', 'required'),
-			array('is_virtual, store_id, can_ship_partially, can_ship_partially_item, customer_is_guest, customer_note_notify, billing_address_id, customer_group_id, edit_increment, email_sent, forced_shipment_with_invoice, payment_auth_expiration, quote_address_id, quote_id, shipping_address_id, total_item_count, customer_gender, gift_message_id', 'numerical', 'integerOnly'=>true),
+			array('is_virtual, store_id, can_ship_partially, can_ship_partially_item, customer_is_guest, customer_note_notify, billing_address_id, customer_group_id, edit_increment, email_sent, send_email, forced_shipment_with_invoice, payment_auth_expiration, quote_address_id, quote_id, shipping_address_id, total_item_count, customer_gender, gift_message_id', 'numerical', 'integerOnly'=>true),
 			array('state, status, relation_child_id, relation_child_real_id, relation_parent_id, relation_parent_real_id', 'length', 'max'=>32),
 			array('coupon_code, protect_code, shipping_description, applied_rule_ids, customer_email, customer_firstname, customer_lastname, customer_middlename, customer_prefix, customer_suffix, customer_taxvat, discount_description, ext_customer_id, ext_order_id, hold_before_state, hold_before_status, order_currency_code, remote_ip, shipping_method, store_name, x_forwarded_for, coupon_rule_name', 'length', 'max'=>255),
 			array('customer_id', 'length', 'max'=>10),

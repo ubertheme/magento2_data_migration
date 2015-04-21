@@ -9,6 +9,7 @@
  * @property string $total_weight
  * @property string $total_qty
  * @property integer $email_sent
+ * @property integer $send_email
  * @property string $order_id
  * @property integer $customer_id
  * @property integer $shipping_address_id
@@ -17,7 +18,8 @@
  * @property string $increment_id
  * @property string $created_at
  * @property string $updated_at
- * @property string $packages
+ * @property string $customer_note
+ * @property string $customer_note_notify
  * @property string $shipping_label
  */
 class Mage2SalesShipmentPeer extends Mage2ActiveRecord
@@ -39,7 +41,7 @@ class Mage2SalesShipmentPeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('order_id', 'required'),
-			array('store_id, email_sent, customer_id, shipping_address_id, billing_address_id, shipment_status', 'numerical', 'integerOnly'=>true),
+			array('store_id, email_sent, send_email, customer_id, shipping_address_id, billing_address_id, shipment_status', 'numerical', 'integerOnly'=>true),
 			array('total_weight, total_qty', 'length', 'max'=>12),
 			array('order_id', 'length', 'max'=>10),
 			array('increment_id', 'length', 'max'=>50),

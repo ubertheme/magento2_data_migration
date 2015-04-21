@@ -5,59 +5,52 @@ class MigrateController extends Controller
 	public $layout = '2column_left';
 
     protected function beforeAction($action) {
-        if ($action->id != 'step1'){
 
-            //increase the max execution time
-            @ini_set('max_execution_time', -1);
+        //increase the max execution time
+        @ini_set('max_execution_time', -1);
 
-            // SET FOREIGN_KEY_CHECKS=0;
-            $sql = "SET FOREIGN_KEY_CHECKS=0";
-            Yii::app()->mage2->createCommand($sql)->execute();
-
-
-            //initial needed session variables
-            //needed session variables
-            $migrated_data = array(
-                'website_ids' => array(),
-                'store_group_ids' => array(),
-                'store_ids' => array(),
-                'category_ids' => array(),
-                'product_type_ids' => array(),
-                'product_ids' => array(),
-                'customer_group_ids' => array(),
-                'customer_ids' => array(),
-                'sales_object_ids' => array(),
-                'sales_order_ids' => array(),
-                'sales_quote_ids' => array(),
-                'sales_invoice_ids' => array(),
-                'sales_shipment_ids' => array(),
-                'sales_credit_ids' => array()
-            );
-            $migratedObj = (object) $migrated_data;
-            //update migrated data
-            $steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
-            if ($steps){
-                foreach ($steps as $step) {
-                    $migrated_data = json_decode($step->migrated_data);
-                    if ($migrated_data) {
-                        $attributes = get_object_vars($migrated_data);
-                        if ($attributes){
-                            foreach ($attributes as $attr => $value){
-                                $migratedObj->$attr = $value;
-                            }
+        //initial needed session variables
+        //needed session variables
+        $migrated_data = array(
+            'website_ids' => array(),
+            'store_group_ids' => array(),
+            'store_ids' => array(),
+            'category_ids' => array(),
+            'product_type_ids' => array(),
+            'product_ids' => array(),
+            'customer_group_ids' => array(),
+            'customer_ids' => array(),
+            'sales_object_ids' => array(),
+            'sales_order_ids' => array(),
+            'sales_quote_ids' => array(),
+            'sales_invoice_ids' => array(),
+            'sales_shipment_ids' => array(),
+            'sales_credit_ids' => array()
+        );
+        $migratedObj = (object) $migrated_data;
+        //update migrated data
+        $steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
+        if ($steps){
+            foreach ($steps as $step) {
+                $migrated_data = json_decode($step->migrated_data);
+                if ($migrated_data) {
+                    $attributes = get_object_vars($migrated_data);
+                    if ($attributes){
+                        foreach ($attributes as $attr => $value){
+                            $migratedObj->$attr = $value;
                         }
                     }
                 }
             }
-            //initial session
-            $attributes = get_object_vars($migratedObj);
-            if ($attributes){
-                foreach ($attributes as $attr => $value){
-                    Yii::app()->session['migrated_'.$attr] = $value;
-                }
-            }
-            //end initial needed session variables
         }
+        //initial session
+        $attributes = get_object_vars($migratedObj);
+        if ($attributes){
+            foreach ($attributes as $attr => $value){
+                Yii::app()->session['migrated_'.$attr] = $value;
+            }
+        }
+        //end initial needed session variables
 
         return parent::beforeAction($action);
     }
@@ -69,12 +62,6 @@ class MigrateController extends Controller
      */
     protected function afterAction($action)
     {
-        if ($action->id != 'step1'){
-            // SET FOREIGN_KEY_CHECKS=1;
-            $sql = "SET FOREIGN_KEY_CHECKS=1";
-            Yii::app()->mage2->createCommand($sql)->execute();
-        }
-
         return parent::afterAction($action);
     }
 
@@ -163,6 +150,12 @@ class MigrateController extends Controller
                             //save settings to database
                             $step->status = MigrateSteps::STATUS_DONE;
                             if ($step->save()){
+
+                                $this->refresh();
+
+                                $sql = "SET FOREIGN_KEY_CHECKS=0";
+                                Yii::app()->mage2->createCommand($sql)->execute();
+
                                 //alert message
                                 Yii::app()->user->setFlash('success', Yii::t('frontend', "Your settings was saved successfully."));
                             }
@@ -2826,6 +2819,11 @@ class MigrateController extends Controller
                         'sales_credit_ids' => $migrated_credit_ids
                     ));
                     if ($step->update()) {
+
+                        //SET FOREIGN_KEY_CHECKS=1
+                        $sql = "SET FOREIGN_KEY_CHECKS=1";
+                        Yii::app()->mage2->createCommand($sql)->execute();
+
                         //update session
                         Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;
                         Yii::app()->session['migrated_sales_order_ids'] = $migrated_order_ids;

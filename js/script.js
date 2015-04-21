@@ -3,6 +3,8 @@
 
     $(document).ready(function ($){
 
+        $.hideProcessorBox();
+
         //hide the message function
         $.hideMessage = function(){
             if ($('#message').length){
