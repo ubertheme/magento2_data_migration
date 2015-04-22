@@ -3,7 +3,7 @@ return array(
 //    'components'=>array(
 //        //Database of Magento1
 //        'mage1' => array(
-//            'connectionString' => 'mysql:host=localhost;dbname=mage1901',
+//            'connectionString' => 'mysql:host=localhost;dbname=aroma1901',
 //            'emulatePrepare' => true,
 //            'username' => 'root',
 //            'password' => '',

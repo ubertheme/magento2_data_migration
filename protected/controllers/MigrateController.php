@@ -153,9 +153,6 @@ class MigrateController extends Controller
 
                                 $this->refresh();
 
-                                $sql = "SET FOREIGN_KEY_CHECKS=0";
-                                Yii::app()->mage2->createCommand($sql)->execute();
-
                                 //alert message
                                 Yii::app()->user->setFlash('success', Yii::t('frontend', "Your settings was saved successfully."));
                             }
@@ -214,6 +211,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 //start migrate process
                 $website_ids = Yii::app()->request->getParam('website_ids', array());
@@ -320,6 +320,9 @@ class MigrateController extends Controller
                             Yii::app()->session['migrated_store_group_ids'] = $migrated_store_group_ids;
                             Yii::app()->session['migrated_store_ids'] = $migrated_store_ids;
 
+                            //check foreign key
+                            Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
                             //alert message
                             $message = "Migrated successfully. Total Website: %s1, Total Store Groups: %s2, Total Store Views: %s3";
                             $message = Yii::t('frontend', $message, array('%s1'=> (sizeof($migrated_website_ids)-1), '%s2'=> (sizeof($migrated_store_group_ids)-1), '%s3' => (sizeof($migrated_store_ids)-1) ));
@@ -385,6 +388,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 //migrate attribute sets
                 if ($attribute_sets){
@@ -616,6 +622,10 @@ class MigrateController extends Controller
                 if ($total_attribute_set && $total_attribute_group && $total_attribute){
                     $step->status = MigrateSteps::STATUS_DONE;
                     if ($step->update()) {
+
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
                         $message = "Migrated successfully. Total Attribute Sets: %s1, Total Attribute Groups: %s2, Total Attributes: %s3";
                         $message = Yii::t('frontend', $message, array('%s1'=> $total_attribute_set, '%s2'=> $total_attribute_group, '%s3' => $total_attribute));
                         Yii::app()->user->setFlash('success', $message);
@@ -675,6 +685,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 //get all categories from magento1
                 $categories = Mage1CatalogCategoryEntity::model()->findAll();
@@ -932,6 +945,9 @@ class MigrateController extends Controller
                         //update session
                         Yii::app()->session['migrated_category_ids'] = $migrated_category_ids;
 
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
                         $message = "Migrated successfully. Total Categories migrated: %s1";
                         $message = Yii::t('frontend', $message, array('%s1'=> sizeof($migrated_category_ids)));
                         Yii::app()->user->setFlash('success', $message);
@@ -996,6 +1012,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 /*
                  * Get black list attribute ids
@@ -1741,6 +1760,9 @@ class MigrateController extends Controller
                         Yii::app()->session['migrated_product_type_ids'] = $migrated_product_type_ids;
                         Yii::app()->session['migrated_product_ids'] = $migrated_product_ids;
 
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
                         $message = "Migrated successfully. Total Products migrated: %s1";
                         $message = Yii::t('frontend', $message, array('%s1'=> sizeof($migrated_product_ids)));
                         Yii::app()->user->setFlash('success', $message);
@@ -1793,6 +1815,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 $selected_group_ids = Yii::app()->request->getPost('customer_group_ids', array());
                 if ($selected_group_ids){
@@ -2067,6 +2092,9 @@ class MigrateController extends Controller
                         Yii::app()->session['migrated_customer_group_ids'] = $migrated_customer_group_ids;
                         Yii::app()->session['migrated_customer_ids'] = $migrated_customer_ids;
 
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
                         $message = "Migrated successfully. Total Customer Groups migrated: %s1 and total Customers migrated: %s2.";
                         $message = Yii::t('frontend', $message, array('%s1'=> sizeof($migrated_customer_group_ids), '%s2' => sizeof($migrated_customer_ids)));
                         Yii::app()->user->setFlash('success', $message);
@@ -2124,6 +2152,9 @@ class MigrateController extends Controller
                         }
                     }
                 }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 $selected_objects = Yii::app()->request->getPost('selected_objects', array());
                 if ($selected_objects){
@@ -2356,46 +2387,6 @@ class MigrateController extends Controller
                                 if ($quote2->save()){
                                     $migrated_quote_ids[] = $quote->entity_id;
 
-                                    //quote_address
-                                    $models = Mage1SalesQuoteAddress::model()->findAll("quote_id = {$quote->entity_id}");
-                                    if ($models){
-                                        foreach ($models as $model){
-                                            $model2 = new Mage2SalesQuoteAddress();
-                                            foreach ($model2->attributes as $key => $value){
-                                                if (isset($model->$key)){
-                                                    $model2->$key = $model->$key;
-                                                }
-                                            }
-                                            if ($model2->save()){
-                                                //quote_address_item
-                                                $address_items = Mage1SalesQuoteAddressItem::model()->findAll("quote_address_id = {$model->address_id}");
-                                                if ($address_items){
-                                                    foreach ($address_items as $address_item){
-                                                        $address_item2 = new Mage2SalesQuoteAddressItem();
-                                                        foreach ($address_item2->attributes as $key => $value){
-                                                            if (isset($address_item->$key)){
-                                                                $address_item2->$key = $address_item->$key;
-                                                            }
-                                                        }
-                                                        $address_item2->save();
-                                                    }
-                                                }
-                                                //quote_shipping_rate
-                                                $shipping_rates = Mage1SalesQuoteShippingRate::model()->findAll("address_id = {$model->address_id}");
-                                                if ($shipping_rates){
-                                                    foreach ($shipping_rates as $shipping_rate){
-                                                        $shipping_rate2 = new Mage2SalesQuoteShippingRate();
-                                                        foreach ($shipping_rate2->attributes as $key => $value){
-                                                            if (isset($shipping_rate->$key)){
-                                                                $shipping_rate2->$key = $shipping_rate->$key;
-                                                            }
-                                                        }
-                                                        $shipping_rate2->save();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                     //quote_item
                                     $models = Mage1SalesQuoteItem::model()->findAll("quote_id = {$quote->entity_id}");
                                     if ($models){
@@ -2435,6 +2426,47 @@ class MigrateController extends Controller
                                                 }
                                             }
                                             $model2->save();
+                                        }
+                                    }
+
+                                    //quote_address
+                                    $models = Mage1SalesQuoteAddress::model()->findAll("quote_id = {$quote->entity_id}");
+                                    if ($models){
+                                        foreach ($models as $model){
+                                            $model2 = new Mage2SalesQuoteAddress();
+                                            foreach ($model2->attributes as $key => $value){
+                                                if (isset($model->$key)){
+                                                    $model2->$key = $model->$key;
+                                                }
+                                            }
+                                            if ($model2->save()){
+                                                //quote_address_item
+                                                $address_items = Mage1SalesQuoteAddressItem::model()->findAll("quote_address_id = {$model->address_id}");
+                                                if ($address_items){
+                                                    foreach ($address_items as $address_item){
+                                                        $address_item2 = new Mage2SalesQuoteAddressItem();
+                                                        foreach ($address_item2->attributes as $key => $value){
+                                                            if (isset($address_item->$key)){
+                                                                $address_item2->$key = $address_item->$key;
+                                                            }
+                                                        }
+                                                        $address_item2->save();
+                                                    }
+                                                }
+                                                //quote_shipping_rate
+                                                $shipping_rates = Mage1SalesQuoteShippingRate::model()->findAll("address_id = {$model->address_id}");
+                                                if ($shipping_rates){
+                                                    foreach ($shipping_rates as $shipping_rate){
+                                                        $shipping_rate2 = new Mage2SalesQuoteShippingRate();
+                                                        foreach ($shipping_rate2->attributes as $key => $value){
+                                                            if (isset($shipping_rate->$key)){
+                                                                $shipping_rate2->$key = $shipping_rate->$key;
+                                                            }
+                                                        }
+                                                        $shipping_rate2->save();
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -2820,9 +2852,8 @@ class MigrateController extends Controller
                     ));
                     if ($step->update()) {
 
-                        //SET FOREIGN_KEY_CHECKS=1
-                        $sql = "SET FOREIGN_KEY_CHECKS=1";
-                        Yii::app()->mage2->createCommand($sql)->execute();
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
 
                         //update session
                         Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;

@@ -3,8 +3,6 @@
 
     $(document).ready(function ($){
 
-        $.hideProcessorBox();
-
         //hide the message function
         $.hideMessage = function(){
             if ($('#message').length){
@@ -15,6 +13,19 @@
         setTimeout(function(){
             $.hideMessage();
         }, 30000);
+
+        //show/hide loading mask function
+        $.showProcessorBox = function(){
+            if ($('#processor-box').length){
+                $('#processor-box').modal('show');
+                $(window).trigger('resize');
+            }
+        }
+        $.hideProcessorBox = function(){
+            if ($('#processor-box').length){
+                $('#processor-box').modal('hide');
+            }
+        }
 
         //check/un-check website & stores on it
         $('INPUT[name="website_ids[]"]').on('change', function(){
@@ -68,19 +79,6 @@
                 }
             }
         });
-
-        //show/hide loading mask function
-        $.showProcessorBox = function(){
-            if ($('#processor-box').length){
-                $('#processor-box').modal('show');
-                $(window).trigger('resize');
-            }
-        }
-        $.hideProcessorBox = function(){
-            if ($('#processor-box').length){
-                $('#processor-box').modal('hide');
-            }
-        }
 
         $(window).resize(function(){
             if ($('.loading-box').length){
