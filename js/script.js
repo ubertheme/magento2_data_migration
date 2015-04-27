@@ -59,6 +59,12 @@
         });
         $('INPUT[name="select_all_sales_object"]').prop('checked', true).trigger('change');
 
+        //check/un-check review/rating objects
+        $('INPUT[name="select_all_object"]').on('change', function(){
+            $('INPUT[name="selected_objects[]"]').prop('checked', this.checked);
+        });
+        $('INPUT[name="select_all_object"]').prop('checked', true).trigger('change');
+
         //reset event
         $("button.reset").on('click', function(){
             if ($('INPUT[name="reset"]').length){

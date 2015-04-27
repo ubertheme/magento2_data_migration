@@ -76,18 +76,15 @@
             </div>
         </div>
 
-        <!--    Form Buttons-->
-        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-            <div class="step-controls">
+        <!-- Form Buttons-->
+        <div class="step-controls">
+            <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
                 <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-primary need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
-            </div>
-        <?php else: ?>
-            <div class="step-controls">
-                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
+            <?php else: ?>
+                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><?php echo Yii::t('frontend', 'Update'); ?></button>
                 <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-            </div>
-        <?php endif; ?>
-        <!--//    Form Buttons-->
+            <?php endif; ?>
+        </div>
+        <!--// Form Buttons-->
     </div>
-
 </form>

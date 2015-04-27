@@ -7,19 +7,17 @@
 <div id="step-content">
     <blockquote> <p class="tip"> <?php echo Yii::t('frontend', $step->descriptions); ?> </p> </blockquote>
 
-    <!--    Form Buttons-->
-    <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-        <div class="step-controls">
+    <!--  Form Buttons-->
+    <div class="step-controls">
+        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
-        </div>
-    <?php else: ?>
-        <div class="step-controls">
+        <?php else: ?>
             <input type="hidden" id="reset" name="reset" value="0" />
             <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-        </div>
-    <?php endif; ?>
-    <!--//    Form Buttons-->
+        <?php endif; ?>
+    </div>
+    <!--// Form Buttons-->
 
     <?php
     //get migrated website ids from session if has
@@ -29,10 +27,10 @@
     <ul class="list-group">
         <li class="list-group-item">
             <h4 class="list-group-item-heading">
+                <?php if ($checked = in_array($website->website_id, $migrated_website_ids)): ?>
+                    <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                <?php endif; ?>
                 <label class="checkbox-inline">
-                    <?php if ($checked = in_array($website->website_id, $migrated_website_ids)): ?>
-                        <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                    <?php endif; ?>
                     <input type="checkbox" id="website-<?php echo $website->website_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="website_ids[]" value="<?=$website->website_id?>" />
                     <?php echo $website->name; ?>
                 </label>
@@ -50,19 +48,18 @@
                 <?php foreach ($storeGroups as $storeGroup): ?>
                     <li class="list-group-item">
                         <h5 class="list-group-item-heading">
-                        <label class="checkbox-inline">
                             <?php if ($checked = in_array($storeGroup->group_id, $migrated_store_group_ids)): ?>
                                 <span class="glyphicon glyphicon-ok-sign text-success"></span>
                             <?php endif; ?>
-                            <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?=$storeGroup->group_id?>" />
-                            <?php echo $storeGroup->name; ?>
-                        </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?=$storeGroup->group_id?>" />
+                                <?php echo $storeGroup->name; ?>
+                            </label>
                         </h5>
 
                         <?php
                             //Get list stores of current store group
                             $stores = Mage1Store::model()->findAll("website_id = {$website->website_id} AND group_id = {$storeGroup->group_id}");
-
                             //Get migrated store ids from session
                             $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
                         ?>
@@ -70,10 +67,10 @@
                             <ul class="list-group">
                                 <?php foreach ($stores as $store): ?>
                                     <li class="list-group-item">
+                                        <?php if ($checked = in_array($store->store_id, $migrated_store_ids)): ?>
+                                            <span class="glyphicon glyphicon-ok-sign text-success"></span>
+                                        <?php endif; ?>
                                         <label class="checkbox-inline">
-                                            <?php if ($checked = in_array($store->store_id, $migrated_store_ids)): ?>
-                                                <span class="glyphicon glyphicon-ok-sign text-success"></span>
-                                            <?php endif; ?>
                                             <input type="checkbox" id="store-<?php echo $store->store_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_ids[<?php echo $storeGroup->group_id; ?>][]" class="store-<?php echo $storeGroup->group_id; ?>" value="<?=$store->store_id?>" />
                                             <?php echo $store->name; ?>
                                         </label>
@@ -89,19 +86,17 @@
     </ul>
     <?php endforeach; ?>
 
-    <!--    Form Buttons-->
-    <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-        <div class="step-controls">
+    <!--  Form Buttons-->
+    <div class="step-controls">
+        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
-        </div>
-    <?php else: ?>
-        <div class="step-controls">
+        <?php else: ?>
             <input type="hidden" id="reset" name="reset" value="0" />
             <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-        </div>
-    <?php endif; ?>
-    <!--//    Form Buttons-->
+        <?php endif; ?>
+    </div>
+    <!--// Form Buttons-->
 </div>
 
 </form>

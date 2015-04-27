@@ -10,7 +10,6 @@ class MigrateController extends Controller
         @ini_set('max_execution_time', -1);
 
         //initial needed session variables
-        //needed session variables
         $migrated_data = array(
             'website_ids' => array(),
             'store_group_ids' => array(),
@@ -25,7 +24,11 @@ class MigrateController extends Controller
             'sales_quote_ids' => array(),
             'sales_invoice_ids' => array(),
             'sales_shipment_ids' => array(),
-            'sales_credit_ids' => array()
+            'sales_credit_ids' => array(),
+            //reviews/ratings
+            'object_ids' => array(),
+            'review_ids' => array(),
+            'rating_ids' => array()
         );
         $migratedObj = (object) $migrated_data;
         //update migrated data
@@ -43,7 +46,7 @@ class MigrateController extends Controller
                 }
             }
         }
-        //initial session
+
         $attributes = get_object_vars($migratedObj);
         if ($attributes){
             foreach ($attributes as $attr => $value){
@@ -150,8 +153,6 @@ class MigrateController extends Controller
                             //save settings to database
                             $step->status = MigrateSteps::STATUS_DONE;
                             if ($step->save()){
-
-                                $this->refresh();
 
                                 //alert message
                                 Yii::app()->user->setFlash('success', Yii::t('frontend', "Your settings was saved successfully."));
@@ -357,7 +358,6 @@ class MigrateController extends Controller
             //get migrated data of step1 from session
             $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
 
-            $total_attribute_set = $total_attribute_group = $total_attribute = $total_entity_attribute = 0;
             $migrated_attribute_set_ids = $migrated_attribute_group_ids = $migrated_attribute_ids = array();
 
             //get product entity type id
@@ -393,20 +393,19 @@ class MigrateController extends Controller
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 //migrate attribute sets
+                //eav_attribute_set
                 if ($attribute_sets){
                     foreach ($attribute_sets as $attribute_set) {
-                        $condition = "attribute_set_id = {$attribute_set->attribute_set_id}";
+                        $condition = "entity_type_id = {$product_entity_type_id} AND attribute_set_name = '{$attribute_set->attribute_set_name}'";
                         $attribute_set2 = Mage2AttributeSet::model()->find($condition);
                         if (!$attribute_set2){
                             $attribute_set2 = new Mage2AttributeSet();
-                            $attribute_set2->attribute_set_id = $attribute_set->attribute_set_id;
-                            $attribute_set2->entity_type_id = $attribute_set->entity_type_id;
+                            $attribute_set2->entity_type_id = MigrateSteps::_getMage2EntityTypeId($attribute_set->entity_type_id);
                             $attribute_set2->attribute_set_name = $attribute_set->attribute_set_name;
                             $attribute_set2->sort_order = $attribute_set->sort_order;
                         }
 
                         if ($attribute_set2->save()){
-                            $total_attribute_set++;
                             $migrated_attribute_set_ids[] = $attribute_set->attribute_set_id;
                         }
 
@@ -415,13 +414,12 @@ class MigrateController extends Controller
                         $attribute_groups = Mage1AttributeGroup::model()->findAll($condition);
                         if ($attribute_groups) {
                             foreach ($attribute_groups as $attribute_group) {
-                                //$condition = "attribute_group_id = {$attribute_group->attribute_group_id} AND attribute_set_id = {$attribute_group->attribute_set_id}";
-                                $condition = "attribute_group_id = {$attribute_group->attribute_group_id}";
+                                $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($attribute_group->attribute_set_id);
+                                $condition = "attribute_set_id = {$attribute_set_id2} AND attribute_group_name = '{$attribute_group->attribute_group_name}'";
                                 $attribute_group2 = Mage2AttributeGroup::model()->find($condition);
                                 if (!$attribute_group2) {
                                     $attribute_group2 = new Mage2AttributeGroup();
-                                    $attribute_group2->attribute_group_id = $attribute_group->attribute_group_id;
-                                    $attribute_group2->attribute_set_id = $attribute_group->attribute_set_id;
+                                    $attribute_group2->attribute_set_id = $attribute_set_id2;
                                     $attribute_group2->attribute_group_name = $attribute_group->attribute_group_name;
                                     $attribute_group2->sort_order = $attribute_group->sort_order;
                                     $attribute_group2->default_id = $attribute_group->default_id;
@@ -430,7 +428,6 @@ class MigrateController extends Controller
                                     $attribute_group2->tab_group_code = null;
                                 }
                                 if ($attribute_group2->save()) {
-                                    $total_attribute_group++;
                                     $migrated_attribute_group_ids[] = $attribute_group->attribute_group_id;
                                 }
                             }
@@ -452,7 +449,7 @@ class MigrateController extends Controller
                         $attribute2 = Mage2Attribute::model()->find($condition);
                         if (!$attribute2){
                             $attribute2 = new Mage2Attribute();
-                            $attribute2->entity_type_id = $attribute->entity_type_id;
+                            $attribute2->entity_type_id = MigrateSteps::_getMage2EntityTypeId($attribute->entity_type_id);
                             $attribute2->attribute_code = $attribute->attribute_code;
                             $attribute2->attribute_model = $attribute->attribute_model;
                             $attribute2->backend_model = null;
@@ -475,7 +472,6 @@ class MigrateController extends Controller
                         //save or update data of a attribute
                         if ($attribute2->save()){
                             //update total
-                            $total_attribute++;
                             $migrated_attribute_ids[] = $attribute->attribute_id;
 
                             if ($migrated_store_ids) {
@@ -486,16 +482,11 @@ class MigrateController extends Controller
                                 $attribute_labels = Mage1AttributeLabel::model()->findAll($condition);
                                 if ($attribute_labels) {
                                     foreach ($attribute_labels as $attribute_label){
-                                        $mage2StoreId = MigrateSteps::getMage2StoreId($attribute_label->store_id);
-                                        $condition = "attribute_id = {$attribute2->attribute_id} AND store_id = {$mage2StoreId} AND value = '{$attribute_label->value}'";
-                                        $attribute_label2 = Mage2AttributeLabel::model()->find($condition);
-                                        if (!$attribute_label2) {
-                                            $attribute_label2 = new Mage2AttributeLabel();
-                                            $attribute_label2->attribute_label_id = $attribute_label->attribute_label_id;
-                                            $attribute_label2->attribute_id = $attribute2->attribute_id;
-                                            $attribute_label2->store_id = MigrateSteps::getMage2StoreId($attribute_label->store_id);
-                                            $attribute_label2->value = $attribute_label->value;
-                                        }
+                                        $attribute_label2 = new Mage2AttributeLabel();
+                                        $attribute_label2->attribute_label_id = $attribute_label->attribute_label_id;
+                                        $attribute_label2->attribute_id = $attribute2->attribute_id;
+                                        $attribute_label2->store_id = MigrateSteps::getMage2StoreId($attribute_label->store_id);
+                                        $attribute_label2->value = $attribute_label->value;
                                         //save or update
                                         $attribute_label2->save();
                                     }
@@ -597,29 +588,31 @@ class MigrateController extends Controller
                     $entity_attributes = Mage1EntityAttribute::model()->findAll($condition);
                     if ($entity_attributes){
                         foreach ($entity_attributes as $entity_attribute){
-                            $attributeId2 = MigrateSteps::getMage2AttributeId($entity_attribute->attribute_id, '4');
-                            $condition = "attribute_id = {$attributeId2} AND entity_type_id = 4";
-                            $condition .= " AND attribute_set_id = {$entity_attribute->attribute_set_id}";
-                            //$condition .= " AND attribute_group_id = {$entity_attribute->attribute_group_id}";
-                            $entity_attribute2 = Mage2EntityAttribute::model()->find($condition);
-                            if (!$entity_attribute2) {
-                                $entity_attribute2 = new Mage2EntityAttribute();
-                                $entity_attribute2->entity_type_id = $entity_attribute->entity_type_id;
-                                $entity_attribute2->attribute_set_id = $entity_attribute->attribute_set_id;
-                                $entity_attribute2->attribute_group_id = $entity_attribute->attribute_group_id;
-                                $entity_attribute2->attribute_id = $attributeId2;
-                                $entity_attribute2->sort_order = $entity_attribute->sort_order;
-                            }
-                            //save or update
-                            if ($entity_attribute2->save()){
-                                $total_entity_attribute++;
+                            $attribute_id2 = MigrateSteps::getMage2AttributeId($entity_attribute->attribute_id, '4');
+                            $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($entity_attribute->attribute_set_id);
+                            $attribute_group_id2 = MigrateSteps::getMage2AttributeGroupId($entity_attribute->attribute_group_id);
+
+                            if ($attribute_id2 && $attribute_set_id2 && $attribute_group_id2){
+                                $condition = "attribute_id = {$attribute_id2} AND entity_type_id = 4";
+                                $condition .= " AND attribute_set_id = {$attribute_set_id2}";
+                                $entity_attribute2 = Mage2EntityAttribute::model()->find($condition);
+                                if (!$entity_attribute2) {
+                                    $entity_attribute2 = new Mage2EntityAttribute();
+                                    $entity_attribute2->entity_type_id = MigrateSteps::_getMage2EntityTypeId($entity_attribute->entity_type_id);
+                                    $entity_attribute2->attribute_set_id = $attribute_set_id2;
+                                    $entity_attribute2->attribute_group_id = $attribute_group_id2;
+                                    $entity_attribute2->attribute_id = $attribute_id2;
+                                    $entity_attribute2->sort_order = $entity_attribute->sort_order;
+                                }
+                                //save or update
+                                $entity_attribute2->save();
                             }
                         }
                     }
                 }
 
                 //Update step status
-                if ($total_attribute_set && $total_attribute_group && $total_attribute){
+                if ($migrated_attribute_set_ids && $migrated_attribute_group_ids && $migrated_attribute_ids){
                     $step->status = MigrateSteps::STATUS_DONE;
                     if ($step->update()) {
 
@@ -627,7 +620,10 @@ class MigrateController extends Controller
                         Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
 
                         $message = "Migrated successfully. Total Attribute Sets: %s1, Total Attribute Groups: %s2, Total Attributes: %s3";
-                        $message = Yii::t('frontend', $message, array('%s1'=> $total_attribute_set, '%s2'=> $total_attribute_group, '%s3' => $total_attribute));
+                        $message = Yii::t('frontend', $message, array('%s1'=> sizeof($migrated_attribute_set_ids),
+                            '%s2'=> sizeof($migrated_attribute_group_ids),
+                            '%s3' => sizeof($migrated_attribute_ids))
+                        );
                         Yii::app()->user->setFlash('success', $message);
                     }
                 }
@@ -1749,7 +1745,7 @@ class MigrateController extends Controller
                 }
 
                 //Update step status
-                if ($migrated_product_type_ids && $migrated_product_ids){
+                if ($migrated_product_type_ids){
                     $step->status = MigrateSteps::STATUS_DONE;
                     $step->migrated_data = json_encode(array(
                         'product_type_ids' => $migrated_product_type_ids,
@@ -2125,7 +2121,8 @@ class MigrateController extends Controller
                 'payment' => Yii::t('frontend', 'Sales Payments'),
                 'invoice' => Yii::t('frontend', 'Sales Invoices'),
                 'shipment' => Yii::t('frontend', 'Sales Shipments'),
-                'credit' => Yii::t('frontend', 'Sales Credit Memo')
+                'credit' => Yii::t('frontend', 'Sales Credit Memo'),
+                'bestseller' => Yii::t('frontend', 'Sales Bestsellers')
             );
 
             //variables to log
@@ -2157,12 +2154,18 @@ class MigrateController extends Controller
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 $selected_objects = Yii::app()->request->getPost('selected_objects', array());
+                $selected_objects[] = 'bestseller';
+
                 if ($selected_objects){
                     //get migrated data from first step in session
                     $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
                     $str_store_ids = implode(',', $migrated_store_ids);
+
                     $migrated_customer_ids = isset(Yii::app()->session['migrated_customer_ids']) ? Yii::app()->session['migrated_customer_ids'] : array();
                     $str_customer_ids = implode(',', $migrated_customer_ids);
+
+                    $migrated_product_ids = isset(Yii::app()->session['migrated_product_ids']) ? Yii::app()->session['migrated_product_ids'] : array();
+                    $str_product_ids = implode(',', $migrated_product_ids);
 
                     if (in_array('order', $selected_objects)){
                         //sales_order_status
@@ -2835,12 +2838,61 @@ class MigrateController extends Controller
                             $migrated_sales_object_ids[] = 'credit';
                         }
                     }//End Sales credit memo migration
+
+                    //sales bestsellers
+                    if (in_array('bestseller', $selected_objects)){
+                        if ($migrated_store_ids && $migrated_product_ids){
+                            $condition = "store_id IN ({$str_store_ids}) AND product_id IN ({$str_product_ids})";
+
+                            //sales_bestsellers_aggregated_daily
+                            $models = Mage1SalesBestsellersDaily::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesBestsellersDaily();
+                                    $model2->attributes = $model->attributes;
+                                    if ($model2->store_id){
+                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    }
+                                    $model2->save();
+                                }
+                            }
+
+                            //sales_bestsellers_aggregated_monthly
+                            $models = Mage1SalesBestsellersMonthly::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesBestsellersMonthly();
+                                    $model2->attributes = $model->attributes;
+                                    if ($model2->store_id){
+                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    }
+                                    $model2->save();
+                                }
+                            }
+
+                            //sales_bestsellers_aggregated_yearly
+                            $models = Mage1SalesBestsellersYearly::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesBestsellersYearly();
+                                    $model2->attributes = $model->attributes;
+                                    if ($model2->store_id){
+                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    }
+                                    $model2->save();
+                                }
+                            }
+
+                            $migrated_sales_object_ids[] = 'bestseller';
+                        }
+                    }//end sales bestsellers
+
                 }else{
                     Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
                 }
 
                 //Update step status
-                if ($migrated_sales_object_ids && $migrated_order_ids){
+                if ($migrated_sales_object_ids){
                     $step->status = MigrateSteps::STATUS_DONE;
                     $step->migrated_data = json_encode(array(
                         'sales_object_ids' => $migrated_sales_object_ids,
@@ -2873,6 +2925,237 @@ class MigrateController extends Controller
             }//end post request
 
             $this->render("step{$step->sorder}", array('step' => $step, 'sale_objects' => $sales_objects));
+        }else{
+            Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
+            $this->redirect(array($result['back_step']));
+        }
+    }
+
+    /**
+     * Migrate Data from:
+     * Sales Orders, Sales Quote, Sales Payments, Sales Invoices, Sales Shipments
+     */
+    public function actionStep8()
+    {
+        $step = MigrateSteps::model()->find("sorder = 8");
+        $result = MigrateSteps::checkStep($step->sorder);
+        if ($result['allowed']){
+            //declare objects to migrate
+            $objects = array(
+                'review' => Yii::t('frontend', 'Reviews'),
+                'rating' => Yii::t('frontend', 'Ratings')
+            );
+
+            //variables to log
+            $migrated_object_ids = array();
+            $migrated_review_ids = $migrated_rating_ids = array();
+
+            if (Yii::app()->request->isPostRequest){
+
+                //reset database of this step if has
+                $is_reset = Yii::app()->request->getPost('reset');
+                if ($is_reset){
+                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
+                    $resetSQLFile = $dataPath . "step8_reset.sql";
+                    if (file_exists($resetSQLFile)) {
+                        $rs = MigrateSteps::executeFile($resetSQLFile);
+                        if ($rs){
+                            //reset step status
+                            $step->status = MigrateSteps::STATUS_NOT_DONE;
+                            $step->migrated_data = null;
+                            if ($step->update()){
+                                $this->refresh();
+                            }
+                        }
+                    }
+                }
+
+                //uncheck foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
+
+                $selected_objects = Yii::app()->request->getPost('selected_objects', array());
+                if ($selected_objects){
+                    //get migrated data from first step in session
+                    $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+                    $str_store_ids = implode(',', $migrated_store_ids);
+
+                    $migrated_customer_ids = isset(Yii::app()->session['migrated_customer_ids']) ? Yii::app()->session['migrated_customer_ids'] : array();
+                    $str_customer_ids = implode(',', $migrated_customer_ids);
+
+                    //$migrated_product_ids = isset(Yii::app()->session['migrated_product_ids']) ? Yii::app()->session['migrated_product_ids'] : array();
+                    //$str_product_ids = implode(',', $migrated_product_ids);
+
+                    if (in_array('review', $selected_objects)){
+                        //review_status -> this table was not changed
+                        //review_entity -> this table was not changed
+
+                        //review_entity_summary
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $models = Mage1ReviewEntitySummary::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2ReviewEntitySummary();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //review
+                        $models = Mage1Review::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2Review();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->save()){
+                                    $migrated_review_ids[] = $model2->review_id;
+                                }
+                            }
+                        }
+                        //review_detail
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition .= " AND customer_id IN ({$str_customer_ids})";
+                        $models = Mage1ReviewDetail::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2ReviewDetail();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        //review_store
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $models = Mage1ReviewStore::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2ReviewStore();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_object_ids[] = 'review';
+                    }//end migrate reviews
+
+                    if (in_array('rating', $selected_objects)){
+
+                        //rating_entity (not changed)
+                        //rating_option (not changed)
+                        //rating  (not changed)
+
+                        //rating_option_vote
+                        $models = Mage1RatingOptionVote::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2RatingOptionVote();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->save()){
+                                    $migrated_rating_ids[] = $model2->vote_id;
+                                }
+                            }
+                        }
+                        //rating_option_vote_aggregated
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $models = Mage1RatingOptionVoteAggregated::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2RatingOptionVoteAggregated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //rating_store
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $models = Mage1RatingStore::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2RatingStore();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //rating_title
+                        $condition = "store_id IN ({$str_store_ids})";
+                        $models = Mage1RatingTitle::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2RatingTitle();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_object_ids[] = 'rating';
+                    }//end migrate ratings
+
+                }else{
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
+                }
+
+                //Update step status
+                if ($migrated_object_ids){
+                    $step->status = MigrateSteps::STATUS_DONE;
+                    $step->migrated_data = json_encode(array(
+                        'object_ids' => $migrated_object_ids,
+                        'review_ids' => $migrated_review_ids,
+                        'rating_ids' => $migrated_rating_ids
+                    ));
+                    if ($step->update()) {
+
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
+                        //update session
+                        Yii::app()->session['migrated_object_ids'] = $migrated_object_ids;
+                        Yii::app()->session['migrated_review_ids'] = $migrated_review_ids;
+                        Yii::app()->session['migrated_rating_ids'] = $migrated_rating_ids;
+
+                        $message = Yii::t('frontend', 'Migrated successfully');
+                        $message .= "<br/>". Yii::t('frontend', "Total Reviews migrated: %s1.", array('%s1' => sizeof($migrated_review_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Ratings migrated: %s2.", array('%s2' => sizeof($migrated_rating_ids)));
+                        Yii::app()->user->setFlash('success', $message);
+                    }
+                }
+            }//end post request
+
+            $this->render("step{$step->sorder}", array('step' => $step, 'objects' => $objects));
         }else{
             Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
             $this->redirect(array($result['back_step']));

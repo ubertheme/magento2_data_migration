@@ -13,19 +13,17 @@ $migrated_customer_group_ids = isset(Yii::app()->session['migrated_customer_grou
     <div id="step-content">
         <blockquote> <p class="tip"> <?php echo Yii::t('frontend', $step->descriptions); ?> </p> </blockquote>
 
-        <!--    Form Buttons-->
-        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-            <div class="step-controls">
+        <!--  Form Buttons-->
+        <div class="step-controls">
+            <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
                 <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
-            </div>
-        <?php else: ?>
-            <div class="step-controls">
+            <?php else: ?>
                 <input type="hidden" id="reset" name="reset" value="0" />
                 <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
                 <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-            </div>
-        <?php endif; ?>
-        <!--//   Form Buttons-->
+            <?php endif; ?>
+        </div>
+        <!--// Form Buttons-->
 
         <ul class="list-group">
             <li class="list-group-item">
@@ -41,8 +39,10 @@ $migrated_customer_group_ids = isset(Yii::app()->session['migrated_customer_grou
                             <?php if ($checked = in_array($group->customer_group_id, $migrated_customer_group_ids)): ?>
                             <span class="glyphicon glyphicon-ok-sign text-success"></span>
                             <?php endif; ?>
-                            <input type="checkbox" <?php echo ($checked) ? "checked" : ''; ?> id="customer_group_<?php echo $group->customer_group_id; ?>" name="customer_group_ids[]" value="<?php echo $group->customer_group_id; ?>" />
-                            <span> <?php echo $group->customer_group_code . " (". MigrateSteps::getTotalCustomersByGroup($group->customer_group_id) .")"; ?> </span>
+                            <label for="customer_group_<?php echo $group->customer_group_id; ?>" class="checkbox-inline">
+                                <input type="checkbox" <?php echo ($checked) ? "checked" : ''; ?> id="customer_group_<?php echo $group->customer_group_id; ?>" name="customer_group_ids[]" value="<?php echo $group->customer_group_id; ?>" />
+                                <?php echo $group->customer_group_code . " (". MigrateSteps::getTotalCustomersByGroup($group->customer_group_id) .")"; ?>
+                            </label>
                         </h4>
                     </li>
                     <?php endforeach; ?>
@@ -52,17 +52,15 @@ $migrated_customer_group_ids = isset(Yii::app()->session['migrated_customer_grou
         </ul>
     </div>
 
-    <!--    Form Buttons-->
-    <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-        <div class="step-controls">
+    <!--  Form Buttons-->
+    <div class="step-controls">
+        <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
-        </div>
-    <?php else: ?>
-        <div class="step-controls">
+        <?php else: ?>
             <input type="hidden" id="reset" name="reset" value="0" />
             <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
-        </div>
-    <?php endif; ?>
-    <!--//   Form Buttons-->
+        <?php endif; ?>
+    </div>
+    <!--// Form Buttons-->
 </form>

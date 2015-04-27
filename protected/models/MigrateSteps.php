@@ -77,6 +77,38 @@ class MigrateSteps extends MigrateStepsPeer
         return $id;
     }
 
+    public static function getMage2AttributeSetId($mage1AttrSetId){
+        $id = null;
+        if (isset($mage1AttrSetId)){
+            $model1 = Mage1AttributeSet::model()->findByPk($mage1AttrSetId);
+            if ($model1){
+                $entity_type_id2 = MigrateSteps::getMage2EntityTypeId(self::PRODUCT_TYPE_CODE);
+                $model2 = Mage2AttributeSet::model()->find("entity_type_id = {$entity_type_id2} AND attribute_set_name = '{$model1->attribute_set_name}'");
+                if ($model2) {
+                    $id = $model2->attribute_set_id;
+                }
+            }
+        }
+
+        return $id;
+    }
+
+    public static function getMage2AttributeGroupId($mage1AttrGroupId){
+        $id = null;
+        if (isset($mage1AttrGroupId)){
+            $model1 = Mage1AttributeGroup::model()->findByPk($mage1AttrGroupId);
+            if ($model1){
+                $attr_set_id2 = self::getMage2AttributeSetId($model1->attribute_set_id);
+                $model2 = Mage2AttributeGroup::model()->find("attribute_set_id = {$attr_set_id2} AND attribute_group_name = '{$model1->attribute_group_name}'");
+                if ($model2) {
+                    $id = $model2->attribute_group_id;
+                }
+            }
+        }
+
+        return $id;
+    }
+
     public static function getMage2AttributeId($mage1AttrId, $entityTypeId = 3){
         $id = null;
         if (isset($mage1AttrId)){
@@ -204,6 +236,37 @@ class MigrateSteps extends MigrateStepsPeer
             $tablePrefix = $db->tablePrefix;
             $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
             $id = $db->createCommand($query)->queryScalar();
+        }
+
+        return $id;
+    }
+
+    public static function getMage2EntityTypeId($entity_type_code){
+        $id = null;
+        if ($entity_type_code){
+            $db = Yii::app()->mage2;
+            $tablePrefix = $db->tablePrefix;
+            $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+            $id = $db->createCommand($query)->queryScalar();
+        }
+
+        return $id;
+    }
+
+    public static function _getMage2EntityTypeId($entity_type_id1){
+        $id = null;
+        if ($entity_type_id1){
+            $db = Yii::app()->mage1;
+            $tablePrefix = $db->tablePrefix;
+            $query = "SELECT entity_type_code FROM {$tablePrefix}eav_entity_type WHERE entity_type_id = {$entity_type_id1}";
+            $entity_type_code = $db->createCommand($query)->queryScalar();
+
+            if ($entity_type_code){
+                $db = Yii::app()->mage2;
+                $tablePrefix = $db->tablePrefix;
+                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+                $id = $db->createCommand($query)->queryScalar();
+            }
         }
 
         return $id;

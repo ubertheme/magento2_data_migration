@@ -65,7 +65,6 @@ return CMap::mergeArray(
             'application.models.*',
             'application.models.db.*',
             'application.models.db.mage2.*',
-
             'application.models.mage2.*',
             'application.models.mage1.*'
         ),

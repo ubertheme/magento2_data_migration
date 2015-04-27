@@ -177,3 +177,4 @@ blockquote{font-size: 12px;}
 .list-group input{cursor: pointer;}
 /* end css for categories tree*/
 #footer #report-bugs{display: block;}
+.tree li span.glyphicon{border: none;}
