@@ -20,3 +20,6 @@ INSERT INTO ub_migrate_steps VALUES ('5', 'Migrate Products', 'step5', '0', null
 INSERT INTO ub_migrate_steps VALUES ('6', 'Migrate Customers', 'step6', '0', null, '- Select customer groups you want to migrate <br/>- System will auto migrate the related data for each selected customer group.', '6');
 INSERT INTO ub_migrate_steps VALUES ('7', 'Migrate Sales Data', 'step7', '0', null, '- Sales Data migration <br/>- System will auto migrate the related data for each sales object', '7');
 INSERT INTO ub_migrate_steps VALUES ('8', 'Migrate Reviews & Ratings Data', 'step8', '0', null, null, '8');
+
+SET FOREIGN_KEY_CHECKS=1;
+

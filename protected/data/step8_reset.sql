@@ -18,7 +18,7 @@ CREATE TABLE `#__review_entity_summary` (
 DROP TABLE IF EXISTS `#__review`;
 CREATE TABLE `#__review` (
   `review_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Review id',
-  `created_at` timestamp NOT NULL COMMENT 'Review create date',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Review create date',
   `entity_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Entity id',
   `entity_pk_value` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Product id',
   `status_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Status code',

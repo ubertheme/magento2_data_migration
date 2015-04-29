@@ -2911,7 +2911,7 @@ class MigrateController extends Controller
                         Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;
                         Yii::app()->session['migrated_sales_order_ids'] = $migrated_order_ids;
 
-                        $message = Yii::t('frontend', 'Migrated successfully');
+                        $message = Yii::t('frontend', 'Migrated successfully.');
                         $message .= "<br/>". Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids)));
                         $message .= "<br/>". Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses)));
                         $message .= "<br/>". Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids)));
@@ -3147,7 +3147,7 @@ class MigrateController extends Controller
                         Yii::app()->session['migrated_review_ids'] = $migrated_review_ids;
                         Yii::app()->session['migrated_rating_ids'] = $migrated_rating_ids;
 
-                        $message = Yii::t('frontend', 'Migrated successfully');
+                        $message = Yii::t('frontend', 'Migrated successfully.');
                         $message .= "<br/>". Yii::t('frontend', "Total Reviews migrated: %s1.", array('%s1' => sizeof($migrated_review_ids)));
                         $message .= "<br/>". Yii::t('frontend', "Total Ratings migrated: %s2.", array('%s2' => sizeof($migrated_rating_ids)));
                         Yii::app()->user->setFlash('success', $message);
