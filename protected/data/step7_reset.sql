@@ -1436,4 +1436,126 @@ CREATE TABLE `#__sales_bestsellers_aggregated_yearly` (
   CONSTRAINT `FK_SALES_BESTSELLERS_AGGRED_YEARLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Bestsellers Aggregated Yearly';
 
+DROP TABLE IF EXISTS `#__salesrule`;
+CREATE TABLE `#__salesrule` (
+  `rule_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Rule Id',
+  `name` varchar(255) DEFAULT NULL COMMENT 'Name',
+  `description` text COMMENT 'Description',
+  `from_date` date DEFAULT NULL COMMENT 'From Date',
+  `to_date` date DEFAULT NULL COMMENT 'To Date',
+  `uses_per_customer` int(11) NOT NULL DEFAULT '0' COMMENT 'Uses Per Customer',
+  `is_active` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Is Active',
+  `conditions_serialized` mediumtext COMMENT 'Conditions Serialized',
+  `actions_serialized` mediumtext COMMENT 'Actions Serialized',
+  `stop_rules_processing` smallint(6) NOT NULL DEFAULT '1' COMMENT 'Stop Rules Processing',
+  `is_advanced` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT 'Is Advanced',
+  `product_ids` text COMMENT 'Product Ids',
+  `sort_order` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Sort Order',
+  `simple_action` varchar(32) DEFAULT NULL COMMENT 'Simple Action',
+  `discount_amount` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Discount Amount',
+  `discount_qty` decimal(12,4) DEFAULT NULL COMMENT 'Discount Qty',
+  `discount_step` int(10) unsigned NOT NULL COMMENT 'Discount Step',
+  `apply_to_shipping` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Apply To Shipping',
+  `times_used` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
+  `is_rss` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Is Rss',
+  `coupon_type` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT 'Coupon Type',
+  `use_auto_generation` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Use Auto Generation',
+  `uses_per_coupon` int(11) NOT NULL DEFAULT '0' COMMENT 'User Per Coupon',
+  `simple_free_shipping` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`rule_id`),
+  KEY `IDX_SALESRULE_IS_ACTIVE_SORT_ORDER_TO_DATE_FROM_DATE` (`is_active`,`sort_order`,`to_date`,`from_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule';
+
+DROP TABLE IF EXISTS `#__salesrule_coupon`;
+CREATE TABLE `#__salesrule_coupon` (
+  `coupon_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Coupon Id',
+  `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
+  `code` varchar(255) DEFAULT NULL COMMENT 'Code',
+  `usage_limit` int(10) unsigned DEFAULT NULL COMMENT 'Usage Limit',
+  `usage_per_customer` int(10) unsigned DEFAULT NULL COMMENT 'Usage Per Customer',
+  `times_used` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
+  `expiration_date` timestamp NULL DEFAULT NULL COMMENT 'Expiration Date',
+  `is_primary` smallint(5) unsigned DEFAULT NULL COMMENT 'Is Primary',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT 'Coupon Code Creation Date',
+  `type` smallint(6) DEFAULT '0' COMMENT 'Coupon Code Type',
+  PRIMARY KEY (`coupon_id`),
+  UNIQUE KEY `UNQ_SALESRULE_COUPON_CODE` (`code`),
+  UNIQUE KEY `UNQ_SALESRULE_COUPON_RULE_ID_IS_PRIMARY` (`rule_id`,`is_primary`),
+  KEY `IDX_SALESRULE_COUPON_RULE_ID` (`rule_id`),
+  CONSTRAINT `FK_SALESRULE_COUPON_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Coupon';
+
+DROP TABLE IF EXISTS `#__salesrule_coupon_usage`;
+CREATE TABLE `#__salesrule_coupon_usage` (
+  `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon Id',
+  `customer_id` int(10) unsigned NOT NULL COMMENT 'Customer Id',
+  `times_used` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
+  PRIMARY KEY (`coupon_id`,`customer_id`),
+  KEY `IDX_SALESRULE_COUPON_USAGE_CUSTOMER_ID` (`customer_id`),
+  CONSTRAINT `FK_SALESRULE_COUPON_USAGE_COUPON_ID_SALESRULE_COUPON_COUPON_ID` FOREIGN KEY (`coupon_id`) REFERENCES `#__salesrule_coupon` (`coupon_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_COUPON_USAGE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Coupon Usage';
+
+DROP TABLE IF EXISTS `#__salesrule_customer`;
+CREATE TABLE `#__salesrule_customer` (
+  `rule_customer_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Rule Customer Id',
+  `rule_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Rule Id',
+  `customer_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Customer Id',
+  `times_used` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
+  PRIMARY KEY (`rule_customer_id`),
+  KEY `IDX_SALESRULE_CUSTOMER_RULE_ID_CUSTOMER_ID` (`rule_id`,`customer_id`),
+  KEY `IDX_SALESRULE_CUSTOMER_CUSTOMER_ID_RULE_ID` (`customer_id`,`rule_id`),
+  CONSTRAINT `FK_SALESRULE_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_CUSTOMER_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Customer';
+
+DROP TABLE IF EXISTS `#__salesrule_customer_group`;
+CREATE TABLE `#__salesrule_customer_group` (
+  `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
+  `customer_group_id` smallint(5) unsigned NOT NULL COMMENT 'Customer Group Id',
+  PRIMARY KEY (`rule_id`,`customer_group_id`),
+  KEY `IDX_SALESRULE_CUSTOMER_GROUP_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  CONSTRAINT `FK_SALESRULE_CUSTOMER_GROUP_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Rules To Customer Groups Relations';
+
+DROP TABLE IF EXISTS `#__salesrule_label`;
+CREATE TABLE `#__salesrule_label` (
+  `label_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Label Id',
+  `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
+  `store_id` smallint(5) unsigned NOT NULL COMMENT 'Store Id',
+  `label` varchar(255) DEFAULT NULL COMMENT 'Label',
+  PRIMARY KEY (`label_id`),
+  UNIQUE KEY `UNQ_SALESRULE_LABEL_RULE_ID_STORE_ID` (`rule_id`,`store_id`),
+  KEY `IDX_SALESRULE_LABEL_STORE_ID` (`store_id`),
+  CONSTRAINT `FK_SALESRULE_LABEL_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Label';
+
+DROP TABLE IF EXISTS `#__salesrule_product_attribute`;
+CREATE TABLE `#__salesrule_product_attribute` (
+  `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
+  `website_id` smallint(5) unsigned NOT NULL COMMENT 'Website Id',
+  `customer_group_id` smallint(5) unsigned NOT NULL COMMENT 'Customer Group Id',
+  `attribute_id` smallint(5) unsigned NOT NULL COMMENT 'Attribute Id',
+  PRIMARY KEY (`rule_id`,`website_id`,`customer_group_id`,`attribute_id`),
+  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_WEBSITE_ID` (`website_id`),
+  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_ATTRIBUTE_ID` (`attribute_id`),
+  CONSTRAINT `FK_SALESRULE_PRD_ATTR_ATTR_ID_EAV_ATTR_ATTR_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_PRD_ATTR_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_PRODUCT_ATTRIBUTE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_PRD_ATTR_WS_ID_STORE_WS_WS_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Product Attribute';
+
+DROP TABLE IF EXISTS `#__salesrule_website`;
+CREATE TABLE `#__salesrule_website` (
+  `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
+  `website_id` smallint(5) unsigned NOT NULL COMMENT 'Website Id',
+  PRIMARY KEY (`rule_id`,`website_id`),
+  KEY `IDX_SALESRULE_WEBSITE_WEBSITE_ID` (`website_id`),
+  CONSTRAINT `FK_SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_SALESRULE_WEBSITE_WEBSITE_ID_CORE/WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Rules To Websites Relations';
+
 SET FOREIGN_KEY_CHECKS=1;

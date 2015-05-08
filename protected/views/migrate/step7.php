@@ -38,7 +38,7 @@ $migrated_sales_object_ids = isset(Yii::app()->session['migrated_sales_object_id
                                     <?php if ($checked = in_array($id, $migrated_sales_object_ids)): ?>
                                     <span class="glyphicon glyphicon-ok-sign text-success"></span>
                                     <?php endif; ?>
-                                    <input type="checkbox" style="visibility: hidden;" <?php echo ($checked) ? "checked" : ''; ?> id="sales_object_<?php echo $id; ?>" name="selected_objects[]" value="<?php echo $id; ?>" />
+                                    <input type="checkbox" style="<?php echo ($id != 'rule_coupon') ? 'visibility: hidden;' : ''; ?>" <?php echo ($checked) ? "checked" : ''; ?> id="sales_object_<?php echo $id; ?>" name="selected_objects[]" value="<?php echo $id; ?>" />
                                     <span> <?php echo $label . " (". MigrateSteps::getTotalSalesChildObject($id) .")"; ?> </span>
                                 </h4>
                             </li>

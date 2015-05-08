@@ -368,6 +368,13 @@ class MigrateSteps extends MigrateStepsPeer
                 $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_creditmemo` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
                 $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
                 break;
+            case 'rule_coupon':
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}salesrule`";
+                $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}salesrule_coupon`";
+                $total2 = Yii::app()->mage1->createCommand($sql)->queryScalar();
+                $total = $total . " rules," . $total2 . " coupons";
+                break;
         }
 
         return $total;
@@ -378,5 +385,43 @@ class MigrateSteps extends MigrateStepsPeer
             'mage19x' => Yii::t('frontend', 'Magento 1.9.x')
         );
         return $options;
+    }
+
+    public static function replaceCatalogRuleModels($data){
+        $finds = array(
+            's:34:"catalogrule/rule_condition_combine"',
+            's:34:"catalogrule/rule_condition_product"',
+            's:34:"catalogrule/rule_action_collection"'
+        );
+        $replaces = array(
+            's:48:"Magento\CatalogRule\Model\Rule\Condition\Combine"',
+            's:48:"Magento\CatalogRule\Model\Rule\Condition\Product"',
+            's:48:"Magento\CatalogRule\Model\Rule\Action\Collection"'
+        );
+        $data = str_replace($finds, $replaces, $data);
+
+        return $data;
+    }
+
+    public static function replaceSalesRuleModels($data){
+        $finds = array(
+            's:38:"salesrule/rule_condition_product_found"',
+            's:42:"salesrule/rule_condition_product_subselect"',
+            's:40:"salesrule/rule_condition_product_combine"',
+            's:32:"salesrule/rule_condition_product"',
+            's:32:"salesrule/rule_condition_combine"',
+            's:32:"salesrule/rule_condition_address"',
+        );
+        $replaces = array(
+            's:52:"Magento\SalesRule\Model\Rule\Condition\Product\Found"',
+            's:56:"Magento\SalesRule\Model\Rule\Condition\Product\Subselect"',
+            's:54:"Magento\SalesRule\Model\Rule\Condition\Product\Combine"',
+            's:46:"Magento\SalesRule\Model\Rule\Condition\Product"',
+            's:46:"Magento\SalesRule\Model\Rule\Condition\Combine"',
+            's:46:"Magento\SalesRule\Model\Rule\Condition\Address"'
+        );
+        $data = str_replace($finds, $replaces, $data);
+
+        return $data;
     }
 }

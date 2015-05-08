@@ -28,7 +28,8 @@ class MigrateController extends Controller
             //reviews/ratings
             'object_ids' => array(),
             'review_ids' => array(),
-            'rating_ids' => array()
+            'rating_ids' => array(),
+            'other_object_ids' => array()
         );
         $migratedObj = (object) $migrated_data;
         //update migrated data
@@ -449,24 +450,18 @@ class MigrateController extends Controller
                         $attribute2 = Mage2Attribute::model()->find($condition);
                         if (!$attribute2){
                             $attribute2 = new Mage2Attribute();
+                            foreach ($attribute2->attributes as $key => $value){
+                                if (isset($attribute->$key)){
+                                    $attribute2->$key = $attribute->$key;
+                                }
+                            }
+                            //We need re-update some values
+                            $attribute2->attribute_id = null;
                             $attribute2->entity_type_id = MigrateSteps::_getMage2EntityTypeId($attribute->entity_type_id);
-                            $attribute2->attribute_code = $attribute->attribute_code;
-                            $attribute2->attribute_model = $attribute->attribute_model;
+                            $attribute2->attribute_model = null;
                             $attribute2->backend_model = null;
-                            $attribute2->backend_type = $attribute->backend_type;
-                            $attribute2->backend_table = $attribute->backend_table;
-                            // note: this was changed in magento2, we don't migrate this field
-                            //$attribute2->frontend_model = $attribute->frontend_model;
                             $attribute2->frontend_model = null;
-                            $attribute2->frontend_input = $attribute->frontend_input;
-                            $attribute2->frontend_label = $attribute->frontend_label;
-                            $attribute2->frontend_class = $attribute->frontend_class;
                             $attribute2->source_model = null;
-                            $attribute2->is_required = $attribute->is_required;
-                            $attribute2->is_user_defined = $attribute->is_user_defined;
-                            $attribute2->default_value = $attribute->default_value;
-                            $attribute2->is_unique = $attribute->is_unique;
-                            $attribute2->note = $attribute->note;
                         }
 
                         //save or update data of a attribute
@@ -541,35 +536,16 @@ class MigrateController extends Controller
                                 $catalog_eav_attribute2 = Mage2CatalogEavAttribute::model()->find("attribute_id = {$attribute2->attribute_id}");
                                 if (!$catalog_eav_attribute2){
                                     $catalog_eav_attribute2 = new Mage2CatalogEavAttribute();
-                                    $catalog_eav_attribute2->attribute_id = $attribute2->attribute_id;
-                                    $catalog_eav_attribute2->frontend_input_renderer = $catalog_eav_attribute->frontend_input_renderer;
-                                    $catalog_eav_attribute2->is_global = $catalog_eav_attribute->is_global;
-                                    $catalog_eav_attribute2->is_visible = $catalog_eav_attribute->is_visible;
-                                    $catalog_eav_attribute2->is_searchable = $catalog_eav_attribute->is_searchable;
-                                    $catalog_eav_attribute2->is_filterable = $catalog_eav_attribute->is_filterable;
-                                    $catalog_eav_attribute2->is_comparable = $catalog_eav_attribute->is_comparable;
-                                    $catalog_eav_attribute2->is_visible_on_front = $catalog_eav_attribute->is_visible_on_front;
-                                    $catalog_eav_attribute2->is_html_allowed_on_front = $catalog_eav_attribute->is_html_allowed_on_front;
-                                    $catalog_eav_attribute2->is_used_for_price_rules = $catalog_eav_attribute->is_used_for_price_rules;
-                                    $catalog_eav_attribute2->is_filterable_in_search = $catalog_eav_attribute->is_filterable_in_search;
-                                    $catalog_eav_attribute2->used_in_product_listing = $catalog_eav_attribute->used_in_product_listing;
-                                    $catalog_eav_attribute2->used_for_sort_by = $catalog_eav_attribute->used_for_sort_by;
-                                    $catalog_eav_attribute2->apply_to = $catalog_eav_attribute->apply_to;
-                                    $catalog_eav_attribute2->is_visible_in_advanced_search = $catalog_eav_attribute->is_filterable_in_search;
-                                    $catalog_eav_attribute2->position = $catalog_eav_attribute->position;
-                                    $catalog_eav_attribute2->is_wysiwyg_enabled = $catalog_eav_attribute->is_wysiwyg_enabled;
-                                    $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
-                                    $catalog_eav_attribute2->is_required_in_admin_store = 0;
-
-                                    // note: This for Magento1 version < 1.9.1.0
-                                    if (isset($catalog_eav_attribute->search_weight)){
-                                        $catalog_eav_attribute2->search_weight = $catalog_eav_attribute->search_weight;
-                                    }
-
-                                    // note: this attribute removed from Magento2 0.42.0 beta11
-                                    //$catalog_eav_attribute2->is_configurable = $catalog_eav_attribute->is_configurable;
-                                    $catalog_eav_attribute2->save();
                                 }
+                                foreach ($catalog_eav_attribute2->attributes as $key => $value){
+                                    if (isset($catalog_eav_attribute->$key)){
+                                        $catalog_eav_attribute2->$key = $catalog_eav_attribute->$key;
+                                    }
+                                }
+                                //update new attribute_id
+                                $catalog_eav_attribute2->attribute_id = $attribute2->attribute_id;
+                                //save
+                                $catalog_eav_attribute2->save();
                             }
                         }
                     }//end foreach attributes
@@ -2122,13 +2098,14 @@ class MigrateController extends Controller
                 'invoice' => Yii::t('frontend', 'Sales Invoices'),
                 'shipment' => Yii::t('frontend', 'Sales Shipments'),
                 'credit' => Yii::t('frontend', 'Sales Credit Memo'),
-                'bestseller' => Yii::t('frontend', 'Sales Bestsellers')
+                'bestseller' => Yii::t('frontend', 'Sales Bestsellers'),
+                'rule_coupon' => Yii::t('frontend', 'Sales Rules & Coupons')
             );
 
             //variables to log
             $migrated_sales_object_ids = array();
             $migrated_order_ids = $migrated_quote_ids = $migrated_payment_ids = $migrated_invoice_ids = $migrated_shipment_ids = $migrated_credit_ids = array();
-            $migrated_order_statuses = array();
+            $migrated_order_statuses = $migrated_sales_rule_ids = $migrated_sales_coupon_ids = array();
 
             if (Yii::app()->request->isPostRequest){
 
@@ -2158,6 +2135,9 @@ class MigrateController extends Controller
 
                 if ($selected_objects){
                     //get migrated data from first step in session
+                    $migrated_website_ids = isset(Yii::app()->session['migrated_website_ids']) ? Yii::app()->session['migrated_website_ids'] : array();
+                    $str_website_ids = implode(',', $migrated_website_ids);
+
                     $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
                     $str_store_ids = implode(',', $migrated_store_ids);
 
@@ -2849,7 +2829,11 @@ class MigrateController extends Controller
                             if ($models){
                                 foreach ($models as $model){
                                     $model2 = new Mage2SalesBestsellersDaily();
-                                    $model2->attributes = $model->attributes;
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
                                     if ($model2->store_id){
                                         $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     }
@@ -2862,7 +2846,11 @@ class MigrateController extends Controller
                             if ($models){
                                 foreach ($models as $model){
                                     $model2 = new Mage2SalesBestsellersMonthly();
-                                    $model2->attributes = $model->attributes;
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
                                     if ($model2->store_id){
                                         $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     }
@@ -2875,7 +2863,11 @@ class MigrateController extends Controller
                             if ($models){
                                 foreach ($models as $model){
                                     $model2 = new Mage2SalesBestsellersYearly();
-                                    $model2->attributes = $model->attributes;
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
                                     if ($model2->store_id){
                                         $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     }
@@ -2886,6 +2878,134 @@ class MigrateController extends Controller
                             $migrated_sales_object_ids[] = 'bestseller';
                         }
                     }//end sales bestsellers
+
+                    //sales rules & coupons
+                    if (in_array('rule_coupon', $selected_objects)){
+                        if ($migrated_store_ids && $migrated_product_ids){
+                            //salesrule
+                            $models = Mage1Salesrule::model()->findAll();
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2Salesrule();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
+                                    //replace model names because it was changed in magento 2
+                                    $model2->conditions_serialized = MigrateSteps::replaceSalesRuleModels($model2->conditions_serialized);
+                                    $model2->actions_serialized = MigrateSteps::replaceSalesRuleModels($model2->actions_serialized);
+
+                                    if ($model2->save()){
+                                        $migrated_sales_rule_ids[] = $model2->rule_id;
+
+                                        //salesrule_coupon
+                                        $coupons = Mage1SalesruleCoupon::model()->findAll("rule_id = {$model2->rule_id}");
+                                        if ($coupons){
+                                            foreach ($coupons as $coupon){
+                                                $coupon2 = new Mage2SalesruleCoupon();
+                                                foreach ($coupon2->attributes as $key => $value){
+                                                    if (isset($coupon->$key)){
+                                                        $coupon2->$key = $coupon->$key;
+                                                    }
+                                                }
+                                                if ($coupon2->save()){
+                                                    $migrated_sales_coupon_ids[] = $coupon2->coupon_id;
+
+                                                    //salesrule_coupon_usage
+                                                    $coupon_usages = Mage1SalesruleCouponUsage::model()->findAll("coupon_id = {$coupon2->coupon_id}");
+                                                    if ($coupon_usages){
+                                                        foreach($coupon_usages as $coupon_usage){
+                                                            $coupon_usage2 = new Mage2SalesruleCouponUsage();
+                                                            foreach ($coupon_usage2->attributes as $key => $value){
+                                                                if (isset($coupon_usage->$key)){
+                                                                    $coupon_usage2->$key = $coupon_usage->$key;
+                                                                }
+                                                            }
+                                                            $coupon_usage2->save();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        //salesrule_label
+                                        $labels = Mage1SalesruleLabel::model()->findAll("rule_id = {$model2->rule_id}");
+                                        if ($labels){
+                                            foreach ($labels as $label){
+                                                $label2 = new Mage2SalesruleLabel();
+                                                foreach ($label2->attributes as $key => $value){
+                                                    if (isset($label->$key)){
+                                                        $label2->$key = $label->$key;
+                                                    }
+                                                }
+                                                $label2->store_id = MigrateSteps::getMage2StoreId($label2->store_id);
+                                                $label2->save();
+                                            }
+                                        }
+                                        //salesrule_product_attribute
+                                        $condition = "rule_id = {$model2->rule_id}";
+                                        if ($migrated_website_ids){
+                                            $condition .= " AND website_id IN ({$str_website_ids})";
+                                        }
+                                        $product_attributes = Mage1SalesruleProductAttribute::model()->findAll($condition);
+                                        if ($product_attributes){
+                                            foreach ($product_attributes as $product_attribute){
+                                                $product_attribute2 = new Mage2SalesruleProductAttribute();
+                                                foreach ($product_attribute2->attributes as $key => $value){
+                                                    if (isset($product_attribute->$key)){
+                                                        $product_attribute2->$key = $product_attribute->$key;
+                                                    }
+                                                }
+                                                $product_attribute2->attribute_id = MigrateSteps::getMage2AttributeId($product_attribute2->attribute_id);
+                                                $product_attribute2->save();
+                                            }
+                                        }
+                                        //salesrule_website
+                                        $r_websites = Mage1SalesruleWebsite::model()->findAll($condition);
+                                        if ($r_websites){
+                                            foreach ($r_websites as $r_website){
+                                                $r_website2 = new Mage2SalesruleWebsite();
+                                                foreach ($r_website2->attributes as $key => $value){
+                                                    if (isset($r_website->$key)){
+                                                        $r_website2->$key = $r_website->$key;
+                                                    }
+                                                }
+                                                $r_website2->save();
+                                            }
+                                        }
+                                        //salesrule_customer
+                                        $r_customers = Mage1SalesruleCustomer::model()->findAll("rule_id = {$model2->rule_id}");
+                                        if ($r_customers){
+                                            foreach ($r_customers as $r_customer){
+                                                $r_customer2 = new Mage2SalesruleCustomer();
+                                                foreach ($r_customer2->attributes as $key => $value){
+                                                    if (isset($r_customer->$key)){
+                                                        $r_customer2->$key = $r_customer->$key;
+                                                    }
+                                                }
+                                                $r_customer2->save();
+                                            }
+                                        }
+                                        //salesrule_customer_group
+                                        $r_customer_groups = Mage1SalesruleCustomerGroup::model()->findAll("rule_id = {$model2->rule_id}");
+                                        if ($r_customer_groups){
+                                            foreach ($r_customer_groups as $r_customer_group){
+                                                $r_customer_group2 = new Mage2SalesruleCustomerGroup();
+                                                foreach ($r_customer_group2->attributes as $key => $value){
+                                                    if (isset($r_customer_group->$key)){
+                                                        $r_customer_group2->$key = $r_customer_group->$key;
+                                                    }
+                                                }
+                                                $r_customer_group->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            $migrated_sales_object_ids[] = 'rule_coupon';
+                        }
+                    }//end sales rules & coupons
 
                 }else{
                     Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
@@ -2918,6 +3038,8 @@ class MigrateController extends Controller
                         $message .= "<br/>". Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids)));
                         $message .= "<br/>". Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids)));
                         $message .= "<br/>". Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Rules migrated: %s7.", array('%s7' => sizeof($migrated_sales_rule_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Sales Coupons migrated: %s8.", array('%s8' => sizeof($migrated_sales_coupon_ids)));
 
                         Yii::app()->user->setFlash('success', $message);
                     }
@@ -3150,6 +3272,328 @@ class MigrateController extends Controller
                         $message = Yii::t('frontend', 'Migrated successfully.');
                         $message .= "<br/>". Yii::t('frontend', "Total Reviews migrated: %s1.", array('%s1' => sizeof($migrated_review_ids)));
                         $message .= "<br/>". Yii::t('frontend', "Total Ratings migrated: %s2.", array('%s2' => sizeof($migrated_rating_ids)));
+                        Yii::app()->user->setFlash('success', $message);
+                    }
+                }
+            }//end post request
+
+            $this->render("step{$step->sorder}", array('step' => $step, 'objects' => $objects));
+        }else{
+            Yii::app()->user->setFlash('note', Yii::t('frontend', "The first you need to finish the %s.", array("%s" => ucfirst($result['back_step']))));
+            $this->redirect(array($result['back_step']));
+        }
+    }
+
+    /**
+     * Migrate Tax Data
+     */
+    public function actionStep9()
+    {
+        $step = MigrateSteps::model()->find("sorder = 9");
+        $result = MigrateSteps::checkStep($step->sorder);
+        if ($result['allowed']){
+            //declare objects to migrate
+            $objects = array(
+                'tax' => Yii::t('frontend', 'Tax Rules, Tax Zones and Rates'),
+                'catalog_rule' => Yii::t('frontend', 'Catalog Rules'),
+            );
+
+            //variables to log
+            $migrated_object_ids = array();
+            $migrated_tax_rule_ids = $migrated_tax_rate_ids = $migrated_catalog_rule_ids = array();
+
+            if (Yii::app()->request->isPostRequest){
+
+                //reset database of this step if has
+                $is_reset = Yii::app()->request->getPost('reset');
+                if ($is_reset){
+                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
+                    $resetSQLFile = $dataPath . "step9_reset.sql";
+                    if (file_exists($resetSQLFile)) {
+                        $rs = MigrateSteps::executeFile($resetSQLFile);
+                        if ($rs){
+                            //reset step status
+                            $step->status = MigrateSteps::STATUS_NOT_DONE;
+                            $step->migrated_data = null;
+                            if ($step->update()){
+                                $this->refresh();
+                            }
+                        }
+                    }
+                }
+
+                //un-check foreign key
+                Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
+
+                $selected_objects = Yii::app()->request->getPost('selected_objects', array());
+                if ($selected_objects){
+                    //get migrated data from first step in session
+                    $migrated_website_ids = isset(Yii::app()->session['migrated_website_ids']) ? Yii::app()->session['migrated_website_ids'] : array();
+                    $str_website_ids = implode(',', $migrated_website_ids);
+
+                    $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
+                    $str_store_ids = implode(',', $migrated_store_ids);
+
+                    $migrated_customer_group_ids = isset(Yii::app()->session['migrated_customer_group_ids']) ? Yii::app()->session['migrated_customer_group_ids'] : array();
+                    $str_customer_group_ids = implode(',', $migrated_customer_group_ids);
+
+                    if (in_array('tax', $selected_objects)){
+                        //tax_calculation_rate
+                        //Reset
+                        Mage2TaxCalculationRate::model()->deleteAll();
+                        //start migrate
+                        $models = Mage1TaxCalculationRate::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxCalculationRate();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->save()){
+                                    $migrated_tax_rate_ids[] = $model2->tax_calculation_rate_id;
+                                }
+                            }
+                        }
+                        //tax_calculation_rate_title
+                        $models = Mage1TaxCalculationRateTitle::model()->findAll("store_id IN ({$str_store_ids})");
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxCalculationRateTitle();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //tax_calculation_rule
+                        $models = Mage1TaxCalculationRule::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxCalculationRule();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->save()){
+                                    $migrated_tax_rule_ids[] = $model2->tax_calculation_rule_id;
+                                }
+                            }
+                        }
+                        //tax_calculation
+                        $models = Mage1TaxCalculation::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxCalculation();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                if ($model2->save()){
+                                    $migrated_tax_ids[] = $model2->tax_calculation_id;
+                                }
+                            }
+                        }
+                        //tax_order_aggregated_created
+                        $models = Mage1TaxOrderAggregatedCreated::model()->findAll("store_id IN ({$str_store_ids})");
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxOrderAggregatedCreated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+                        //tax_order_aggregated_updated
+                        $models = Mage1TaxOrderAggregatedUpdated::model()->findAll("store_id IN ({$str_store_ids})");
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2TaxOrderAggregatedUpdated();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->save();
+                            }
+                        }
+
+                        $migrated_object_ids[] = 'tax';
+                    }//end migrate tax
+
+                    if (in_array('catalog_rule', $selected_objects)){
+                        //catalogrule
+                        $models = Mage1Catalogrule::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2Catalogrule();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                //update conditions, because model name was changed in Magento2
+                                $model2->conditions_serialized = MigrateSteps::replaceCatalogRuleModels($model2->conditions_serialized);
+                                $model2->actions_serialized = MigrateSteps::replaceCatalogRuleModels($model2->actions_serialized);
+
+                                if ($model2->save()){
+                                    $migrated_catalog_rule_ids[] = $model2->rule_id;
+                                }
+                            }
+                        }
+                        //catalogrule_affected_product
+                        $models = Mage1CatalogruleAffectedProduct::model()->findAll();
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleAffectedProduct();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }
+                        //catalogrule_customer_group
+                        $condition = '';
+                        if ($str_customer_group_ids){
+                            $condition = "customer_group_id IN ({$str_customer_group_ids})";
+                        }
+                        $models = Mage1CatalogruleCustomerGroup::model()->findAll($condition);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleCustomerGroup();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }
+                        //catalogrule_group_website
+                        $conditions = array();
+                        if ($str_website_ids){
+                            $conditions[] = "website_id IN ({$str_website_ids})";
+                        }
+                        if ($str_customer_group_ids){
+                            $conditions[] = "customer_group_id IN ({$str_customer_group_ids})";
+                        }
+                        $conditions = implode(" AND ", $conditions);
+                        $models = Mage1CatalogruleGroupWebsite::model()->findAll($conditions);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleGroupWebsite();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }
+                        //catalogrule_product
+                        $conditions = array();
+                        if ($str_website_ids){
+                            $conditions[] = "website_id IN ({$str_website_ids})";
+                        }
+                        if ($str_customer_group_ids){
+                            $conditions[] = "customer_group_id IN ({$str_customer_group_ids})";
+                        }
+                        $conditions = implode(" AND ", $conditions);
+                        $models = Mage1CatalogruleProduct::model()->findAll($conditions);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleProduct();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }
+
+                        //catalogrule_website
+                        $conditions = array();
+                        if ($str_website_ids){
+                            $conditions[] = "website_id IN ({$str_website_ids})";
+                        }
+                        $conditions = implode(" AND ", $conditions);
+                        $models = Mage1CatalogruleWebsite::model()->findAll($conditions);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleWebsite();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }
+                        //catalogrule_product_price
+                        //this table will auto generate by indexer
+                        /*
+                        $conditions = array();
+                        if ($str_website_ids){
+                            $conditions[] = "website_id IN ({$str_website_ids})";
+                        }
+                        if ($str_customer_group_ids){
+                            $conditions[] = "customer_group_id IN ({$str_customer_group_ids})";
+                        }
+                        $conditions = implode(" AND ", $conditions);
+                        $models = Mage1CatalogruleProductPrice::model()->findAll($conditions);
+                        if ($models){
+                            foreach ($models as $model){
+                                $model2 = new Mage2CatalogruleProductPrice();
+                                foreach ($model2->attributes as $key => $value){
+                                    if (isset($model->$key)){
+                                        $model2->$key = $model->$key;
+                                    }
+                                }
+                                $model2->save();
+                            }
+                        }*/
+
+                        $migrated_object_ids[] = 'catalog_rule';
+                    }
+
+                }else{
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
+                }
+
+                //Update step status
+                if ($migrated_object_ids){
+                    $step->status = MigrateSteps::STATUS_DONE;
+                    $step->migrated_data = json_encode(array(
+                        'other_object_ids' => $migrated_object_ids,
+                        'tax_ids' => $migrated_tax_ids,
+                        'catalog_rule_ids' => $migrated_catalog_rule_ids
+                    ));
+                    if ($step->update()) {
+
+                        //check foreign key
+                        Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
+
+                        //update session
+                        Yii::app()->session['migrated_other_object_ids'] = $migrated_object_ids;
+
+                        $message = Yii::t('frontend', 'Migrated successfully.');
+                        $message .= "<br/>". Yii::t('frontend', "Total Tax Rules migrated: %s1.", array('%s1' => sizeof($migrated_tax_rule_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Tax Rates migrated: %s1.", array('%s1' => sizeof($migrated_tax_rate_ids)));
+                        $message .= "<br/>". Yii::t('frontend', "Total Catalog Rules migrated: %s2.", array('%s2' => sizeof($migrated_catalog_rule_ids)));
                         Yii::app()->user->setFlash('success', $message);
                     }
                 }
