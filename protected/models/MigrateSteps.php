@@ -63,26 +63,36 @@ class MigrateSteps extends MigrateStepsPeer
     }
 
     public static function getMage2StoreId($mage1StoreId){
-        $id = null;
+        $id = NULL;
         if (isset($mage1StoreId)){
-            $store1 = Mage1Store::model()->find("store_id = {$mage1StoreId}");
-            if ($store1){
-                $store2 = Mage2Store::model()->find("code = '{$store1->code}'");
-                if ($store2) {
-                    $id = $store2->store_id;
+            if (is_null($mage1StoreId)){
+                $id = 'NULL';
+            } else {
+                $store1 = Mage1Store::model()->find("store_id = {$mage1StoreId}");
+                if ($store1){
+                    $store2 = Mage2Store::model()->find("code = '{$store1->code}'");
+                    if ($store2) {
+                        $id = $store2->store_id;
+                    }
+                } else{
+                    $id = $mage1StoreId;
                 }
             }
+
         }
 
         return $id;
     }
 
-    public static function getMage2AttributeSetId($mage1AttrSetId){
+    public static function getMage2AttributeSetId($mage1AttrSetId, $entity_type_code = null){
         $id = null;
         if (isset($mage1AttrSetId)){
             $model1 = Mage1AttributeSet::model()->findByPk($mage1AttrSetId);
             if ($model1){
-                $entity_type_id2 = MigrateSteps::getMage2EntityTypeId(self::PRODUCT_TYPE_CODE);
+                if (!$entity_type_code){
+                    $entity_type_code = self::PRODUCT_TYPE_CODE;
+                }
+                $entity_type_id2 = MigrateSteps::getMage2EntityTypeId($entity_type_code);
                 $model2 = Mage2AttributeSet::model()->find("entity_type_id = {$entity_type_id2} AND attribute_set_name = '{$model1->attribute_set_name}'");
                 if ($model2) {
                     $id = $model2->attribute_set_id;
@@ -98,7 +108,7 @@ class MigrateSteps extends MigrateStepsPeer
         if (isset($mage1AttrGroupId)){
             $model1 = Mage1AttributeGroup::model()->findByPk($mage1AttrGroupId);
             if ($model1){
-                $attr_set_id2 = self::getMage2AttributeSetId($model1->attribute_set_id);
+                $attr_set_id2 = self::getMage2AttributeSetId($model1->attribute_set_id, self::PRODUCT_TYPE_CODE);
                 $model2 = Mage2AttributeGroup::model()->find("attribute_set_id = {$attr_set_id2} AND attribute_group_name = '{$model1->attribute_group_name}'");
                 if ($model2) {
                     $id = $model2->attribute_group_id;
@@ -112,7 +122,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2AttributeId($mage1AttrId, $entityTypeId = 3){
         $id = null;
         if (isset($mage1AttrId)){
-            $attr1 = Mage1Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_id = {$mage1AttrId}");
+            $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
             if ($attr1){
                 //msrp_enabled was changed to msrp in magento2
                 if ($attr1->attribute_code == 'msrp_enabled')
@@ -132,7 +142,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage1AttributeCode($mage1AttrId){
         $code = null;
         if (isset($mage1AttrId)){
-            $attr1 = Mage1Attribute::model()->find("attribute_id = {$mage1AttrId}");
+            $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
             if ($attr1){
                 $code = $attr1->attribute_code;
             }
@@ -140,9 +150,9 @@ class MigrateSteps extends MigrateStepsPeer
         return $code;
     }
 
-    public static function getMage1AttributeId($mage1AttrCode, $entityTypeId = 3){
+    public static function getMage1AttributeId($mage1AttrCode, $entityTypeId){
         $id = null;
-        if (isset($mage1AttrCode)){
+        if ($mage1AttrCode && $entityTypeId){
             $attr1 = Mage1Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_code = '{$mage1AttrCode}'");
             if ($attr1){
                 $id = $attr1->attribute_id;
@@ -327,8 +337,8 @@ class MigrateSteps extends MigrateStepsPeer
 
     public static function getTotalVisibleProductsAttr(){
         $tablePrefix = Yii::app()->mage1->tablePrefix;
-
-        $sql = "SELECT COUNT(*) FROM `{$tablePrefix}eav_attribute` e INNER JOIN `{$tablePrefix}catalog_eav_attribute` ce ON e.attribute_id = ce.attribute_id WHERE e.entity_type_id = 4 AND ce.is_visible = 1";
+        $entity_type_id = MigrateSteps::getMage1EntityTypeId(self::PRODUCT_TYPE_CODE);
+        $sql = "SELECT COUNT(*) FROM `{$tablePrefix}eav_attribute` e INNER JOIN `{$tablePrefix}catalog_eav_attribute` ce ON e.attribute_id = ce.attribute_id WHERE e.entity_type_id = {$entity_type_id} AND ce.is_visible = 1";
         $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
 
         return $total;
@@ -373,7 +383,7 @@ class MigrateSteps extends MigrateStepsPeer
                 $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
                 $sql = "SELECT COUNT(*) FROM `{$tablePrefix}salesrule_coupon`";
                 $total2 = Yii::app()->mage1->createCommand($sql)->queryScalar();
-                $total = $total . " rules," . $total2 . " coupons";
+                $total = $total . " rules, " . $total2 . " coupons";
                 break;
         }
 
@@ -382,7 +392,8 @@ class MigrateSteps extends MigrateStepsPeer
 
     public static function getMG1VersionOptions(){
         $options = array(
-            'mage19x' => Yii::t('frontend', 'Magento 1.9.x')
+            'mage19x' => Yii::t('frontend', 'Magento 1.9.x'),
+            'mage19x' => Yii::t('frontend', 'Magento 1.8.x')
         );
         return $options;
     }

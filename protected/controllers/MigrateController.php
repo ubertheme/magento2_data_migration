@@ -397,7 +397,8 @@ class MigrateController extends Controller
                 //eav_attribute_set
                 if ($attribute_sets){
                     foreach ($attribute_sets as $attribute_set) {
-                        $condition = "entity_type_id = {$product_entity_type_id} AND attribute_set_name = '{$attribute_set->attribute_set_name}'";
+                        $entity_type_id2 = MigrateSteps::_getMage2EntityTypeId($attribute_set->entity_type_id);
+                        $condition = "entity_type_id = {$entity_type_id2} AND attribute_set_name = '{$attribute_set->attribute_set_name}'";
                         $attribute_set2 = Mage2AttributeSet::model()->find($condition);
                         if (!$attribute_set2){
                             $attribute_set2 = new Mage2AttributeSet();
@@ -415,7 +416,7 @@ class MigrateController extends Controller
                         $attribute_groups = Mage1AttributeGroup::model()->findAll($condition);
                         if ($attribute_groups) {
                             foreach ($attribute_groups as $attribute_group) {
-                                $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($attribute_group->attribute_set_id);
+                                $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($attribute_group->attribute_set_id, MigrateSteps::PRODUCT_TYPE_CODE);
                                 $condition = "attribute_set_id = {$attribute_set_id2} AND attribute_group_name = '{$attribute_group->attribute_group_name}'";
                                 $attribute_group2 = Mage2AttributeGroup::model()->find($condition);
                                 if (!$attribute_group2) {
@@ -438,6 +439,10 @@ class MigrateController extends Controller
 
                 //migrate product attributes
                 if ($attributes){
+                    //Some tables need to reset before migrate
+                    Mage2AttributeOption::model()->deleteAll();
+                    Mage2AttributeOptionValue::model()->deleteAll();
+
                     foreach ($attributes as $attribute){
 
                         //msrp_enabled was changed to msrp in magento2
@@ -446,7 +451,9 @@ class MigrateController extends Controller
                         else
                             $attribute_code2 = $attribute->attribute_code;
 
-                        $condition = "entity_type_id = {$product_entity_type_id} AND attribute_code = '{$attribute_code2}'";
+                        $entity_type_id2 = MigrateSteps::_getMage2EntityTypeId($attribute->entity_type_id);
+                        $condition = "entity_type_id = {$entity_type_id2} AND attribute_code = '{$attribute_code2}'";
+
                         $attribute2 = Mage2Attribute::model()->find($condition);
                         if (!$attribute2){
                             $attribute2 = new Mage2Attribute();
@@ -465,6 +472,7 @@ class MigrateController extends Controller
                         }
 
                         //save or update data of a attribute
+
                         if ($attribute2->save()){
                             //update total
                             $migrated_attribute_ids[] = $attribute->attribute_id;
@@ -489,38 +497,35 @@ class MigrateController extends Controller
                             }
 
                             //eav_attribute_option
-                            $condition = "attribute_id = {$attribute->attribute_id}";
-                            $attribute_options = Mage1AttributeOption::model()->findAll($condition);
+                            $attribute_options = Mage1AttributeOption::model()->findAll("attribute_id = {$attribute->attribute_id}");
                             if ($attribute_options){
                                 foreach ($attribute_options as $attribute_option){
-                                    $condition = "attribute_id = {$attribute2->attribute_id} AND option_id = {$attribute_option->option_id}";
-                                    $attribute_option2 = Mage2AttributeOption::model()->find($condition);
-                                    if (!$attribute_option2) {
-                                        $attribute_option2 = new Mage2AttributeOption();
-                                        $attribute_option2->option_id = $attribute_option->option_id;
-                                        $attribute_option2->attribute_id = $attribute2->attribute_id;
-                                        $attribute_option2->sort_order = $attribute_option->sort_order;
-                                    }
+
+                                    $attribute_option2 = new Mage2AttributeOption();
+                                    $attribute_option2->option_id = $attribute_option->option_id;
+                                    $attribute_option2->attribute_id = $attribute2->attribute_id;
+                                    $attribute_option2->sort_order = $attribute_option->sort_order;
+
                                     //save or update
                                     if ($attribute_option2->save()){
                                         //eav_attribute_option_value,
                                         if ($migrated_store_ids) {
+
                                             //get all option values of current option in Magento1
                                             $condition = "option_id = {$attribute_option->option_id}";
                                             $str_store_ids = implode(',', $migrated_store_ids);
                                             $condition .= " AND store_id IN ({$str_store_ids})";
                                             $option_values = Mage1AttributeOptionValue::model()->findAll($condition);
+
                                             if ($option_values){
                                                 foreach ($option_values as $option_value){
-                                                    $condition = "value_id = {$option_value->value_id}";
-                                                    $option_value2 = Mage2AttributeOptionValue::model()->find($condition);
-                                                    if (!$option_value2) {
-                                                        $option_value2 = new Mage2AttributeOptionValue();
-                                                        $option_value2->value_id = $option_value->value_id;
-                                                        $option_value2->option_id = $option_value->option_id;
-                                                        $option_value2->store_id = MigrateSteps::getMage2StoreId($option_value->store_id);
-                                                        $option_value2->value = $option_value->value;
-                                                    }
+
+                                                    $option_value2 = new Mage2AttributeOptionValue();
+                                                    $option_value2->value_id = $option_value->value_id;
+                                                    $option_value2->option_id = $option_value->option_id;
+                                                    $option_value2->store_id = MigrateSteps::getMage2StoreId($option_value->store_id);
+                                                    $option_value2->value = $option_value->value;
+
                                                     //update or save
                                                     $option_value2->save();
                                                 }
@@ -534,16 +539,38 @@ class MigrateController extends Controller
                             $catalog_eav_attribute = Mage1CatalogEavAttribute::model()->find("attribute_id = {$attribute->attribute_id}");
                             if ($catalog_eav_attribute) {
                                 $catalog_eav_attribute2 = Mage2CatalogEavAttribute::model()->find("attribute_id = {$attribute2->attribute_id}");
-                                if (!$catalog_eav_attribute2){
+                                if (!$catalog_eav_attribute2){ //create new
                                     $catalog_eav_attribute2 = new Mage2CatalogEavAttribute();
-                                }
-                                foreach ($catalog_eav_attribute2->attributes as $key => $value){
-                                    if (isset($catalog_eav_attribute->$key)){
-                                        $catalog_eav_attribute2->$key = $catalog_eav_attribute->$key;
+                                    foreach ($catalog_eav_attribute2->attributes as $key => $value){
+                                        if (isset($catalog_eav_attribute->$key)){
+                                            $catalog_eav_attribute2->$key = $catalog_eav_attribute->$key;
+                                        }
                                     }
+                                    //update new attribute_id
+                                    $catalog_eav_attribute2->attribute_id = $attribute2->attribute_id;
+                                    $catalog_eav_attribute2->is_required_in_admin_store = 0;
+                                    //this not take because was changed in magento2
+                                    $catalog_eav_attribute2->frontend_input_renderer = null;
+                                } else{
+                                    //update settings values
+                                    $catalog_eav_attribute2->is_global = $catalog_eav_attribute->is_global;
+                                    $catalog_eav_attribute2->is_visible = $catalog_eav_attribute->is_visible;
+                                    $catalog_eav_attribute2->is_searchable = $catalog_eav_attribute->is_searchable;
+                                    $catalog_eav_attribute2->is_filterable = $catalog_eav_attribute->is_filterable;
+                                    $catalog_eav_attribute2->is_comparable = $catalog_eav_attribute->is_comparable;
+                                    $catalog_eav_attribute2->is_visible_on_front = $catalog_eav_attribute->is_visible_on_front;
+                                    $catalog_eav_attribute2->is_html_allowed_on_front = $catalog_eav_attribute->is_html_allowed_on_front;
+                                    $catalog_eav_attribute2->is_used_for_price_rules = $catalog_eav_attribute->is_used_for_price_rules;
+                                    $catalog_eav_attribute2->is_filterable_in_search = $catalog_eav_attribute->is_filterable_in_search;
+                                    $catalog_eav_attribute2->used_in_product_listing = $catalog_eav_attribute->used_in_product_listing;
+                                    $catalog_eav_attribute2->used_for_sort_by = $catalog_eav_attribute->used_for_sort_by;
+                                    $catalog_eav_attribute2->apply_to = $catalog_eav_attribute->apply_to;
+                                    $catalog_eav_attribute2->is_visible_in_advanced_search = $catalog_eav_attribute->is_visible_in_advanced_search;
+                                    $catalog_eav_attribute2->position = $catalog_eav_attribute->position;
+                                    $catalog_eav_attribute2->is_wysiwyg_enabled = $catalog_eav_attribute->is_wysiwyg_enabled;
+                                    $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
                                 }
-                                //update new attribute_id
-                                $catalog_eav_attribute2->attribute_id = $attribute2->attribute_id;
+
                                 //save
                                 $catalog_eav_attribute2->save();
                             }
@@ -565,7 +592,7 @@ class MigrateController extends Controller
                     if ($entity_attributes){
                         foreach ($entity_attributes as $entity_attribute){
                             $attribute_id2 = MigrateSteps::getMage2AttributeId($entity_attribute->attribute_id, '4');
-                            $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($entity_attribute->attribute_set_id);
+                            $attribute_set_id2 = MigrateSteps::getMage2AttributeSetId($entity_attribute->attribute_set_id, MigrateSteps::PRODUCT_TYPE_CODE);
                             $attribute_group_id2 = MigrateSteps::getMage2AttributeGroupId($entity_attribute->attribute_group_id);
 
                             if ($attribute_id2 && $attribute_set_id2 && $attribute_group_id2){
@@ -696,7 +723,7 @@ class MigrateController extends Controller
                                 if (!$category2){
                                     $category2 = new Mage2CatalogCategoryEntity();
                                     $category2->entity_id = $category->entity_id;
-                                    $category2->attribute_set_id = $category->attribute_set_id;
+                                    $category2->attribute_set_id = MigrateSteps::getMage2AttributeSetId($category->attribute_set_id, MigrateSteps::CATEGORY_TYPE_CODE);
                                     $category2->parent_id = $category->parent_id;
                                     $category2->created_at = $category->created_at;
                                     $category2->updated_at = $category->updated_at;
@@ -1017,6 +1044,7 @@ class MigrateController extends Controller
                                         $product2->$key = $product->$key;
                                     }
                                 }
+                                $product2->attribute_set_id = MigrateSteps::getMage2AttributeSetId($product2->attribute_set_id, MigrateSteps::PRODUCT_TYPE_CODE);
 
                                 //save or update
                                 if ($product2->save()){
@@ -2172,9 +2200,7 @@ class MigrateController extends Controller
                                         foreach ($models as $model){
                                             $model2 = new Mage2SalesOrderStatusLabel();
                                             $model2->attributes = $model->attributes;
-                                            if ($model2->store_id){
-                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                            }
+                                            $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                             $model2->save();
                                         }
                                     }
@@ -2241,9 +2267,7 @@ class MigrateController extends Controller
                                                 }
                                             }
                                             //we have changed store_id in magento2
-                                            if ($model2->store_id){
-                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                            }
+                                            $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                             $model2->save();
                                         }
                                     }
@@ -2257,9 +2281,7 @@ class MigrateController extends Controller
                                                     $model2->$key = $model->$key;
                                                 }
                                             }
-                                            if ($model2->store_id){
-                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                            }
+                                            $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                             $model2->save();
                                         }
                                     }
@@ -2325,9 +2347,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                if ($model2->store_id){
-                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -2342,9 +2362,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                if ($model2->store_id){
-                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                }
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -2741,9 +2759,9 @@ class MigrateController extends Controller
                                     $model2->save();
                                 }
                             }
-
-                            $migrated_sales_object_ids[] = 'shipment';
                         }
+
+                        $migrated_sales_object_ids[] = 'shipment';
                     }//end sales shipment migration
 
                     //Sales credit memo migration
@@ -2815,8 +2833,8 @@ class MigrateController extends Controller
                                     }
                                 }
                             }
-                            $migrated_sales_object_ids[] = 'credit';
                         }
+                        $migrated_sales_object_ids[] = 'credit';
                     }//End Sales credit memo migration
 
                     //sales bestsellers
@@ -2834,9 +2852,7 @@ class MigrateController extends Controller
                                             $model2->$key = $model->$key;
                                         }
                                     }
-                                    if ($model2->store_id){
-                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                    }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     $model2->save();
                                 }
                             }
@@ -2851,9 +2867,7 @@ class MigrateController extends Controller
                                             $model2->$key = $model->$key;
                                         }
                                     }
-                                    if ($model2->store_id){
-                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                    }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     $model2->save();
                                 }
                             }
@@ -2868,9 +2882,7 @@ class MigrateController extends Controller
                                             $model2->$key = $model->$key;
                                         }
                                     }
-                                    if ($model2->store_id){
-                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                    }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                     $model2->save();
                                 }
                             }
@@ -3112,7 +3124,7 @@ class MigrateController extends Controller
                         //review_entity -> this table was not changed
 
                         //review_entity_summary
-                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
                         $models = Mage1ReviewEntitySummary::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3142,8 +3154,8 @@ class MigrateController extends Controller
                             }
                         }
                         //review_detail
-                        $condition = "store_id IN ({$str_store_ids})";
-                        $condition .= " AND customer_id IN ({$str_customer_ids})";
+                        $condition = "(store_id IN ({$str_store_ids}) OR store_id IS NULL)";
+                        $condition .= " AND (customer_id IN ({$str_customer_ids}) OR customer_id IS NULL)";
                         $models = Mage1ReviewDetail::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3153,13 +3165,13 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
 
                         //review_store
-                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
                         $models = Mage1ReviewStore::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3169,7 +3181,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -3199,7 +3211,7 @@ class MigrateController extends Controller
                             }
                         }
                         //rating_option_vote_aggregated
-                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
                         $models = Mage1RatingOptionVoteAggregated::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3209,12 +3221,12 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
                         //rating_store
-                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
                         $models = Mage1RatingStore::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3224,12 +3236,12 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
                         //rating_title
-                        $condition = "store_id IN ({$str_store_ids})";
+                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
                         $models = Mage1RatingTitle::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
@@ -3239,7 +3251,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -3366,7 +3378,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -3410,7 +3422,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
@@ -3424,7 +3436,7 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model2->store_id);
+                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
                                 $model2->save();
                             }
                         }
