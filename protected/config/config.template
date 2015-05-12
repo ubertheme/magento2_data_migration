@@ -25,6 +25,7 @@ return array(
 
     'import'=>array(
         //This can change for your magento1 version if needed
-        'application.models.db.{MG1_VERSION}.*',
+        //'application.models.db.{MG1_VERSION}.*',
+        'application.models.db.mage19x.*',
     )
 );

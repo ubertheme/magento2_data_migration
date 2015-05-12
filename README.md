@@ -1,29 +1,4 @@
-<strong>Magento 2</strong> beta version has just been released not long ago with lots of huge improvements compared to the previous versions.
-
-Moving to the latest version is obviously beneficial for most Magento users.
-
-However, the data migration may be troublesome for new users. In an attempt to help you with this, <strong>UberTheme</strong> is developing a handy migration tool to migrate data from old Magento version to Magento 2. Let’s see what we’ve got so far.
-
-Here is what we’ve learnt about <strong>Magento 2</strong> beta’s new structure so far.
-
-<h3>Key changes in the database structures.</h3>
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/magento-1.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-
-</div>
-<h3>Changes in tables.</h3>
-<h4>+ Name change for some tables</h4>
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/changes-in-tables.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-
-</div>
-<h4>+ Change of Attributes</h4>
-<div class="center">
-<p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/attributes.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
-</div>
-...
-
-To use this migration tool, follow the steps below:
+<h3>To use this migration tool, follow the steps below:</h3>
 
 <h4># Step1: Install Magento 2</h4>
 - Download the latest version of Magento2 from Github

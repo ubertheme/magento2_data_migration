@@ -393,7 +393,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMG1VersionOptions(){
         $options = array(
             'mage19x' => Yii::t('frontend', 'Magento 1.9.x'),
-            'mage19x' => Yii::t('frontend', 'Magento 1.8.x')
+            'mage18x' => Yii::t('frontend', 'Magento 1.8.x')
         );
         return $options;
     }
