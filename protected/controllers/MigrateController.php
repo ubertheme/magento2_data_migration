@@ -196,24 +196,6 @@ class MigrateController extends Controller
 
             if (Yii::app()->request->isPostRequest){
 
-                //reset this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step2_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
-
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
@@ -372,23 +354,6 @@ class MigrateController extends Controller
             $attributes = Mage1Attribute::model()->findAll("entity_type_id = {$product_entity_type_id}");
 
             if (Yii::app()->request->isPostRequest){
-
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step3_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -664,27 +629,6 @@ class MigrateController extends Controller
 
             if (Yii::app()->request->isPostRequest){
 
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step4_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //delete url related data in url_rewrite table and catalog_url_rewrite_product_category table
-                            Mage2UrlRewrite::model()->deleteAll("entity_type = 'category'");
-
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
-
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
@@ -899,7 +843,7 @@ class MigrateController extends Controller
                                     }
 
                                     //url_rewrite for category
-                                    $condition = "category_id = {$category->entity_id}";
+                                    $condition = "category_id = {$category->entity_id} AND product_id IS NULL";
                                     if ($migrated_store_ids) {
                                         $str_store_ids = implode(',', $migrated_store_ids);
                                         $condition .= " AND store_id IN ({$str_store_ids})";
@@ -912,7 +856,6 @@ class MigrateController extends Controller
                                             $url2 = Mage2UrlRewrite::model()->find($condition);
                                             if (!$url2) {
                                                 $url2 = new Mage2UrlRewrite();
-                                                $url2->url_rewrite_id = $url->url_rewrite_id;
                                                 $url2->entity_type = 'category';
                                                 $url2->entity_id = $url->category_id;
                                                 $url2->request_path = $url->request_path;
@@ -990,27 +933,6 @@ class MigrateController extends Controller
             $migrated_product_ids = array();
 
             if (Yii::app()->request->isPostRequest){
-
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step5_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //delete url related data in url_rewrite table and catalog_url_rewrite_product_category table
-                            Mage2UrlRewrite::model()->deleteAll("entity_type = 'product'");
-
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -1395,7 +1317,6 @@ class MigrateController extends Controller
                                         foreach ($urls as $url){
                                             $store_id2 = MigrateSteps::getMage2StoreId($url->store_id);
                                             $url2 = new Mage2UrlRewrite();
-                                            $url2->url_rewrite_id = $url->url_rewrite_id;
                                             $url2->entity_type = 'product';
                                             $url2->entity_id = $url->product_id;
                                             $url2->request_path = $url->request_path;
@@ -1411,7 +1332,7 @@ class MigrateController extends Controller
                                             if ($url2->save()) {
                                                 //catalog_url_rewrite_product_category
                                                 $catalog_url2 = new Mage2CatalogUrlRewriteProductCategory();
-                                                $catalog_url2->url_rewrite_id = $url->url_rewrite_id;
+                                                $catalog_url2->url_rewrite_id = $url2->url_rewrite_id;
                                                 $catalog_url2->category_id = $url->category_id;
                                                 $catalog_url2->product_id = $url->product_id;
                                                 $catalog_url2->save();
@@ -1798,24 +1719,6 @@ class MigrateController extends Controller
 
             if (Yii::app()->request->isPostRequest){
 
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step6_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
-
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
@@ -2136,24 +2039,6 @@ class MigrateController extends Controller
             $migrated_order_statuses = $migrated_sales_rule_ids = $migrated_sales_coupon_ids = array();
 
             if (Yii::app()->request->isPostRequest){
-
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step7_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -3086,24 +2971,6 @@ class MigrateController extends Controller
 
             if (Yii::app()->request->isPostRequest){
 
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step8_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
-
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
@@ -3316,24 +3183,6 @@ class MigrateController extends Controller
 
             if (Yii::app()->request->isPostRequest){
 
-                //reset database of this step if has
-                $is_reset = Yii::app()->request->getPost('reset');
-                if ($is_reset){
-                    $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
-                    $resetSQLFile = $dataPath . "step9_reset.sql";
-                    if (file_exists($resetSQLFile)) {
-                        $rs = MigrateSteps::executeFile($resetSQLFile);
-                        if ($rs){
-                            //reset step status
-                            $step->status = MigrateSteps::STATUS_NOT_DONE;
-                            $step->migrated_data = null;
-                            if ($step->update()){
-                                $this->refresh();
-                            }
-                        }
-                    }
-                }
-
                 //un-check foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
@@ -3392,6 +3241,11 @@ class MigrateController extends Controller
                                         $model2->$key = $model->$key;
                                     }
                                 }
+                                //this only for Magento 1.6.x
+                                if (MigrateSteps::getMG1Version() == 'mage16x'){
+                                    $model2->calculate_subtotal = 0;
+                                }
+
                                 if ($model2->save()){
                                     $migrated_tax_rule_ids[] = $model2->tax_calculation_rule_id;
                                 }
@@ -3460,7 +3314,34 @@ class MigrateController extends Controller
                                 $model2->actions_serialized = MigrateSteps::replaceCatalogRuleModels($model2->actions_serialized);
 
                                 if ($model2->save()){
+
                                     $migrated_catalog_rule_ids[] = $model2->rule_id;
+
+                                    //this only for Magento 1.6.x
+                                    if (MigrateSteps::getMG1Version() == 'mage16x'){
+                                        if ($model->customer_group_ids){
+                                            $customer_group_ids = explode(',', $model->customer_group_ids);
+                                            if ($customer_group_ids){
+                                                foreach ($customer_group_ids as $id){
+                                                    $row = new Mage2CatalogruleCustomerGroup();
+                                                    $row->rule_id = $model2->rule_id;
+                                                    $row->customer_group_id = $id;
+                                                    $row->save();
+                                                }
+                                            }
+                                        }
+                                        if ($model->website_ids){
+                                            $website_ids = explode(',', $model->website_ids);
+                                            if ($website_ids){
+                                                foreach ($website_ids as $id){
+                                                    $row = new Mage2CatalogruleWebsite();
+                                                    $row->rule_id = $model2->rule_id;
+                                                    $row->website_id = $id;
+                                                    $row->save();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -3477,23 +3358,7 @@ class MigrateController extends Controller
                                 $model2->save();
                             }
                         }
-                        //catalogrule_customer_group
-                        $condition = '';
-                        if ($str_customer_group_ids){
-                            $condition = "customer_group_id IN ({$str_customer_group_ids})";
-                        }
-                        $models = Mage1CatalogruleCustomerGroup::model()->findAll($condition);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2CatalogruleCustomerGroup();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
-                                    }
-                                }
-                                $model2->save();
-                            }
-                        }
+
                         //catalogrule_group_website
                         $conditions = array();
                         if ($str_website_ids){
@@ -3537,24 +3402,45 @@ class MigrateController extends Controller
                             }
                         }
 
-                        //catalogrule_website
-                        $conditions = array();
-                        if ($str_website_ids){
-                            $conditions[] = "website_id IN ({$str_website_ids})";
-                        }
-                        $conditions = implode(" AND ", $conditions);
-                        $models = Mage1CatalogruleWebsite::model()->findAll($conditions);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2CatalogruleWebsite();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
+                        //we only migrate bellow tables for Magento >= 1.7.x
+                        if (MigrateSteps::getMG1Version() != 'mage16x'){
+                            //catalogrule_customer_group
+                            $condition = '';
+                            if ($str_customer_group_ids){
+                                $condition = "customer_group_id IN ({$str_customer_group_ids})";
+                            }
+                            $models = Mage1CatalogruleCustomerGroup::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2CatalogruleCustomerGroup();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
                                     }
+                                    $model2->save();
                                 }
-                                $model2->save();
+                            }
+                            //catalogrule_website
+                            $conditions = array();
+                            if ($str_website_ids){
+                                $conditions[] = "website_id IN ({$str_website_ids})";
+                            }
+                            $conditions = implode(" AND ", $conditions);
+                            $models = Mage1CatalogruleWebsite::model()->findAll($conditions);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2CatalogruleWebsite();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
+                                    }
+                                    $model2->save();
+                                }
                             }
                         }
+
                         //catalogrule_product_price
                         //this table will auto generate by indexer
                         /*
@@ -3656,5 +3542,33 @@ class MigrateController extends Controller
             $nextStep = MigrateSteps::getNextSteps();
             $this->redirect(array($nextStep));
         }
+    }
+
+    public function actionReset(){
+        $stepIndex = Yii::app()->request->getParam('step', 1);
+        $step = MigrateSteps::model()->findByPk($stepIndex);
+        if ($step){
+            $dataPath = Yii::app()->basePath .DIRECTORY_SEPARATOR. "data".DIRECTORY_SEPARATOR;
+            $resetSQLFile = $dataPath . "step{$stepIndex}_reset.sql";
+            if (file_exists($resetSQLFile)) {
+                $rs = MigrateSteps::executeFile($resetSQLFile);
+                if ($rs){
+                    if ($stepIndex == 4){
+                        //delete url related data in url_rewrite table and catalog_url_rewrite_product_category table
+                        Mage2UrlRewrite::model()->deleteAll("entity_type = 'category'");
+                    }
+                    if ($stepIndex == 5){
+                        //delete url related data in url_rewrite table and catalog_url_rewrite_product_category table
+                        Mage2UrlRewrite::model()->deleteAll("entity_type = 'product'");
+                    }
+                    //reset step status
+                    $step->status = MigrateSteps::STATUS_NOT_DONE;
+                    $step->migrated_data = null;
+                    $step->update();
+                }
+            }
+        }
+
+        $this->redirect(array("step{$stepIndex}"));
     }
 }

@@ -17,8 +17,7 @@ $migrated_type_ids = isset(Yii::app()->session['migrated_product_type_ids']) ? Y
             <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
                 <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
             <?php else: ?>
-                <input type="hidden" id="reset" name="reset" value="0" />
-                <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
+                <a href="<?php echo Yii::app()->createUrl("migrate/reset/step/" . $step->sorder); ?>" class="btn btn-danger"><?php echo Yii::t('frontend', 'Reset'); ?></a>
                 <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
             <?php endif; ?>
         </div>
@@ -68,8 +67,7 @@ $migrated_type_ids = isset(Yii::app()->session['migrated_product_type_ids']) ? Y
         <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
         <?php else: ?>
-            <input type="hidden" id="reset" name="reset" value="0" />
-            <button type="submit" class="btn btn-danger reset"><?php echo Yii::t('frontend', 'Reset'); ?></button>
+            <a href="<?php echo Yii::app()->createUrl("migrate/reset/step/" . $step->sorder); ?>" class="btn btn-danger"><?php echo Yii::t('frontend', 'Reset'); ?></a>
             <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
         <?php endif; ?>
     </div>

@@ -393,9 +393,22 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMG1VersionOptions(){
         $options = array(
             'mage19x' => Yii::t('frontend', 'Magento 1.9.x'),
-            'mage18x' => Yii::t('frontend', 'Magento 1.8.x')
+            'mage18x' => Yii::t('frontend', 'Magento 1.8.x'),
+            'mage17x' => Yii::t('frontend', 'Magento 1.7.x'),
+            'mage16x' => Yii::t('frontend', 'Magento 1.6.x')
         );
         return $options;
+    }
+
+    public static function getMG1Version(){
+        $ver = NULL;
+        $step = MigrateSteps::model()->findByPk(1);
+        if ($step){
+            $settings = (object)json_decode($step->migrated_data);
+            $ver = $settings->mg1_version;
+        }
+
+        return $ver;
     }
 
     public static function replaceCatalogRuleModels($data){

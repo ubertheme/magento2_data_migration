@@ -66,11 +66,11 @@
         $('INPUT[name="select_all_object"]').prop('checked', true).trigger('change');
 
         //reset event
-        $("button.reset").on('click', function(){
-            if ($('INPUT[name="reset"]').length){
-                $('INPUT[name="reset"]').val(1);
-            }
-        });
+//        $("button.reset").on('click', function(){
+//            if ($('INPUT[name="reset"]').length){
+//                $('INPUT[name="reset"]').val(1);
+//            }
+//        });
 
         //add disabled class after click on a button
         $(".btn").on('click', function(){
