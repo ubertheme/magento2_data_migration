@@ -354,7 +354,10 @@ class MigrateSteps extends MigrateStepsPeer
 
         switch ($objectId){
             case 'order':
-                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_order` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL) AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_order` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
+                if ($str_customer_ids){
+                    $sql .= " AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                }
                 $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
                 break;
             case 'quote':
@@ -371,7 +374,10 @@ class MigrateSteps extends MigrateStepsPeer
                 $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
                 break;
             case 'shipment':
-                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_shipment` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL) AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                $sql = "SELECT COUNT(*) FROM `{$tablePrefix}sales_flat_shipment` e WHERE (e.store_id IN ({$str_store_ids}) OR e.store_id IS NULL)";
+                if ($str_customer_ids){
+                    $sql .= " AND (e.customer_id IN ({$str_customer_ids}) OR e.customer_id IS NULL)";
+                }
                 $total = Yii::app()->mage1->createCommand($sql)->queryScalar();
                 break;
             case 'credit':

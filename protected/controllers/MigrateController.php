@@ -2111,7 +2111,10 @@ class MigrateController extends Controller
                         }
 
                         //sales_order
-                        $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL ) AND ( customer_id IN ({$str_customer_ids}) OR customer_id IS NULL )";
+                        $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
+                        if ($str_customer_ids){
+                            $condition .= " AND ( customer_id IN ({$str_customer_ids}) OR customer_id IS NULL )";
+                        }
                         $sales_orders = Mage1SalesOrder::model()->findAll($condition);
                         if ($sales_orders){
                             foreach ($sales_orders as $sales_order){
@@ -3022,7 +3025,10 @@ class MigrateController extends Controller
                         }
                         //review_detail
                         $condition = "(store_id IN ({$str_store_ids}) OR store_id IS NULL)";
-                        $condition .= " AND (customer_id IN ({$str_customer_ids}) OR customer_id IS NULL)";
+                        if ($str_customer_ids){
+                            $condition .= " AND (customer_id IN ({$str_customer_ids}) OR customer_id IS NULL)";
+                        }
+
                         $models = Mage1ReviewDetail::model()->findAll($condition);
                         if ($models){
                             foreach ($models as $model){
