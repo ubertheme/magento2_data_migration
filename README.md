@@ -37,7 +37,8 @@ Some step screenshots will go here...
     - In Window: Open the command line window and go to the folder: <strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell </strong>
     and type in the command line: php indexer.php reindexall
     then press enter key to re-index all data in your Magento 2 website.
-    - Note: If you are using <strong> Magento 2 version 0.74.0 - beta 9 or later</strong>: Run command line: <strong> php -f PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\bin\magento indexer:reindex </strong
+    - Note: If you are using <strong> Magento 2 version 0.74.0 - beta 9 or later</strong>: To reindex all data, run following command line:
+    <strong> php -f PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\bin\magento indexer:reindex </strong
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/img-2.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 </div>
