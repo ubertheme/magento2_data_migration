@@ -5,8 +5,9 @@
 
         //hide the message function
         $.hideMessage = function(){
-            if ($('#message').length){
-                $('#message').slideUp('slow');
+            //We only auto hide the success message.
+            if ($('#message.flash-success').length){
+                $('#message.flash-success').slideUp('slow');
             }
         }
         //set timeout to hide the message

@@ -17,6 +17,19 @@
         <?php endforeach; ?>
     <?php endif; ?>
 </ul>
+
+<div class="progress">
+    <?php
+    $totalSteps = MigrateSteps::model()->count();
+    $totalStepsFinished = MigrateSteps::model()->count("status = ".MigrateSteps::STATUS_DONE);
+    $percent = round(($totalStepsFinished/$totalSteps)*100);
+    ?>
+    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?=$percent?>"
+         aria-valuemin="0" aria-valuemax="100" style="width:<?=$percent?>%">
+        <?=$percent?>% Completed
+    </div>
+</div>
+
 <div id="btn-reset">
     <?php
         if(MigrateSteps::model()->count("status =".MigrateSteps::STATUS_DONE) > 0){

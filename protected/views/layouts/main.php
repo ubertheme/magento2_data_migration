@@ -15,56 +15,21 @@
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/script.js"></script>
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 </head>
-
 <body>
-
 <div id="page" class="container">
     <div class="row">
-
         <div id="header">
             <div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
         </div><!-- header -->
-
-        <?php
-        /*
-        $this->widget('zii.widgets.CBreadcrumbs', array(
-		'links'=>$this->breadcrumbs,
-	    ));
-        */
-        ?><!-- breadcrumbs -->
-
-        <?php if(Yii::app()->user->hasFlash('error')):  ?>
-            <div id="message" class="flash-error">
-                <?php echo Yii::app()->user->getFlash('error'); ?>
-            </div>
-        <?php endif;?>
-
-        <?php if(Yii::app()->user->hasFlash('note')):  ?>
-            <div id="message" class="flash-notice">
-                <?php echo Yii::app()->user->getFlash('note'); ?>
-            </div>
-
-        <?php endif;?>
-
-        <?php if(Yii::app()->user->hasFlash('success')):  ?>
-            <div id="message" class="flash-success">
-                <?php echo Yii::app()->user->getFlash('success'); ?>
-            </div>
-        <?php endif;?>
-
         <?php echo $content; ?>
-
         <div id="footer">
             Copyright &copy; <?php echo date('Y'); ?> by <a href="http://www.ubertheme.com/" target="_blank">UberTheme</a>.<br/>
             All Rights Reserved.<br/>
             <?php echo Yii::powered(); ?>
-
             <div id="report-bugs"><a target="_blank" href="https://github.com/ubertheme/magento2_data_migration/issues" title="<?php echo Yii::t('frontend', 'Report Bugs')?>"><?php echo Yii::t('frontend', 'Report Bugs')?></a></div>
         </div><!-- footer -->
-
     </div>
 </div><!-- page -->
-
 <!-- markup for mask box-->
 <div id="processor-box" class="modal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog loading-box">

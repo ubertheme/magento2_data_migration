@@ -18,8 +18,9 @@ body{
     border-bottom:1px solid #eaeaea;
 }
 #content{
-	padding: 20px;
+	padding: 0px 20px;
 }
+#content h1.page-header{margin-top: 0px !important;}
 #sidebar{
 	padding: 20px;
 }
@@ -35,9 +36,9 @@ body{
 	font-size: 200%;
 }
 div.flash-error, div.flash-notice, div.flash-success{
-	padding:.8em;
-	margin-bottom:1em;
-	border:2px solid #ddd;
+	padding:0.8em;
+	margin-bottom:2em;
+	border:5px solid #ddd;
 }
 div.flash-error{
 	background:#FBE3E4;
@@ -91,7 +92,7 @@ div.breadcrumbs span{
     text-align: right;
 }
 #btn-reset {
-    border-top: 1px solid #eaeaea;
+    border-top: 1px solid #ddd;
     display: block;
     padding: 20px 10px;
     text-align: center;
@@ -178,3 +179,12 @@ blockquote{font-size: 12px;}
 /* end css for categories tree*/
 #footer #report-bugs{display: block;}
 .tree li span.glyphicon{border: none;}
+#menu .progress {
+    margin-top: 20px;
+}
+#menu .portlet-content {
+    background: #ddd none repeat scroll 0 0;
+    padding: 5px;
+    border-radius:5px;
+}
+#message ul{text-align: left;}

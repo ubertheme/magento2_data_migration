@@ -194,7 +194,7 @@ class MigrateController extends Controller
             $condition = "code <> 'admin'";
             $websites = Mage1Website::model()->findAll($condition);
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -316,6 +316,10 @@ class MigrateController extends Controller
                 }else{
                     Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have to select at least one website, one store group, one store to migrate.'));
                 }
+            }else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
             }
 
             $assign_data = array(
@@ -353,7 +357,7 @@ class MigrateController extends Controller
             //$condition = "entity_type_id = {$product_entity_type_id} AND is_user_defined = 1";
             $attributes = Mage1Attribute::model()->findAll("entity_type_id = {$product_entity_type_id}");
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -596,6 +600,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $assign_data = array(
                 'step' => $step,
@@ -627,7 +636,7 @@ class MigrateController extends Controller
             //get all categories from magento1 with level > 0
             $categories = Mage1CatalogCategoryEntity::model()->findAll("level > 0");
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -896,6 +905,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $assign_data = array(
                 'step' => $step,
@@ -932,7 +946,7 @@ class MigrateController extends Controller
             $migrated_product_type_ids = array();
             $migrated_product_ids = array();
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -1690,6 +1704,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $assign_data = array(
                 'step' => $step,
@@ -1717,7 +1736,7 @@ class MigrateController extends Controller
             $migrated_customer_group_ids = array();
             $migrated_customer_ids = array();
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -1980,7 +1999,7 @@ class MigrateController extends Controller
                     //customer_form_attribute
 
                 }else{
-                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Customer Groups.'));
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have to select at least one Customer Group to migrate.'));
                 }
 
                 //Update step status
@@ -2004,6 +2023,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $this->render("step{$step->sorder}", array('step' => $step, 'customer_groups' => $customer_groups));
         }else{
@@ -2038,7 +2062,7 @@ class MigrateController extends Controller
             $migrated_order_ids = $migrated_quote_ids = $migrated_payment_ids = $migrated_invoice_ids = $migrated_shipment_ids = $migrated_credit_ids = array();
             $migrated_order_statuses = $migrated_sales_rule_ids = $migrated_sales_coupon_ids = array();
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -2931,20 +2955,27 @@ class MigrateController extends Controller
                         Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;
                         Yii::app()->session['migrated_sales_order_ids'] = $migrated_order_ids;
 
-                        $message = Yii::t('frontend', 'Migrated successfully.');
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Rules migrated: %s7.", array('%s7' => sizeof($migrated_sales_rule_ids)));
-                        $message .= "<br/>". Yii::t('frontend', "Total Sales Coupons migrated: %s8.", array('%s8' => sizeof($migrated_sales_coupon_ids)));
+                        $message = '<ul>';
+                        $message .= '<li>'.Yii::t('frontend', 'Migrated successfully.').'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Rules migrated: %s7.", array('%s7' => sizeof($migrated_sales_rule_ids))).'</li>';
+                        $message .= '<li>'. Yii::t('frontend', "Total Sales Coupons migrated: %s8.", array('%s8' => sizeof($migrated_sales_coupon_ids))).'</li>';
+                        $message .= '</ul>';
 
                         Yii::app()->user->setFlash('success', $message);
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $this->render("step{$step->sorder}", array('step' => $step, 'sale_objects' => $sales_objects));
         }else{
@@ -2972,7 +3003,7 @@ class MigrateController extends Controller
             $migrated_object_ids = array();
             $migrated_review_ids = $migrated_rating_ids = array();
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //uncheck foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -3161,6 +3192,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $this->render("step{$step->sorder}", array('step' => $step, 'objects' => $objects));
         }else{
@@ -3187,7 +3223,7 @@ class MigrateController extends Controller
             $migrated_object_ids = array();
             $migrated_tax_rule_ids = $migrated_tax_rate_ids = $migrated_catalog_rule_ids = array();
 
-            if (Yii::app()->request->isPostRequest){
+            if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
                 //un-check foreign key
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
@@ -3502,6 +3538,11 @@ class MigrateController extends Controller
                     }
                 }
             }//end post request
+            else{
+                if ($step->status == MigrateSteps::STATUS_DONE){
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', "This step was finished. If you want to update data of this step, the first you have to click to 'Reset' button."));
+                }
+            }
 
             $this->render("step{$step->sorder}", array('step' => $step, 'objects' => $objects));
         }else{
