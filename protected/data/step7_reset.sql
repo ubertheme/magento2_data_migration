@@ -657,7 +657,7 @@ DROP TABLE IF EXISTS `#__quote_item`;
 CREATE TABLE `#__quote_item` (
   `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Item Id',
   `quote_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Quote Id',
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP COMMENT 'Created At',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Created At',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated At',
   `product_id` int(10) unsigned DEFAULT NULL COMMENT 'Product Id',
   `store_id` smallint(5) unsigned DEFAULT NULL COMMENT 'Store Id',

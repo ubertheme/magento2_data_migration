@@ -46,5 +46,6 @@ Some step screenshots will go here...
 - Copy media files to complete migration:<br/>
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+- Clean the Magento 2 cache.
 
 <h4># Step 5: Now you can test the data which have been migrated into your Magento 2 website from the browser.</h4>
