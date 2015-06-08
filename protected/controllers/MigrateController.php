@@ -1773,6 +1773,18 @@ class MigrateController extends Controller
 
                             //migrate all customers of this customer group
                             //customer_entity
+
+                            //This only for Magento 2 version from 0.74.0 - beta 12
+                            //needed_update_attr.
+                            $needed_update_attr = array(
+                                'created_in',
+                                'firstname',
+                                'lastname',
+                                'password_hash',
+                                'rp_token',
+                                'rp_token_created_at'
+                            );
+
                             $customers = Mage1CustomerEntity::model()->findAll("group_id = {$group_id}");
                             if ($customers){
                                 foreach ($customers as $customer){
@@ -1803,7 +1815,16 @@ class MigrateController extends Controller
                                                             }
                                                         }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->save();
+                                                        if ($model2->save()){
+                                                            //this only for Magento 2 from version 0.74.0 - beta 12
+                                                            $attribute_code1 = MigrateSteps::getMage1AttributeCode($model->attribute_id);
+                                                            if (in_array($attribute_code1, $needed_update_attr)){
+                                                                if ($customer2->hasAttribute($attribute_code1)){
+                                                                    $customer2->$attribute_code1 = $model->value;
+                                                                    $customer2->update();
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1876,7 +1897,16 @@ class MigrateController extends Controller
                                                             }
                                                         }
                                                         $model2->attribute_id = $attribute_id2;
-                                                        $model2->save();
+                                                        if ($model2->save()){
+                                                            //this only for Magento 2 from version 0.74.0 - beta 12
+                                                            $attribute_code1 = MigrateSteps::getMage1AttributeCode($model->attribute_id);
+                                                            if (in_array($attribute_code1, $needed_update_attr)){
+                                                                if ($customer2->hasAttribute($attribute_code1)){
+                                                                    $customer2->$attribute_code1 = $model->value;
+                                                                    $customer2->update();
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
