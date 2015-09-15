@@ -520,23 +520,24 @@ class MigrateController extends Controller
                                     $catalog_eav_attribute2->is_required_in_admin_store = 0;
                                     //this not take because was changed in magento2
                                     $catalog_eav_attribute2->frontend_input_renderer = null;
-                                } else{
-                                    //update settings values
-                                    $catalog_eav_attribute2->is_global = $catalog_eav_attribute->is_global;
-                                    $catalog_eav_attribute2->is_visible = $catalog_eav_attribute->is_visible;
-                                    $catalog_eav_attribute2->is_searchable = $catalog_eav_attribute->is_searchable;
-                                    $catalog_eav_attribute2->is_filterable = $catalog_eav_attribute->is_filterable;
-                                    $catalog_eav_attribute2->is_comparable = $catalog_eav_attribute->is_comparable;
-                                    $catalog_eav_attribute2->is_visible_on_front = $catalog_eav_attribute->is_visible_on_front;
-                                    $catalog_eav_attribute2->is_html_allowed_on_front = $catalog_eav_attribute->is_html_allowed_on_front;
-                                    $catalog_eav_attribute2->is_used_for_price_rules = $catalog_eav_attribute->is_used_for_price_rules;
-                                    $catalog_eav_attribute2->is_filterable_in_search = $catalog_eav_attribute->is_filterable_in_search;
-                                    $catalog_eav_attribute2->used_in_product_listing = $catalog_eav_attribute->used_in_product_listing;
-                                    $catalog_eav_attribute2->used_for_sort_by = $catalog_eav_attribute->used_for_sort_by;
-                                    $catalog_eav_attribute2->apply_to = $catalog_eav_attribute->apply_to;
-                                    $catalog_eav_attribute2->is_visible_in_advanced_search = $catalog_eav_attribute->is_visible_in_advanced_search;
+                                } 
+                                else{
+//                                    //update settings values
+//                                    $catalog_eav_attribute2->is_global = $catalog_eav_attribute->is_global;
+//                                    $catalog_eav_attribute2->is_visible = $catalog_eav_attribute->is_visible;
+//                                    $catalog_eav_attribute2->is_searchable = $catalog_eav_attribute->is_searchable;
+//                                    $catalog_eav_attribute2->is_filterable = $catalog_eav_attribute->is_filterable;
+//                                    $catalog_eav_attribute2->is_comparable = $catalog_eav_attribute->is_comparable;
+//                                    $catalog_eav_attribute2->is_visible_on_front = $catalog_eav_attribute->is_visible_on_front;
+//                                    $catalog_eav_attribute2->is_html_allowed_on_front = $catalog_eav_attribute->is_html_allowed_on_front;
+//                                    $catalog_eav_attribute2->is_filterable_in_search = $catalog_eav_attribute->is_filterable_in_search;
+//                                    $catalog_eav_attribute2->used_in_product_listing = $catalog_eav_attribute->used_in_product_listing;
+//                                    $catalog_eav_attribute2->used_for_sort_by = $catalog_eav_attribute->used_for_sort_by;
+//                                    $catalog_eav_attribute2->apply_to = $catalog_eav_attribute->apply_to;
+//                                    $catalog_eav_attribute2->is_visible_in_advanced_search = $catalog_eav_attribute->is_visible_in_advanced_search;
                                     $catalog_eav_attribute2->position = $catalog_eav_attribute->position;
                                     $catalog_eav_attribute2->is_wysiwyg_enabled = $catalog_eav_attribute->is_wysiwyg_enabled;
+                                    $catalog_eav_attribute2->is_used_for_price_rules = $catalog_eav_attribute->is_used_for_price_rules;
                                     $catalog_eav_attribute2->is_used_for_promo_rules = $catalog_eav_attribute->is_used_for_promo_rules;
                                 }
 

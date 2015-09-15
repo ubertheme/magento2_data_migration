@@ -82,7 +82,7 @@
                 <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-primary need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
             <?php else: ?>
                 <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><?php echo Yii::t('frontend', 'Update'); ?></button>
-                <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
+                <a href="<?php echo Yii::app()->createUrl("migrate/step" . ($step->sorder+1)); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
             <?php endif; ?>
         </div>
         <!--// Form Buttons-->

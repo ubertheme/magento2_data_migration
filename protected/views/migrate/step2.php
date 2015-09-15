@@ -7,13 +7,15 @@
 <div id="step-content">
     <blockquote> <p class="tip"> <?php echo Yii::t('frontend', $step->descriptions); ?> </p> </blockquote>
 
+    <?php $this->renderPartial('_frmButtons', array('step' => $step)); ?>
+    
     <!--  Form Buttons-->
     <div class="step-controls">
         <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
         <?php else: ?>
             <a href="<?php echo Yii::app()->createUrl("migrate/reset/step/" . $step->sorder); ?>" class="btn btn-danger"><?php echo Yii::t('frontend', 'Reset'); ?></a>
-            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
+            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ($step->sorder+1)); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
         <?php endif; ?>
     </div>
     <!--// Form Buttons-->
@@ -91,7 +93,7 @@
             <button type="submit" class="btn btn-primary"><?php echo Yii::t('frontend', 'Start'); ?></button>
         <?php else: ?>
             <a href="<?php echo Yii::app()->createUrl("migrate/reset/step/" . $step->sorder); ?>" class="btn btn-danger"><?php echo Yii::t('frontend', 'Reset'); ?></a>
-            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ++$step->sorder); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
+            <a href="<?php echo Yii::app()->createUrl("migrate/step" . ($step->sorder+1)); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
         <?php endif; ?>
     </div>
     <!--// Form Buttons-->
