@@ -25,9 +25,9 @@ CREATE TABLE `#__sales_order_status_label` (
   `store_id` smallint(5) unsigned NOT NULL COMMENT 'Store Id',
   `label` varchar(128) NOT NULL COMMENT 'Label',
   PRIMARY KEY (`status`,`store_id`),
-  KEY `IDX_SALES_ORDER_STATUS_LABEL_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_ORDER_STATUS_LABEL_STATUS_SALES_ORDER_STATUS_STATUS` FOREIGN KEY (`status`) REFERENCES `#__sales_order_status` (`status`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_ORDER_STATUS_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `SALES_ORDER_STATUS_LABEL_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_ORDER_STATUS_LABEL_STATUS_SALES_ORDER_STATUS_STATUS` FOREIGN KEY (`status`) REFERENCES `#__sales_order_status` (`status`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_ORDER_STATUS_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Status Label Table';
 
 DROP TABLE IF EXISTS `#__sales_order_status_state`;
@@ -37,7 +37,7 @@ CREATE TABLE `#__sales_order_status_state` (
   `is_default` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Is Default',
   `visible_on_front` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Visible on front',
   PRIMARY KEY (`status`,`state`),
-  CONSTRAINT `FK_SALES_ORDER_STATUS_STATE_STATUS_SALES_ORDER_STATUS_STATUS` FOREIGN KEY (`status`) REFERENCES `#__sales_order_status` (`status`) ON DELETE CASCADE
+  CONSTRAINT `SALES_ORDER_STATUS_STATE_STATUS_SALES_ORDER_STATUS_STATUS` FOREIGN KEY (`status`) REFERENCES `#__sales_order_status` (`status`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Status Table';
 
 INSERT INTO #__sales_order_status_state VALUES ('canceled', 'canceled', '1', '1');
@@ -177,32 +177,32 @@ CREATE TABLE `#__sales_order` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `total_item_count` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Total Item Count',
   `customer_gender` int(11) DEFAULT NULL COMMENT 'Customer Gender',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
-  `shipping_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Hidden Tax Amount',
-  `base_shipping_hidden_tax_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Hidden Tax Amount',
-  `hidden_tax_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Invoiced',
-  `base_hidden_tax_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Invoiced',
-  `hidden_tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Refunded',
-  `base_hidden_tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Refunded',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
+  `shipping_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Discount Tax Compensation Amount',
+  `base_shipping_discount_tax_compensation_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Discount Tax Compensation Amount',
+  `discount_tax_compensation_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Invoiced',
+  `base_discount_tax_compensation_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Invoiced',
+  `discount_tax_compensation_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Refunded',
+  `base_discount_tax_compensation_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Refunded',
   `shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Incl Tax',
   `base_shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Incl Tax',
   `coupon_rule_name` varchar(255) DEFAULT NULL COMMENT 'Coupon Sales Rule Name',
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_ORDER_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_ORDER_STATUS` (`status`),
-  KEY `IDX_SALES_ORDER_STATE` (`state`),
-  KEY `IDX_SALES_ORDER_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_ORDER_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_ORDER_CUSTOMER_ID` (`customer_id`),
-  KEY `IDX_SALES_ORDER_EXT_ORDER_ID` (`ext_order_id`),
-  KEY `IDX_SALES_ORDER_QUOTE_ID` (`quote_id`),
-  KEY `IDX_SALES_ORDER_UPDATED_AT` (`updated_at`),
-  KEY `IDX_SALES_ORDER_EMAIL_SENT` (`email_sent`),
-  KEY `IDX_SALES_ORDER_SEND_EMAIL` (`send_email`),
-  CONSTRAINT `FK_SALES_ORDER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_SALES_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_ORDER_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_ORDER_STATUS` (`status`),
+  KEY `SALES_ORDER_STATE` (`state`),
+  KEY `SALES_ORDER_STORE_ID` (`store_id`),
+  KEY `SALES_ORDER_CREATED_AT` (`created_at`),
+  KEY `SALES_ORDER_CUSTOMER_ID` (`customer_id`),
+  KEY `SALES_ORDER_EXT_ORDER_ID` (`ext_order_id`),
+  KEY `SALES_ORDER_QUOTE_ID` (`quote_id`),
+  KEY `SALES_ORDER_UPDATED_AT` (`updated_at`),
+  KEY `SALES_ORDER_EMAIL_SENT` (`email_sent`),
+  KEY `SALES_ORDER_SEND_EMAIL` (`send_email`),
+  CONSTRAINT `SALES_ORDER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
+  CONSTRAINT `SALES_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order';
 
 DROP TABLE IF EXISTS `#__sales_order_address`;
@@ -234,8 +234,8 @@ CREATE TABLE `#__sales_order_address` (
   `vat_request_date` text COMMENT 'Vat Request Date',
   `vat_request_success` smallint(6) DEFAULT NULL COMMENT 'Vat Request Success',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_ORDER_ADDRESS_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_ORDER_ADDRESS_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_ORDER_ADDRESS_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_ORDER_ADDRESS_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order Address';
 
 DROP TABLE IF EXISTS `#__sales_order_grid`;
@@ -257,21 +257,21 @@ CREATE TABLE `#__sales_order_grid` (
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'Created At',
   `updated_at` timestamp NULL DEFAULT NULL COMMENT 'Updated At',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_ORDER_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_ORDER_GRID_STATUS` (`status`),
-  KEY `IDX_SALES_ORDER_GRID_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_ORDER_GRID_BASE_GRAND_TOTAL` (`base_grand_total`),
-  KEY `IDX_SALES_ORDER_GRID_BASE_TOTAL_PAID` (`base_total_paid`),
-  KEY `IDX_SALES_ORDER_GRID_GRAND_TOTAL` (`grand_total`),
-  KEY `IDX_SALES_ORDER_GRID_TOTAL_PAID` (`total_paid`),
-  KEY `IDX_SALES_ORDER_GRID_SHIPPING_NAME` (`shipping_name`),
-  KEY `IDX_SALES_ORDER_GRID_BILLING_NAME` (`billing_name`),
-  KEY `IDX_SALES_ORDER_GRID_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_ORDER_GRID_CUSTOMER_ID` (`customer_id`),
-  KEY `IDX_SALES_ORDER_GRID_UPDATED_AT` (`updated_at`),
-  CONSTRAINT `FK_SALES_ORDER_GRID_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_SALES_ORDER_GRID_ENTITY_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_ORDER_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_ORDER_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_ORDER_GRID_STATUS` (`status`),
+  KEY `SALES_ORDER_GRID_STORE_ID` (`store_id`),
+  KEY `SALES_ORDER_GRID_BASE_GRAND_TOTAL` (`base_grand_total`),
+  KEY `SALES_ORDER_GRID_BASE_TOTAL_PAID` (`base_total_paid`),
+  KEY `SALES_ORDER_GRID_GRAND_TOTAL` (`grand_total`),
+  KEY `SALES_ORDER_GRID_TOTAL_PAID` (`total_paid`),
+  KEY `SALES_ORDER_GRID_SHIPPING_NAME` (`shipping_name`),
+  KEY `SALES_ORDER_GRID_BILLING_NAME` (`billing_name`),
+  KEY `SALES_ORDER_GRID_CREATED_AT` (`created_at`),
+  KEY `SALES_ORDER_GRID_CUSTOMER_ID` (`customer_id`),
+  KEY `SALES_ORDER_GRID_UPDATED_AT` (`updated_at`),
+  CONSTRAINT `SALES_ORDER_GRID_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
+  CONSTRAINT `SALES_ORDER_GRID_ENTITY_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_ORDER_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order Grid';
 
 DROP TABLE IF EXISTS `#__sales_order_item`;
@@ -332,14 +332,14 @@ CREATE TABLE `#__sales_order_item` (
   `base_price_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Price Incl Tax',
   `row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Row Total Incl Tax',
   `base_row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Row Total Incl Tax',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
-  `hidden_tax_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Invoiced',
-  `base_hidden_tax_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Invoiced',
-  `hidden_tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Refunded',
-  `base_hidden_tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Refunded',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
+  `discount_tax_compensation_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Invoiced',
+  `base_discount_tax_compensation_invoiced` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Invoiced',
+  `discount_tax_compensation_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Refunded',
+  `base_discount_tax_compensation_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Refunded',
   `tax_canceled` decimal(12,4) DEFAULT NULL COMMENT 'Tax Canceled',
-  `hidden_tax_canceled` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Canceled',
+  `discount_tax_compensation_canceled` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Canceled',
   `tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Tax Refunded',
   `base_tax_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Tax Refunded',
   `discount_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Discount Refunded',
@@ -357,10 +357,10 @@ CREATE TABLE `#__sales_order_item` (
   `base_weee_tax_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Disposition',
   `base_weee_tax_row_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Row Disposition',
   PRIMARY KEY (`item_id`),
-  KEY `IDX_SALES_ORDER_ITEM_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_ORDER_ITEM_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_ORDER_ITEM_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_ORDER_ITEM_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  KEY `SALES_ORDER_ITEM_ORDER_ID` (`order_id`),
+  KEY `SALES_ORDER_ITEM_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_ORDER_ITEM_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_ORDER_ITEM_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order Item';
 
 DROP TABLE IF EXISTS `#__sales_order_status_history`;
@@ -374,9 +374,9 @@ CREATE TABLE `#__sales_order_status_history` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `entity_name` varchar(32) DEFAULT NULL COMMENT 'Shows what entity history is bind to.',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_ORDER_STATUS_HISTORY_PARENT_ID` (`parent_id`),
-  KEY `IDX_SALES_ORDER_STATUS_HISTORY_CREATED_AT` (`created_at`),
-  CONSTRAINT `FK_SALES_ORDER_STATUS_HISTORY_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_ORDER_STATUS_HISTORY_PARENT_ID` (`parent_id`),
+  KEY `SALES_ORDER_STATUS_HISTORY_CREATED_AT` (`created_at`),
+  CONSTRAINT `SALES_ORDER_STATUS_HISTORY_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order Status History';
 
 DROP TABLE IF EXISTS `#__sales_order_tax`;
@@ -392,9 +392,8 @@ CREATE TABLE `#__sales_order_tax` (
   `base_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Amount',
   `process` smallint(6) NOT NULL COMMENT 'Process',
   `base_real_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Real Amount',
-  `hidden` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Hidden',
   PRIMARY KEY (`tax_id`),
-  KEY `IDX_SALES_ORDER_TAX_ORDER_ID_PRIORITY_POSITION` (`order_id`,`priority`,`position`)
+  KEY `SALES_ORDER_TAX_ORDER_ID_PRIORITY_POSITION` (`order_id`,`priority`,`position`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Tax Table';
 
 DROP TABLE IF EXISTS `#__sales_order_tax_item`;
@@ -410,12 +409,12 @@ CREATE TABLE `#__sales_order_tax_item` (
   `associated_item_id` int(10) unsigned DEFAULT NULL COMMENT 'Id of the associated item',
   `taxable_item_type` varchar(32) NOT NULL COMMENT 'Type of the taxable item',
   PRIMARY KEY (`tax_item_id`),
-  UNIQUE KEY `UNQ_SALES_ORDER_TAX_ITEM_TAX_ID_ITEM_ID` (`tax_id`,`item_id`),
-  KEY `IDX_SALES_ORDER_TAX_ITEM_ITEM_ID` (`item_id`),
-  KEY `FK_A2F1F40083C7C1A767C86AF11080505B` (`associated_item_id`),
-  CONSTRAINT `FK_A2F1F40083C7C1A767C86AF11080505B` FOREIGN KEY (`associated_item_id`) REFERENCES `#__sales_order_item` (`item_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_ORDER_TAX_ITEM_TAX_ID_SALES_ORDER_TAX_TAX_ID` FOREIGN KEY (`tax_id`) REFERENCES `#__sales_order_tax` (`tax_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_ORDER_TAX_ITEM_ITEM_ID_SALES_ORDER_ITEM_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `#__sales_order_item` (`item_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALES_ORDER_TAX_ITEM_TAX_ID_ITEM_ID` (`tax_id`,`item_id`),
+  KEY `SALES_ORDER_TAX_ITEM_ITEM_ID` (`item_id`),
+  KEY `SALES_ORDER_TAX_ITEM_ASSOCIATED_ITEM_ID_SALES_ORDER_ITEM_ITEM_ID` (`associated_item_id`),
+  CONSTRAINT `SALES_ORDER_TAX_ITEM_ASSOCIATED_ITEM_ID_SALES_ORDER_ITEM_ITEM_ID` FOREIGN KEY (`associated_item_id`) REFERENCES `#__sales_order_item` (`item_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_ORDER_TAX_ITEM_TAX_ID_SALES_ORDER_TAX_TAX_ID` FOREIGN KEY (`tax_id`) REFERENCES `#__sales_order_tax` (`tax_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_ORDER_TAX_ITEM_ITEM_ID_SALES_ORDER_ITEM_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `#__sales_order_item` (`item_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Tax Item';
 
 DROP TABLE IF EXISTS `#__sales_order_aggregated_created`;
@@ -441,9 +440,9 @@ CREATE TABLE `#__sales_order_aggregated_created` (
   `total_discount_amount` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Total Discount Amount',
   `total_discount_amount_actual` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Total Discount Amount Actual',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_ORDER_AGGREGATED_CREATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_ORDER_AGGREGATED_CREATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_ORDER_AGGREGATED_CREATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_ORDER_AGGREGATED_CREATED_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Aggregated Created';
 
 DROP TABLE IF EXISTS `#__sales_order_aggregated_updated`;
@@ -469,9 +468,9 @@ CREATE TABLE `#__sales_order_aggregated_updated` (
   `total_discount_amount` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Total Discount Amount',
   `total_discount_amount_actual` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Total Discount Amount Actual',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_ORDER_AGGREGATED_UPDATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_ORDER_AGGREGATED_UPDATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_ORDER_AGGREGATED_UPDATED_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Aggregated Updated';
 
 DROP TABLE IF EXISTS `#__quote`;
@@ -528,9 +527,9 @@ CREATE TABLE `#__quote` (
   `is_persistent` smallint(5) unsigned DEFAULT '0' COMMENT 'Is Quote Persistent',
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_QUOTE_CUSTOMER_ID_STORE_ID_IS_ACTIVE` (`customer_id`,`store_id`,`is_active`),
-  KEY `IDX_QUOTE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_QUOTE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `QUOTE_CUSTOMER_ID_STORE_ID_IS_ACTIVE` (`customer_id`,`store_id`,`is_active`),
+  KEY `QUOTE_STORE_ID` (`store_id`),
+  CONSTRAINT `QUOTE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote';
 
 DROP TABLE IF EXISTS `#__quote_address`;
@@ -584,10 +583,10 @@ CREATE TABLE `#__quote_address` (
   `base_shipping_discount_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Discount Amount',
   `subtotal_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Subtotal Incl Tax',
   `base_subtotal_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Subtotal Total Incl Tax',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
-  `shipping_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Hidden Tax Amount',
-  `base_shipping_hidden_tax_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
+  `shipping_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Discount Tax Compensation Amount',
+  `base_shipping_discount_tax_compensation_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Discount Tax Compensation Amount',
   `shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Incl Tax',
   `base_shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Incl Tax',
   `free_shipping` smallint(6) DEFAULT NULL,
@@ -598,8 +597,8 @@ CREATE TABLE `#__quote_address` (
   `vat_request_success` smallint(6) DEFAULT NULL COMMENT 'Vat Request Success',
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   PRIMARY KEY (`address_id`),
-  KEY `IDX_QUOTE_ADDRESS_QUOTE_ID` (`quote_id`),
-  CONSTRAINT `FK_QUOTE_ADDRESS_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE
+  KEY `QUOTE_ADDRESS_QUOTE_ID` (`quote_id`),
+  CONSTRAINT `QUOTE_ADDRESS_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Address';
 
 DROP TABLE IF EXISTS `#__quote_address_item`;
@@ -640,17 +639,17 @@ CREATE TABLE `#__quote_address_item` (
   `base_price_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Price Incl Tax',
   `row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Row Total Incl Tax',
   `base_row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Row Total Incl Tax',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
   `free_shipping` int(11) DEFAULT NULL,
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   PRIMARY KEY (`address_item_id`),
-  KEY `IDX_QUOTE_ADDRESS_ITEM_QUOTE_ADDRESS_ID` (`quote_address_id`),
-  KEY `IDX_QUOTE_ADDRESS_ITEM_PARENT_ITEM_ID` (`parent_item_id`),
-  KEY `IDX_QUOTE_ADDRESS_ITEM_QUOTE_ITEM_ID` (`quote_item_id`),
-  CONSTRAINT `FK_QUOTE_ADDRESS_ITEM_QUOTE_ADDRESS_ID_QUOTE_ADDRESS_ADDRESS_ID` FOREIGN KEY (`quote_address_id`) REFERENCES `#__quote_address` (`address_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_QUOTE_ADDRESS_ITEM_QUOTE_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`quote_item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_QUOTE_ADDR_ITEM_PARENT_ITEM_ID_QUOTE_ADDR_ITEM_ADDR_ITEM_ID` FOREIGN KEY (`parent_item_id`) REFERENCES `#__quote_address_item` (`address_item_id`) ON DELETE CASCADE
+  KEY `QUOTE_ADDRESS_ITEM_QUOTE_ADDRESS_ID` (`quote_address_id`),
+  KEY `QUOTE_ADDRESS_ITEM_PARENT_ITEM_ID` (`parent_item_id`),
+  KEY `QUOTE_ADDRESS_ITEM_QUOTE_ITEM_ID` (`quote_item_id`),
+  CONSTRAINT `QUOTE_ADDRESS_ITEM_QUOTE_ADDRESS_ID_QUOTE_ADDRESS_ADDRESS_ID` FOREIGN KEY (`quote_address_id`) REFERENCES `#__quote_address` (`address_id`) ON DELETE CASCADE,
+  CONSTRAINT `QUOTE_ADDRESS_ITEM_QUOTE_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`quote_item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE,
+  CONSTRAINT `QUOTE_ADDR_ITEM_PARENT_ITEM_ID_QUOTE_ADDR_ITEM_ADDR_ITEM_ID` FOREIGN KEY (`parent_item_id`) REFERENCES `#__quote_address_item` (`address_item_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Address Item';
 
 DROP TABLE IF EXISTS `#__quote_item`;
@@ -695,8 +694,8 @@ CREATE TABLE `#__quote_item` (
   `base_price_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Price Incl Tax',
   `row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Row Total Incl Tax',
   `base_row_total_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Row Total Incl Tax',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
   `free_shipping` smallint(6) DEFAULT NULL,
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   `weee_tax_applied` text COMMENT 'Weee Tax Applied',
@@ -709,14 +708,14 @@ CREATE TABLE `#__quote_item` (
   `base_weee_tax_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Disposition',
   `base_weee_tax_row_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Row Disposition',
   PRIMARY KEY (`item_id`),
-  KEY `IDX_QUOTE_ITEM_PARENT_ITEM_ID` (`parent_item_id`),
-  KEY `IDX_QUOTE_ITEM_PRODUCT_ID` (`product_id`),
-  KEY `IDX_QUOTE_ITEM_QUOTE_ID` (`quote_id`),
-  KEY `IDX_QUOTE_ITEM_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_QUOTE_ITEM_PARENT_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`parent_item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_QUOTE_ITEM_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_QUOTE_ITEM_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_QUOTE_ITEM_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  KEY `QUOTE_ITEM_PARENT_ITEM_ID` (`parent_item_id`),
+  KEY `QUOTE_ITEM_PRODUCT_ID` (`product_id`),
+  KEY `QUOTE_ITEM_QUOTE_ID` (`quote_id`),
+  KEY `QUOTE_ITEM_STORE_ID` (`store_id`),
+  CONSTRAINT `QUOTE_ITEM_PARENT_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`parent_item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE,
+  CONSTRAINT `QUOTE_ITEM_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `QUOTE_ITEM_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `QUOTE_ITEM_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Item';
 
 DROP TABLE IF EXISTS `#__quote_item_option`;
@@ -727,8 +726,8 @@ CREATE TABLE `#__quote_item_option` (
   `code` varchar(255) NOT NULL COMMENT 'Code',
   `value` text COMMENT 'Value',
   PRIMARY KEY (`option_id`),
-  KEY `IDX_QUOTE_ITEM_OPTION_ITEM_ID` (`item_id`),
-  CONSTRAINT `FK_QUOTE_ITEM_OPTION_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE
+  KEY `QUOTE_ITEM_OPTION_ITEM_ID` (`item_id`),
+  CONSTRAINT `QUOTE_ITEM_OPTION_ITEM_ID_QUOTE_ITEM_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `#__quote_item` (`item_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Item Option';
 
 DROP TABLE IF EXISTS `#__quote_payment`;
@@ -753,8 +752,8 @@ CREATE TABLE `#__quote_payment` (
   `cc_ss_issue` varchar(255) DEFAULT NULL COMMENT 'Cc Ss Issue',
   `additional_information` text COMMENT 'Additional Information',
   PRIMARY KEY (`payment_id`),
-  KEY `IDX_QUOTE_PAYMENT_QUOTE_ID` (`quote_id`),
-  CONSTRAINT `FK_QUOTE_PAYMENT_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE
+  KEY `QUOTE_PAYMENT_QUOTE_ID` (`quote_id`),
+  CONSTRAINT `QUOTE_PAYMENT_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Payment';
 
 DROP TABLE IF EXISTS `#__quote_shipping_rate`;
@@ -772,8 +771,8 @@ CREATE TABLE `#__quote_shipping_rate` (
   `error_message` text COMMENT 'Error Message',
   `method_title` text COMMENT 'Method Title',
   PRIMARY KEY (`rate_id`),
-  KEY `IDX_QUOTE_SHIPPING_RATE_ADDRESS_ID` (`address_id`),
-  CONSTRAINT `FK_QUOTE_SHIPPING_RATE_ADDRESS_ID_QUOTE_ADDRESS_ADDRESS_ID` FOREIGN KEY (`address_id`) REFERENCES `#__quote_address` (`address_id`) ON DELETE CASCADE
+  KEY `QUOTE_SHIPPING_RATE_ADDRESS_ID` (`address_id`),
+  CONSTRAINT `QUOTE_SHIPPING_RATE_ADDRESS_ID_QUOTE_ADDRESS_ADDRESS_ID` FOREIGN KEY (`address_id`) REFERENCES `#__quote_address` (`address_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Quote Shipping Rate';
 
 DROP TABLE IF EXISTS `#__sales_order_payment`;
@@ -833,8 +832,8 @@ CREATE TABLE `#__sales_order_payment` (
   `address_status` varchar(255) DEFAULT NULL COMMENT 'Address Status',
   `additional_information` text COMMENT 'Additional Information',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_ORDER_PAYMENT_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_ORDER_PAYMENT_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_ORDER_PAYMENT_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_ORDER_PAYMENT_PARENT_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Order Payment';
 
 DROP TABLE IF EXISTS `#__sales_payment_transaction`;
@@ -850,12 +849,12 @@ CREATE TABLE `#__sales_payment_transaction` (
   `additional_information` blob COMMENT 'Additional Information',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`transaction_id`),
-  UNIQUE KEY `UNQ_SALES_PAYMENT_TRANSACTION_ORDER_ID_PAYMENT_ID_TXN_ID` (`order_id`,`payment_id`,`txn_id`),
-  KEY `IDX_SALES_PAYMENT_TRANSACTION_PARENT_ID` (`parent_id`),
-  KEY `IDX_SALES_PAYMENT_TRANSACTION_PAYMENT_ID` (`payment_id`),
-  CONSTRAINT `FK_SALES_PAYMENT_TRANSACTION_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_B99FF1A06402D725EBDB0F3A7ECD47A2` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_payment_transaction` (`transaction_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_DBEA77BE19876AF496E5DE10370FBC59` FOREIGN KEY (`payment_id`) REFERENCES `#__sales_order_payment` (`entity_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALES_PAYMENT_TRANSACTION_ORDER_ID_PAYMENT_ID_TXN_ID` (`order_id`,`payment_id`,`txn_id`),
+  KEY `SALES_PAYMENT_TRANSACTION_PARENT_ID` (`parent_id`),
+  KEY `SALES_PAYMENT_TRANSACTION_PAYMENT_ID` (`payment_id`),
+  CONSTRAINT `SALES_PAYMENT_TRANSACTION_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `B99FF1A06402D725EBDB0F3A7ECD47A2` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_payment_transaction` (`transaction_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_PAYMENT_TRANSACTION_PAYMENT_ID_SALES_ORDER_PAYMENT_ENTT_ID` FOREIGN KEY (`payment_id`) REFERENCES `#__sales_order_payment` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Payment Transaction';
 
 DROP TABLE IF EXISTS `#__sales_refunded_aggregated`;
@@ -869,9 +868,9 @@ CREATE TABLE `#__sales_refunded_aggregated` (
   `online_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Online Refunded',
   `offline_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Offline Refunded',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_REFUNDED_AGGREGATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_REFUNDED_AGGREGATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_REFUNDED_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_REFUNDED_AGGREGATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_REFUNDED_AGGREGATED_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_REFUNDED_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Refunded Aggregated';
 
 DROP TABLE IF EXISTS `#__sales_refunded_aggregated_order`;
@@ -885,9 +884,9 @@ CREATE TABLE `#__sales_refunded_aggregated_order` (
   `online_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Online Refunded',
   `offline_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Offline Refunded',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_REFUNDED_AGGREGATED_ORDER_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_REFUNDED_AGGREGATED_ORDER_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_REFUNDED_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_REFUNDED_AGGREGATED_ORDER_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_REFUNDED_AGGREGATED_ORDER_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_REFUNDED_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Refunded Aggregated Order';
 
 DROP TABLE IF EXISTS `#__sales_invoice`;
@@ -931,25 +930,25 @@ CREATE TABLE `#__sales_invoice` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `customer_note` text COMMENT 'Customer Note',
   `customer_note_notify` smallint(5) unsigned DEFAULT NULL COMMENT 'Customer Note Notify',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
-  `shipping_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Hidden Tax Amount',
-  `base_shipping_hidden_tax_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
+  `shipping_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Discount Tax Compensation Amount',
+  `base_shipping_discount_tax_compensation_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Discount Tax Compensation Amount',
   `shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Incl Tax',
   `base_shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Incl Tax',
   `base_total_refunded` decimal(12,4) DEFAULT NULL COMMENT 'Base Total Refunded',
   `discount_description` varchar(255) DEFAULT NULL COMMENT 'Discount Description',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_INVOICE_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_INVOICE_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_INVOICE_GRAND_TOTAL` (`grand_total`),
-  KEY `IDX_SALES_INVOICE_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_INVOICE_STATE` (`state`),
-  KEY `IDX_SALES_INVOICE_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_INVOICE_EMAIL_SENT` (`email_sent`),
-  KEY `IDX_SALES_INVOICE_SEND_EMAIL` (`send_email`),
-  CONSTRAINT `FK_SALES_INVOICE_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_INVOICE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_INVOICE_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_INVOICE_STORE_ID` (`store_id`),
+  KEY `SALES_INVOICE_GRAND_TOTAL` (`grand_total`),
+  KEY `SALES_INVOICE_ORDER_ID` (`order_id`),
+  KEY `SALES_INVOICE_STATE` (`state`),
+  KEY `SALES_INVOICE_CREATED_AT` (`created_at`),
+  KEY `SALES_INVOICE_EMAIL_SENT` (`email_sent`),
+  KEY `SALES_INVOICE_SEND_EMAIL` (`send_email`),
+  CONSTRAINT `SALES_INVOICE_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_INVOICE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Invoice';
 
 DROP TABLE IF EXISTS `#__sales_invoiced_aggregated`;
@@ -964,9 +963,9 @@ CREATE TABLE `#__sales_invoiced_aggregated` (
   `invoiced_captured` decimal(12,4) DEFAULT NULL COMMENT 'Invoiced Captured',
   `invoiced_not_captured` decimal(12,4) DEFAULT NULL COMMENT 'Invoiced Not Captured',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_INVOICED_AGGREGATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_INVOICED_AGGREGATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_INVOICED_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_INVOICED_AGGREGATED_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_INVOICED_AGGREGATED_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_INVOICED_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Invoiced Aggregated';
 
 DROP TABLE IF EXISTS `#__sales_invoiced_aggregated_order`;
@@ -981,9 +980,9 @@ CREATE TABLE `#__sales_invoiced_aggregated_order` (
   `invoiced_captured` decimal(12,4) DEFAULT NULL COMMENT 'Invoiced Captured',
   `invoiced_not_captured` decimal(12,4) DEFAULT NULL COMMENT 'Invoiced Not Captured',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_INVOICED_AGGREGATED_ORDER_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
-  KEY `IDX_SALES_INVOICED_AGGREGATED_ORDER_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_INVOICED_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_INVOICED_AGGREGATED_ORDER_PERIOD_STORE_ID_ORDER_STATUS` (`period`,`store_id`,`order_status`),
+  KEY `SALES_INVOICED_AGGREGATED_ORDER_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_INVOICED_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Invoiced Aggregated Order';
 
 DROP TABLE IF EXISTS `#__sales_invoice_comment`;
@@ -995,9 +994,9 @@ CREATE TABLE `#__sales_invoice_comment` (
   `comment` text COMMENT 'Comment',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_INVOICE_COMMENT_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_INVOICE_COMMENT_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_INVOICE_COMMENT_PARENT_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_INVOICE_COMMENT_CREATED_AT` (`created_at`),
+  KEY `SALES_INVOICE_COMMENT_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_INVOICE_COMMENT_PARENT_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Invoice Comment';
 
 DROP TABLE IF EXISTS `#__sales_invoice_grid`;
@@ -1019,18 +1018,18 @@ CREATE TABLE `#__sales_invoice_grid` (
   `order_created_at` timestamp NULL DEFAULT NULL COMMENT 'Order Created At',
   `billing_name` varchar(255) DEFAULT NULL COMMENT 'Billing Name',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_INVOICE_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_INVOICE_GRID_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_INVOICE_GRID_GRAND_TOTAL` (`grand_total`),
-  KEY `IDX_SALES_INVOICE_GRID_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_INVOICE_GRID_STATE` (`state`),
-  KEY `IDX_SALES_INVOICE_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
-  KEY `IDX_SALES_INVOICE_GRID_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_INVOICE_GRID_ORDER_CREATED_AT` (`order_created_at`),
-  KEY `IDX_SALES_INVOICE_GRID_BILLING_NAME` (`billing_name`),
-  KEY `IDX_SALES_INVOICE_GRID_UPDATED_AT` (`updated_at`),
-  CONSTRAINT `FK_SALES_INVOICE_GRID_ENTITY_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_INVOICE_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_INVOICE_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_INVOICE_GRID_STORE_ID` (`store_id`),
+  KEY `SALES_INVOICE_GRID_GRAND_TOTAL` (`grand_total`),
+  KEY `SALES_INVOICE_GRID_ORDER_ID` (`order_id`),
+  KEY `SALES_INVOICE_GRID_STATE` (`state`),
+  KEY `SALES_INVOICE_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
+  KEY `SALES_INVOICE_GRID_CREATED_AT` (`created_at`),
+  KEY `SALES_INVOICE_GRID_ORDER_CREATED_AT` (`order_created_at`),
+  KEY `SALES_INVOICE_GRID_BILLING_NAME` (`billing_name`),
+  KEY `SALES_INVOICE_GRID_UPDATED_AT` (`updated_at`),
+  CONSTRAINT `SALES_INVOICE_GRID_ENTITY_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_INVOICE_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Invoice Grid';
 
 DROP TABLE IF EXISTS `#__sales_invoice_item`;
@@ -1057,8 +1056,8 @@ CREATE TABLE `#__sales_invoice_item` (
   `description` text COMMENT 'Description',
   `sku` varchar(255) DEFAULT NULL COMMENT 'Sku',
   `name` varchar(255) DEFAULT NULL COMMENT 'Name',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
   `tax_ratio` text COMMENT 'Ratio of tax invoiced over tax of the order item',
   `weee_tax_applied` text COMMENT 'Weee Tax Applied',
   `weee_tax_applied_amount` decimal(12,4) DEFAULT NULL COMMENT 'Weee Tax Applied Amount',
@@ -1070,8 +1069,8 @@ CREATE TABLE `#__sales_invoice_item` (
   `base_weee_tax_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Disposition',
   `base_weee_tax_row_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Row Disposition',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_INVOICE_ITEM_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_INVOICE_ITEM_PARENT_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_INVOICE_ITEM_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_INVOICE_ITEM_PARENT_ID_SALES_INVOICE_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_invoice` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Invoice Item';
 
 DROP TABLE IF EXISTS `#__sales_shipment`;
@@ -1095,16 +1094,16 @@ CREATE TABLE `#__sales_shipment` (
   `packages` text COMMENT 'Packed Products in Packages',
   `shipping_label` mediumblob COMMENT 'Shipping Label Content',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_SHIPMENT_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_SHIPMENT_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_SHIPMENT_TOTAL_QTY` (`total_qty`),
-  KEY `IDX_SALES_SHIPMENT_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_SHIPMENT_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_SHIPMENT_UPDATED_AT` (`updated_at`),
-  KEY `IDX_SALES_SHIPMENT_EMAIL_SENT` (`email_sent`),
-  KEY `IDX_SALES_SHIPMENT_SEND_EMAIL` (`send_email`),
-  CONSTRAINT `FK_SALES_SHIPMENT_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_SHIPMENT_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_SHIPMENT_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_SHIPMENT_STORE_ID` (`store_id`),
+  KEY `SALES_SHIPMENT_TOTAL_QTY` (`total_qty`),
+  KEY `SALES_SHIPMENT_ORDER_ID` (`order_id`),
+  KEY `SALES_SHIPMENT_CREATED_AT` (`created_at`),
+  KEY `SALES_SHIPMENT_UPDATED_AT` (`updated_at`),
+  KEY `SALES_SHIPMENT_EMAIL_SENT` (`email_sent`),
+  KEY `SALES_SHIPMENT_SEND_EMAIL` (`send_email`),
+  CONSTRAINT `SALES_SHIPMENT_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_SHIPMENT_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Shipment';
 
 DROP TABLE IF EXISTS `#__sales_shipment_comment`;
@@ -1116,9 +1115,9 @@ CREATE TABLE `#__sales_shipment_comment` (
   `comment` text COMMENT 'Comment',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_SHIPMENT_COMMENT_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_SHIPMENT_COMMENT_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_SHIPMENT_COMMENT_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_SHIPMENT_COMMENT_CREATED_AT` (`created_at`),
+  KEY `SALES_SHIPMENT_COMMENT_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_SHIPMENT_COMMENT_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Shipment Comment';
 
 DROP TABLE IF EXISTS `#__sales_shipment_grid`;
@@ -1135,18 +1134,18 @@ CREATE TABLE `#__sales_shipment_grid` (
   `order_created_at` timestamp NULL DEFAULT NULL COMMENT 'Order Created At',
   `shipping_name` varchar(255) DEFAULT NULL COMMENT 'Shipping Name',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_SHIPMENT_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_SHIPMENT_GRID_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_SHIPMENT_GRID_TOTAL_QTY` (`total_qty`),
-  KEY `IDX_SALES_SHIPMENT_GRID_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_SHIPMENT_GRID_SHIPMENT_STATUS` (`shipment_status`),
-  KEY `IDX_SALES_SHIPMENT_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
-  KEY `IDX_SALES_SHIPMENT_GRID_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_SHIPMENT_GRID_ORDER_CREATED_AT` (`order_created_at`),
-  KEY `IDX_SALES_SHIPMENT_GRID_SHIPPING_NAME` (`shipping_name`),
-  KEY `IDX_SALES_SHIPMENT_GRID_UPDATED_AT` (`updated_at`),
-  CONSTRAINT `FK_SALES_SHIPMENT_GRID_ENTITY_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_SHIPMENT_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_SHIPMENT_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_SHIPMENT_GRID_STORE_ID` (`store_id`),
+  KEY `SALES_SHIPMENT_GRID_TOTAL_QTY` (`total_qty`),
+  KEY `SALES_SHIPMENT_GRID_ORDER_ID` (`order_id`),
+  KEY `SALES_SHIPMENT_GRID_SHIPMENT_STATUS` (`shipment_status`),
+  KEY `SALES_SHIPMENT_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
+  KEY `SALES_SHIPMENT_GRID_CREATED_AT` (`created_at`),
+  KEY `SALES_SHIPMENT_GRID_ORDER_CREATED_AT` (`order_created_at`),
+  KEY `SALES_SHIPMENT_GRID_SHIPPING_NAME` (`shipping_name`),
+  KEY `SALES_SHIPMENT_GRID_UPDATED_AT` (`updated_at`),
+  CONSTRAINT `SALES_SHIPMENT_GRID_ENTITY_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_SHIPMENT_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Shipment Grid';
 
 DROP TABLE IF EXISTS `#__sales_shipment_item`;
@@ -1164,8 +1163,8 @@ CREATE TABLE `#__sales_shipment_item` (
   `name` varchar(255) DEFAULT NULL COMMENT 'Name',
   `sku` varchar(255) DEFAULT NULL COMMENT 'Sku',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_SHIPMENT_ITEM_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_SHIPMENT_ITEM_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_SHIPMENT_ITEM_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_SHIPMENT_ITEM_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Shipment Item';
 
 DROP TABLE IF EXISTS `#__sales_shipment_track`;
@@ -1182,10 +1181,10 @@ CREATE TABLE `#__sales_shipment_track` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_SHIPMENT_TRACK_PARENT_ID` (`parent_id`),
-  KEY `IDX_SALES_SHIPMENT_TRACK_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_SHIPMENT_TRACK_CREATED_AT` (`created_at`),
-  CONSTRAINT `FK_SALES_SHIPMENT_TRACK_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_SHIPMENT_TRACK_PARENT_ID` (`parent_id`),
+  KEY `SALES_SHIPMENT_TRACK_ORDER_ID` (`order_id`),
+  KEY `SALES_SHIPMENT_TRACK_CREATED_AT` (`created_at`),
+  CONSTRAINT `SALES_SHIPMENT_TRACK_PARENT_ID_SALES_SHIPMENT_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_shipment` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Shipment Track';
 
 DROP TABLE IF EXISTS `#__sales_shipping_aggregated`;
@@ -1199,9 +1198,9 @@ CREATE TABLE `#__sales_shipping_aggregated` (
   `total_shipping` decimal(12,4) DEFAULT NULL COMMENT 'Total Shipping',
   `total_shipping_actual` decimal(12,4) DEFAULT NULL COMMENT 'Total Shipping Actual',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_SHPP_AGGRED_PERIOD_STORE_ID_ORDER_STS_SHPP_DESCRIPTION` (`period`,`store_id`,`order_status`,`shipping_description`),
-  KEY `IDX_SALES_SHIPPING_AGGREGATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_SHIPPING_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_SHPP_AGGRED_PERIOD_STORE_ID_ORDER_STS_SHPP_DESCRIPTION` (`period`,`store_id`,`order_status`,`shipping_description`),
+  KEY `SALES_SHIPPING_AGGREGATED_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_SHIPPING_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Shipping Aggregated';
 
 DROP TABLE IF EXISTS `#__sales_shipping_aggregated_order`;
@@ -1215,9 +1214,9 @@ CREATE TABLE `#__sales_shipping_aggregated_order` (
   `total_shipping` decimal(12,4) DEFAULT NULL COMMENT 'Total Shipping',
   `total_shipping_actual` decimal(12,4) DEFAULT NULL COMMENT 'Total Shipping Actual',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `C05FAE47282EEA68654D0924E946761F` (`period`,`store_id`,`order_status`,`shipping_description`),
-  KEY `IDX_SALES_SHIPPING_AGGREGATED_ORDER_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALES_SHIPPING_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `UNQ_C05FAE47282EEA68654D0924E946761F` (`period`,`store_id`,`order_status`,`shipping_description`),
+  KEY `SALES_SHIPPING_AGGREGATED_ORDER_STORE_ID` (`store_id`),
+  CONSTRAINT `SALES_SHIPPING_AGGREGATED_ORDER_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Shipping Aggregated Order';
 
 DROP TABLE IF EXISTS `#__sales_creditmemo`;
@@ -1266,24 +1265,24 @@ CREATE TABLE `#__sales_creditmemo` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `customer_note` text COMMENT 'Customer Note',
   `customer_note_notify` smallint(5) unsigned DEFAULT NULL COMMENT 'Customer Note Notify',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
-  `shipping_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Hidden Tax Amount',
-  `base_shipping_hidden_tax_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
+  `shipping_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Discount Tax Compensation Amount',
+  `base_shipping_discount_tax_compensation_amnt` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Discount Tax Compensation Amount',
   `shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Incl Tax',
   `base_shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Incl Tax',
   `discount_description` varchar(255) DEFAULT NULL COMMENT 'Discount Description',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_CREDITMEMO_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_CREDITMEMO_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_CREDITMEMO_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_CREDITMEMO_CREDITMEMO_STATUS` (`creditmemo_status`),
-  KEY `IDX_SALES_CREDITMEMO_STATE` (`state`),
-  KEY `IDX_SALES_CREDITMEMO_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_CREDITMEMO_EMAIL_SENT` (`email_sent`),
-  KEY `IDX_SALES_CREDITMEMO_SEND_EMAIL` (`send_email`),
-  CONSTRAINT `FK_SALES_CREDITMEMO_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_CREDITMEMO_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_CREDITMEMO_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_CREDITMEMO_STORE_ID` (`store_id`),
+  KEY `SALES_CREDITMEMO_ORDER_ID` (`order_id`),
+  KEY `SALES_CREDITMEMO_CREDITMEMO_STATUS` (`creditmemo_status`),
+  KEY `SALES_CREDITMEMO_STATE` (`state`),
+  KEY `SALES_CREDITMEMO_CREATED_AT` (`created_at`),
+  KEY `SALES_CREDITMEMO_EMAIL_SENT` (`email_sent`),
+  KEY `SALES_CREDITMEMO_SEND_EMAIL` (`send_email`),
+  CONSTRAINT `SALES_CREDITMEMO_ORDER_ID_SALES_ORDER_ENTITY_ID` FOREIGN KEY (`order_id`) REFERENCES `#__sales_order` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_CREDITMEMO_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Creditmemo';
 
 DROP TABLE IF EXISTS `#__sales_creditmemo_comment`;
@@ -1295,9 +1294,9 @@ CREATE TABLE `#__sales_creditmemo_comment` (
   `comment` text COMMENT 'Comment',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_CREDITMEMO_COMMENT_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_CREDITMEMO_COMMENT_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_CREDITMEMO_COMMENT_PARENT_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_CREDITMEMO_COMMENT_CREATED_AT` (`created_at`),
+  KEY `SALES_CREDITMEMO_COMMENT_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_CREDITMEMO_COMMENT_PARENT_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Creditmemo Comment';
 
 DROP TABLE IF EXISTS `#__sales_creditmemo_grid`;
@@ -1325,20 +1324,20 @@ CREATE TABLE `#__sales_creditmemo_grid` (
   `order_created_at` timestamp NULL DEFAULT NULL COMMENT 'Order Created At',
   `billing_name` varchar(255) DEFAULT NULL COMMENT 'Billing Name',
   PRIMARY KEY (`entity_id`),
-  UNIQUE KEY `UNQ_SALES_CREDITMEMO_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_GRAND_TOTAL` (`grand_total`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_BASE_GRAND_TOTAL` (`base_grand_total`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_ORDER_ID` (`order_id`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_CREDITMEMO_STATUS` (`creditmemo_status`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_STATE` (`state`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_CREATED_AT` (`created_at`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_ORDER_CREATED_AT` (`order_created_at`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_BILLING_NAME` (`billing_name`),
-  KEY `IDX_SALES_CREDITMEMO_GRID_UPDATED_AT` (`updated_at`),
-  CONSTRAINT `FK_SALES_CREDITMEMO_GRID_ENTITY_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_CREDITMEMO_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  UNIQUE KEY `SALES_CREDITMEMO_GRID_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
+  KEY `SALES_CREDITMEMO_GRID_STORE_ID` (`store_id`),
+  KEY `SALES_CREDITMEMO_GRID_GRAND_TOTAL` (`grand_total`),
+  KEY `SALES_CREDITMEMO_GRID_BASE_GRAND_TOTAL` (`base_grand_total`),
+  KEY `SALES_CREDITMEMO_GRID_ORDER_ID` (`order_id`),
+  KEY `SALES_CREDITMEMO_GRID_CREDITMEMO_STATUS` (`creditmemo_status`),
+  KEY `SALES_CREDITMEMO_GRID_STATE` (`state`),
+  KEY `SALES_CREDITMEMO_GRID_ORDER_INCREMENT_ID` (`order_increment_id`),
+  KEY `SALES_CREDITMEMO_GRID_CREATED_AT` (`created_at`),
+  KEY `SALES_CREDITMEMO_GRID_ORDER_CREATED_AT` (`order_created_at`),
+  KEY `SALES_CREDITMEMO_GRID_BILLING_NAME` (`billing_name`),
+  KEY `SALES_CREDITMEMO_GRID_UPDATED_AT` (`updated_at`),
+  CONSTRAINT `SALES_CREDITMEMO_GRID_ENTITY_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`entity_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_CREDITMEMO_GRID_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Creditmemo Grid';
 
 DROP TABLE IF EXISTS `#__sales_creditmemo_item`;
@@ -1365,8 +1364,8 @@ CREATE TABLE `#__sales_creditmemo_item` (
   `description` text COMMENT 'Description',
   `sku` varchar(255) DEFAULT NULL COMMENT 'Sku',
   `name` varchar(255) DEFAULT NULL COMMENT 'Name',
-  `hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Hidden Tax Amount',
-  `base_hidden_tax_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Hidden Tax Amount',
+  `discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Discount Tax Compensation Amount',
+  `base_discount_tax_compensation_amount` decimal(12,4) DEFAULT NULL COMMENT 'Base Discount Tax Compensation Amount',
   `tax_ratio` text COMMENT 'Ratio of tax in the creditmemo item over tax of the order item',
   `weee_tax_applied` text COMMENT 'Weee Tax Applied',
   `weee_tax_applied_amount` decimal(12,4) DEFAULT NULL COMMENT 'Weee Tax Applied Amount',
@@ -1378,8 +1377,8 @@ CREATE TABLE `#__sales_creditmemo_item` (
   `base_weee_tax_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Disposition',
   `base_weee_tax_row_disposition` decimal(12,4) DEFAULT NULL COMMENT 'Base Weee Tax Row Disposition',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_SALES_CREDITMEMO_ITEM_PARENT_ID` (`parent_id`),
-  CONSTRAINT `FK_SALES_CREDITMEMO_ITEM_PARENT_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE
+  KEY `SALES_CREDITMEMO_ITEM_PARENT_ID` (`parent_id`),
+  CONSTRAINT `SALES_CREDITMEMO_ITEM_PARENT_ID_SALES_CREDITMEMO_ENTITY_ID` FOREIGN KEY (`parent_id`) REFERENCES `#__sales_creditmemo` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Flat Creditmemo Item';
 
 DROP TABLE IF EXISTS `#__sales_bestsellers_aggregated_daily`;
@@ -1393,11 +1392,11 @@ CREATE TABLE `#__sales_bestsellers_aggregated_daily` (
   `qty_ordered` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Qty Ordered',
   `rating_pos` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Rating Pos',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_BESTSELLERS_AGGRED_DAILY_PERIOD_STORE_ID_PRD_ID` (`period`,`store_id`,`product_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_DAILY_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_DAILY_PRODUCT_ID` (`product_id`),
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGREGATED_DAILY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGRED_DAILY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALES_BESTSELLERS_AGGREGATED_DAILY_PERIOD_STORE_ID_PRODUCT_ID` (`period`,`store_id`,`product_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_DAILY_STORE_ID` (`store_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_DAILY_PRODUCT_ID` (`product_id`),
+  CONSTRAINT `SALES_BESTSELLERS_AGGREGATED_DAILY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_BESTSELLERS_AGGRED_DAILY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Bestsellers Aggregated Daily';
 
 DROP TABLE IF EXISTS `#__sales_bestsellers_aggregated_monthly`;
@@ -1411,11 +1410,11 @@ CREATE TABLE `#__sales_bestsellers_aggregated_monthly` (
   `qty_ordered` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Qty Ordered',
   `rating_pos` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Rating Pos',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_BESTSELLERS_AGGRED_MONTHLY_PERIOD_STORE_ID_PRD_ID` (`period`,`store_id`,`product_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_MONTHLY_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_MONTHLY_PRODUCT_ID` (`product_id`),
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGREGATED_MONTHLY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGRED_MONTHLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALES_BESTSELLERS_AGGREGATED_MONTHLY_PERIOD_STORE_ID_PRODUCT_ID` (`period`,`store_id`,`product_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_MONTHLY_STORE_ID` (`store_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_MONTHLY_PRODUCT_ID` (`product_id`),
+  CONSTRAINT `SALES_BESTSELLERS_AGGREGATED_MONTHLY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_BESTSELLERS_AGGRED_MONTHLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Bestsellers Aggregated Monthly';
 
 DROP TABLE IF EXISTS `#__sales_bestsellers_aggregated_yearly`;
@@ -1429,11 +1428,11 @@ CREATE TABLE `#__sales_bestsellers_aggregated_yearly` (
   `qty_ordered` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Qty Ordered',
   `rating_pos` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Rating Pos',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNQ_SALES_BESTSELLERS_AGGRED_YEARLY_PERIOD_STORE_ID_PRD_ID` (`period`,`store_id`,`product_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_YEARLY_STORE_ID` (`store_id`),
-  KEY `IDX_SALES_BESTSELLERS_AGGREGATED_YEARLY_PRODUCT_ID` (`product_id`),
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGREGATED_YEARLY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALES_BESTSELLERS_AGGRED_YEARLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALES_BESTSELLERS_AGGREGATED_YEARLY_PERIOD_STORE_ID_PRODUCT_ID` (`period`,`store_id`,`product_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_YEARLY_STORE_ID` (`store_id`),
+  KEY `SALES_BESTSELLERS_AGGREGATED_YEARLY_PRODUCT_ID` (`product_id`),
+  CONSTRAINT `SALES_BESTSELLERS_AGGREGATED_YEARLY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALES_BESTSELLERS_AGGRED_YEARLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `#__catalog_product_entity` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Bestsellers Aggregated Yearly';
 
 DROP TABLE IF EXISTS `#__salesrule`;
@@ -1463,7 +1462,7 @@ CREATE TABLE `#__salesrule` (
   `uses_per_coupon` int(11) NOT NULL DEFAULT '0' COMMENT 'User Per Coupon',
   `simple_free_shipping` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`rule_id`),
-  KEY `IDX_SALESRULE_IS_ACTIVE_SORT_ORDER_TO_DATE_FROM_DATE` (`is_active`,`sort_order`,`to_date`,`from_date`)
+  KEY `SALESRULE_IS_ACTIVE_SORT_ORDER_TO_DATE_FROM_DATE` (`is_active`,`sort_order`,`to_date`,`from_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule';
 
 DROP TABLE IF EXISTS `#__salesrule_coupon`;
@@ -1479,10 +1478,10 @@ CREATE TABLE `#__salesrule_coupon` (
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'Coupon Code Creation Date',
   `type` smallint(6) DEFAULT '0' COMMENT 'Coupon Code Type',
   PRIMARY KEY (`coupon_id`),
-  UNIQUE KEY `UNQ_SALESRULE_COUPON_CODE` (`code`),
-  UNIQUE KEY `UNQ_SALESRULE_COUPON_RULE_ID_IS_PRIMARY` (`rule_id`,`is_primary`),
-  KEY `IDX_SALESRULE_COUPON_RULE_ID` (`rule_id`),
-  CONSTRAINT `FK_SALESRULE_COUPON_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALESRULE_COUPON_CODE` (`code`),
+  UNIQUE KEY `SALESRULE_COUPON_RULE_ID_IS_PRIMARY` (`rule_id`,`is_primary`),
+  KEY `SALESRULE_COUPON_RULE_ID` (`rule_id`),
+  CONSTRAINT `SALESRULE_COUPON_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Coupon';
 
 DROP TABLE IF EXISTS `#__salesrule_coupon_usage`;
@@ -1491,9 +1490,9 @@ CREATE TABLE `#__salesrule_coupon_usage` (
   `customer_id` int(10) unsigned NOT NULL COMMENT 'Customer Id',
   `times_used` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
   PRIMARY KEY (`coupon_id`,`customer_id`),
-  KEY `IDX_SALESRULE_COUPON_USAGE_CUSTOMER_ID` (`customer_id`),
-  CONSTRAINT `FK_SALESRULE_COUPON_USAGE_COUPON_ID_SALESRULE_COUPON_COUPON_ID` FOREIGN KEY (`coupon_id`) REFERENCES `#__salesrule_coupon` (`coupon_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_COUPON_USAGE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE
+  KEY `SALESRULE_COUPON_USAGE_CUSTOMER_ID` (`customer_id`),
+  CONSTRAINT `SALESRULE_COUPON_USAGE_COUPON_ID_SALESRULE_COUPON_COUPON_ID` FOREIGN KEY (`coupon_id`) REFERENCES `#__salesrule_coupon` (`coupon_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_COUPON_USAGE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Coupon Usage';
 
 DROP TABLE IF EXISTS `#__salesrule_customer`;
@@ -1503,10 +1502,10 @@ CREATE TABLE `#__salesrule_customer` (
   `customer_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Customer Id',
   `times_used` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Times Used',
   PRIMARY KEY (`rule_customer_id`),
-  KEY `IDX_SALESRULE_CUSTOMER_RULE_ID_CUSTOMER_ID` (`rule_id`,`customer_id`),
-  KEY `IDX_SALESRULE_CUSTOMER_CUSTOMER_ID_RULE_ID` (`customer_id`,`rule_id`),
-  CONSTRAINT `FK_SALESRULE_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_CUSTOMER_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
+  KEY `SALESRULE_CUSTOMER_RULE_ID_CUSTOMER_ID` (`rule_id`,`customer_id`),
+  KEY `SALESRULE_CUSTOMER_CUSTOMER_ID_RULE_ID` (`customer_id`,`rule_id`),
+  CONSTRAINT `SALESRULE_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_CUSTOMER_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Customer';
 
 DROP TABLE IF EXISTS `#__salesrule_customer_group`;
@@ -1514,9 +1513,9 @@ CREATE TABLE `#__salesrule_customer_group` (
   `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
   `customer_group_id` smallint(5) unsigned NOT NULL COMMENT 'Customer Group Id',
   PRIMARY KEY (`rule_id`,`customer_group_id`),
-  KEY `IDX_SALESRULE_CUSTOMER_GROUP_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  CONSTRAINT `FK_SALESRULE_CUSTOMER_GROUP_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
+  KEY `SALESRULE_CUSTOMER_GROUP_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  CONSTRAINT `SALESRULE_CUSTOMER_GROUP_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Rules To Customer Groups Relations';
 
 DROP TABLE IF EXISTS `#__salesrule_label`;
@@ -1526,10 +1525,10 @@ CREATE TABLE `#__salesrule_label` (
   `store_id` smallint(5) unsigned NOT NULL COMMENT 'Store Id',
   `label` varchar(255) DEFAULT NULL COMMENT 'Label',
   PRIMARY KEY (`label_id`),
-  UNIQUE KEY `UNQ_SALESRULE_LABEL_RULE_ID_STORE_ID` (`rule_id`,`store_id`),
-  KEY `IDX_SALESRULE_LABEL_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_SALESRULE_LABEL_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  UNIQUE KEY `SALESRULE_LABEL_RULE_ID_STORE_ID` (`rule_id`,`store_id`),
+  KEY `SALESRULE_LABEL_STORE_ID` (`store_id`),
+  CONSTRAINT `SALESRULE_LABEL_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Label';
 
 DROP TABLE IF EXISTS `#__salesrule_product_attribute`;
@@ -1539,13 +1538,13 @@ CREATE TABLE `#__salesrule_product_attribute` (
   `customer_group_id` smallint(5) unsigned NOT NULL COMMENT 'Customer Group Id',
   `attribute_id` smallint(5) unsigned NOT NULL COMMENT 'Attribute Id',
   PRIMARY KEY (`rule_id`,`website_id`,`customer_group_id`,`attribute_id`),
-  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_WEBSITE_ID` (`website_id`),
-  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  KEY `IDX_SALESRULE_PRODUCT_ATTRIBUTE_ATTRIBUTE_ID` (`attribute_id`),
-  CONSTRAINT `FK_SALESRULE_PRD_ATTR_ATTR_ID_EAV_ATTR_ATTR_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_PRD_ATTR_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_PRODUCT_ATTRIBUTE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_PRD_ATTR_WS_ID_STORE_WS_WS_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  KEY `SALESRULE_PRODUCT_ATTRIBUTE_WEBSITE_ID` (`website_id`),
+  KEY `SALESRULE_PRODUCT_ATTRIBUTE_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  KEY `SALESRULE_PRODUCT_ATTRIBUTE_ATTRIBUTE_ID` (`attribute_id`),
+  CONSTRAINT `SALESRULE_PRD_ATTR_ATTR_ID_EAV_ATTR_ATTR_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_PRD_ATTR_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_PRODUCT_ATTRIBUTE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_PRODUCT_ATTRIBUTE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Salesrule Product Attribute';
 
 DROP TABLE IF EXISTS `#__salesrule_website`;
@@ -1553,9 +1552,9 @@ CREATE TABLE `#__salesrule_website` (
   `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
   `website_id` smallint(5) unsigned NOT NULL COMMENT 'Website Id',
   PRIMARY KEY (`rule_id`,`website_id`),
-  KEY `IDX_SALESRULE_WEBSITE_WEBSITE_ID` (`website_id`),
-  CONSTRAINT `FK_SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_SALESRULE_WEBSITE_WEBSITE_ID_CORE/WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  KEY `SALESRULE_WEBSITE_WEBSITE_ID` (`website_id`),
+  CONSTRAINT `SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `SALESRULE_WEBSITE_WEBSITE_ID_CORE/WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Rules To Websites Relations';
 
 SET FOREIGN_KEY_CHECKS=1;

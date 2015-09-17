@@ -15,7 +15,6 @@
  * @property string $base_amount
  * @property integer $process
  * @property string $base_real_amount
- * @property integer $hidden
  */
 class Mage2SalesOrderTaxPeer extends Mage2ActiveRecord
 {
@@ -36,7 +35,7 @@ class Mage2SalesOrderTaxPeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('order_id, priority, position, process', 'required'),
-			array('priority, position, process, hidden', 'numerical', 'integerOnly'=>true),
+			array('priority, position, process', 'numerical', 'integerOnly'=>true),
 			array('order_id', 'length', 'max'=>10),
 			array('code, title', 'length', 'max'=>255),
 			array('percent, amount, base_amount, base_real_amount', 'length', 'max'=>12),

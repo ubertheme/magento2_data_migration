@@ -22,8 +22,8 @@ CREATE TABLE `#__eav_attribute` (
   `is_unique` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Defines Is Unique',
   `note` varchar(255) DEFAULT NULL COMMENT 'Note',
   PRIMARY KEY (`attribute_id`),
-  UNIQUE KEY `UNQ_EAV_ATTRIBUTE_ENTITY_TYPE_ID_ATTRIBUTE_CODE` (`entity_type_id`,`attribute_code`),
-  CONSTRAINT `FK_EAV_ATTRIBUTE_ENTITY_TYPE_ID_EAV_ENTITY_TYPE_ENTITY_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE
+  UNIQUE KEY `EAV_ATTRIBUTE_ENTITY_TYPE_ID_ATTRIBUTE_CODE` (`entity_type_id`,`attribute_code`),
+  CONSTRAINT `EAV_ATTRIBUTE_ENTITY_TYPE_ID_EAV_ENTITY_TYPE_ENTITY_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8 COMMENT='Eav Attribute';
 
 INSERT INTO #__eav_attribute VALUES ('1', '1', 'website_id', null, 'Magento\\Customer\\Model\\Customer\\Attribute\\Backend\\Website', 'static', null, null, 'select', 'Associate to Website', null, 'Magento\\Customer\\Model\\Customer\\Attribute\\Source\\Website', '1', '0', null, '0', null);
@@ -47,25 +47,25 @@ INSERT INTO #__eav_attribute VALUES ('18', '1', 'confirmation', null, null, 'sta
 INSERT INTO #__eav_attribute VALUES ('19', '1', 'created_at', null, null, 'static', null, null, 'date', 'Created At', null, null, '0', '0', null, '0', null);
 INSERT INTO #__eav_attribute VALUES ('20', '1', 'gender', null, null, 'static', null, null, 'select', 'Gender', null, 'Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Table', '0', '0', null, '0', null);
 INSERT INTO #__eav_attribute VALUES ('21', '1', 'disable_auto_group_change', null, 'Magento\\Customer\\Model\\Attribute\\Backend\\Data\\Boolean', 'static', null, null, 'boolean', 'Disable Automatic Group Change Based on VAT ID', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('22', '2', 'prefix', null, null, 'varchar', null, null, 'text', 'Prefix', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('23', '2', 'firstname', null, null, 'varchar', null, null, 'text', 'First Name', null, null, '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('24', '2', 'middlename', null, null, 'varchar', null, null, 'text', 'Middle Name/Initial', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('25', '2', 'lastname', null, null, 'varchar', null, null, 'text', 'Last Name', null, null, '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('26', '2', 'suffix', null, null, 'varchar', null, null, 'text', 'Suffix', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('27', '2', 'company', null, null, 'varchar', null, null, 'text', 'Company', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('28', '2', 'street', null, 'Magento\\Eav\\Model\\Entity\\Attribute\\Backend\\DefaultBackend', 'text', null, null, 'multiline', 'Street Address', null, null, '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('29', '2', 'city', null, null, 'varchar', null, null, 'text', 'City', null, null, '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('30', '2', 'country_id', null, null, 'varchar', null, null, 'select', 'Country', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Source\\Country', '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('31', '2', 'region', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Backend\\Region', 'varchar', null, null, 'text', 'State/Province', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('32', '2', 'region_id', null, null, 'int', null, null, 'hidden', 'State/Province', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Source\\Region', '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('33', '2', 'postcode', null, null, 'varchar', null, null, 'text', 'Zip/Postal Code', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('34', '2', 'telephone', null, null, 'varchar', null, null, 'text', 'Phone Number', null, null, '1', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('35', '2', 'fax', null, null, 'varchar', null, null, 'text', 'Fax', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('36', '2', 'vat_id', null, null, 'varchar', null, null, 'text', 'VAT number', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('37', '2', 'vat_is_valid', null, null, 'int', null, null, 'text', 'VAT number validity', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('38', '2', 'vat_request_id', null, null, 'varchar', null, null, 'text', 'VAT number validation request ID', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('39', '2', 'vat_request_date', null, null, 'varchar', null, null, 'text', 'VAT number validation request date', null, null, '0', '0', null, '0', null);
-INSERT INTO #__eav_attribute VALUES ('40', '2', 'vat_request_success', null, null, 'int', null, null, 'text', 'VAT number validation request success', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('22', '2', 'prefix', null, null, 'static', null, null, 'text', 'Prefix', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('23', '2', 'firstname', null, null, 'static', null, null, 'text', 'First Name', null, null, '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('24', '2', 'middlename', null, null, 'static', null, null, 'text', 'Middle Name/Initial', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('25', '2', 'lastname', null, null, 'static', null, null, 'text', 'Last Name', null, null, '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('26', '2', 'suffix', null, null, 'static', null, null, 'text', 'Suffix', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('27', '2', 'company', null, null, 'static', null, null, 'text', 'Company', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('28', '2', 'street', null, 'Magento\\Eav\\Model\\Entity\\Attribute\\Backend\\DefaultBackend', 'static', null, null, 'multiline', 'Street Address', null, null, '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('29', '2', 'city', null, null, 'static', null, null, 'text', 'City', null, null, '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('30', '2', 'country_id', null, null, 'static', null, null, 'select', 'Country', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Source\\Country', '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('31', '2', 'region', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Backend\\Region', 'static', null, null, 'text', 'State/Province', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('32', '2', 'region_id', null, null, 'static', null, null, 'hidden', 'State/Province', null, 'Magento\\Customer\\Model\\Resource\\Address\\Attribute\\Source\\Region', '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('33', '2', 'postcode', null, null, 'static', null, null, 'text', 'Zip/Postal Code', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('34', '2', 'telephone', null, null, 'static', null, null, 'text', 'Phone Number', null, null, '1', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('35', '2', 'fax', null, null, 'static', null, null, 'text', 'Fax', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('36', '2', 'vat_id', null, null, 'static', null, null, 'text', 'VAT number', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('37', '2', 'vat_is_valid', null, null, 'static', null, null, 'text', 'VAT number validity', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('38', '2', 'vat_request_id', null, null, 'static', null, null, 'text', 'VAT number validation request ID', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('39', '2', 'vat_request_date', null, null, 'static', null, null, 'text', 'VAT number validation request date', null, null, '0', '0', null, '0', null);
+INSERT INTO #__eav_attribute VALUES ('40', '2', 'vat_request_success', null, null, 'static', null, null, 'text', 'VAT number validation request success', null, null, '0', '0', null, '0', null);
 INSERT INTO #__eav_attribute VALUES ('41', '3', 'name', null, null, 'varchar', null, null, 'text', 'Name', null, null, '1', '0', null, '0', null);
 INSERT INTO #__eav_attribute VALUES ('42', '3', 'is_active', null, null, 'int', null, null, 'select', 'Is Active', null, 'Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Boolean', '1', '0', null, '0', null);
 INSERT INTO #__eav_attribute VALUES ('43', '3', 'description', null, null, 'text', null, null, 'textarea', 'Description', null, null, '0', '0', null, '0', null);
@@ -166,9 +166,9 @@ CREATE TABLE `#__eav_attribute_group` (
   `attribute_group_code` varchar(255) DEFAULT NULL COMMENT 'Attribute Group Code',
   `tab_group_code` varchar(255) DEFAULT NULL COMMENT 'Tab Group Code',
   PRIMARY KEY (`attribute_group_id`),
-  UNIQUE KEY `UNQ_EAV_ATTRIBUTE_GROUP_ATTRIBUTE_SET_ID_ATTRIBUTE_GROUP_NAME` (`attribute_set_id`,`attribute_group_name`),
-  KEY `IDX_EAV_ATTRIBUTE_GROUP_ATTRIBUTE_SET_ID_SORT_ORDER` (`attribute_set_id`,`sort_order`),
-  CONSTRAINT `FK_EAV_ATTR_GROUP_ATTR_SET_ID_EAV_ATTR_SET_ATTR_SET_ID` FOREIGN KEY (`attribute_set_id`) REFERENCES `#__eav_attribute_set` (`attribute_set_id`) ON DELETE CASCADE
+  UNIQUE KEY `EAV_ATTRIBUTE_GROUP_ATTRIBUTE_SET_ID_ATTRIBUTE_GROUP_NAME` (`attribute_set_id`,`attribute_group_name`),
+  KEY `EAV_ATTRIBUTE_GROUP_ATTRIBUTE_SET_ID_SORT_ORDER` (`attribute_set_id`,`sort_order`),
+  CONSTRAINT `EAV_ATTR_GROUP_ATTR_SET_ID_EAV_ATTR_SET_ATTR_SET_ID` FOREIGN KEY (`attribute_set_id`) REFERENCES `#__eav_attribute_set` (`attribute_set_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='Eav Attribute Group';
 
 INSERT INTO #__eav_attribute_group VALUES ('1', '1', 'General', '1', '1', null, null);
@@ -195,10 +195,10 @@ CREATE TABLE `#__eav_attribute_label` (
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store Id',
   `value` varchar(255) DEFAULT NULL COMMENT 'Value',
   PRIMARY KEY (`attribute_label_id`),
-  KEY `IDX_EAV_ATTRIBUTE_LABEL_STORE_ID` (`store_id`),
-  KEY `IDX_EAV_ATTRIBUTE_LABEL_ATTRIBUTE_ID_STORE_ID` (`attribute_id`,`store_id`),
-  CONSTRAINT `FK_EAV_ATTRIBUTE_LABEL_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_EAV_ATTRIBUTE_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `EAV_ATTRIBUTE_LABEL_STORE_ID` (`store_id`),
+  KEY `EAV_ATTRIBUTE_LABEL_ATTRIBUTE_ID_STORE_ID` (`attribute_id`,`store_id`),
+  CONSTRAINT `EAV_ATTRIBUTE_LABEL_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
+  CONSTRAINT `EAV_ATTRIBUTE_LABEL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Eav Attribute Label';
 
 DROP TABLE IF EXISTS `#__eav_attribute_option`;
@@ -207,8 +207,8 @@ CREATE TABLE `#__eav_attribute_option` (
   `attribute_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Attribute Id',
   `sort_order` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Sort Order',
   PRIMARY KEY (`option_id`),
-  KEY `IDX_EAV_ATTRIBUTE_OPTION_ATTRIBUTE_ID` (`attribute_id`),
-  CONSTRAINT `FK_EAV_ATTRIBUTE_OPTION_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE
+  KEY `EAV_ATTRIBUTE_OPTION_ATTRIBUTE_ID` (`attribute_id`),
+  CONSTRAINT `EAV_ATTRIBUTE_OPTION_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Eav Attribute Option';
 
 INSERT INTO #__eav_attribute_option VALUES ('1', '20', '0');
@@ -221,10 +221,10 @@ CREATE TABLE `#__eav_attribute_option_value` (
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store Id',
   `value` varchar(255) DEFAULT NULL COMMENT 'Value',
   PRIMARY KEY (`value_id`),
-  KEY `IDX_EAV_ATTRIBUTE_OPTION_VALUE_OPTION_ID` (`option_id`),
-  KEY `IDX_EAV_ATTRIBUTE_OPTION_VALUE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_EAV_ATTR_OPT_VAL_OPT_ID_EAV_ATTR_OPT_OPT_ID` FOREIGN KEY (`option_id`) REFERENCES `#__eav_attribute_option` (`option_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_EAV_ATTRIBUTE_OPTION_VALUE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `EAV_ATTRIBUTE_OPTION_VALUE_OPTION_ID` (`option_id`),
+  KEY `EAV_ATTRIBUTE_OPTION_VALUE_STORE_ID` (`store_id`),
+  CONSTRAINT `EAV_ATTR_OPT_VAL_OPT_ID_EAV_ATTR_OPT_OPT_ID` FOREIGN KEY (`option_id`) REFERENCES `#__eav_attribute_option` (`option_id`) ON DELETE CASCADE,
+  CONSTRAINT `EAV_ATTRIBUTE_OPTION_VALUE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Eav Attribute Option Value';
 
 INSERT INTO #__eav_attribute_option_value VALUES ('1', '1', '0', 'Male');
@@ -237,9 +237,9 @@ CREATE TABLE `#__eav_attribute_set` (
   `attribute_set_name` varchar(255) DEFAULT NULL COMMENT 'Attribute Set Name',
   `sort_order` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Sort Order',
   PRIMARY KEY (`attribute_set_id`),
-  UNIQUE KEY `UNQ_EAV_ATTRIBUTE_SET_ENTITY_TYPE_ID_ATTRIBUTE_SET_NAME` (`entity_type_id`,`attribute_set_name`),
-  KEY `IDX_EAV_ATTRIBUTE_SET_ENTITY_TYPE_ID_SORT_ORDER` (`entity_type_id`,`sort_order`),
-  CONSTRAINT `FK_EAV_ATTR_SET_ENTT_TYPE_ID_EAV_ENTT_TYPE_ENTT_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE
+  UNIQUE KEY `EAV_ATTRIBUTE_SET_ENTITY_TYPE_ID_ATTRIBUTE_SET_NAME` (`entity_type_id`,`attribute_set_name`),
+  KEY `EAV_ATTRIBUTE_SET_ENTITY_TYPE_ID_SORT_ORDER` (`entity_type_id`,`sort_order`),
+  CONSTRAINT `EAV_ATTRIBUTE_SET_ENTITY_TYPE_ID_EAV_ENTITY_TYPE_ENTITY_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='Eav Attribute Set';
 
 INSERT INTO #__eav_attribute_set VALUES ('1', '1', 'Default', '2');
@@ -263,10 +263,10 @@ CREATE TABLE `#__eav_entity` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated At',
   `is_active` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT 'Defines Is Entity Active',
   PRIMARY KEY (`entity_id`),
-  KEY `IDX_EAV_ENTITY_ENTITY_TYPE_ID` (`entity_type_id`),
-  KEY `IDX_EAV_ENTITY_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_EAV_ENTITY_ENTITY_TYPE_ID_EAV_ENTITY_TYPE_ENTITY_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_EAV_ENTITY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `EAV_ENTITY_ENTITY_TYPE_ID` (`entity_type_id`),
+  KEY `EAV_ENTITY_STORE_ID` (`store_id`),
+  CONSTRAINT `EAV_ENTITY_ENTITY_TYPE_ID_EAV_ENTITY_TYPE_ENTITY_TYPE_ID` FOREIGN KEY (`entity_type_id`) REFERENCES `#__eav_entity_type` (`entity_type_id`) ON DELETE CASCADE,
+  CONSTRAINT `EAV_ENTITY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Eav Entity';
 
 DROP TABLE IF EXISTS `#__eav_entity_attribute`;
@@ -278,12 +278,12 @@ CREATE TABLE `#__eav_entity_attribute` (
   `attribute_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Attribute Id',
   `sort_order` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Sort Order',
   PRIMARY KEY (`entity_attribute_id`),
-  UNIQUE KEY `UNQ_EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_SET_ID_ATTRIBUTE_ID` (`attribute_set_id`,`attribute_id`),
-  UNIQUE KEY `UNQ_EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_GROUP_ID_ATTRIBUTE_ID` (`attribute_group_id`,`attribute_id`),
-  KEY `IDX_EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_SET_ID_SORT_ORDER` (`attribute_set_id`,`sort_order`),
-  KEY `IDX_EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_ID` (`attribute_id`),
-  CONSTRAINT `FK_EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_EAV_ENTT_ATTR_ATTR_GROUP_ID_EAV_ATTR_GROUP_ATTR_GROUP_ID` FOREIGN KEY (`attribute_group_id`) REFERENCES `eav_attribute_group` (`attribute_group_id`) ON DELETE CASCADE
+  UNIQUE KEY `EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_SET_ID_ATTRIBUTE_ID` (`attribute_set_id`,`attribute_id`),
+  UNIQUE KEY `EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_GROUP_ID_ATTRIBUTE_ID` (`attribute_group_id`,`attribute_id`),
+  KEY `EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_SET_ID_SORT_ORDER` (`attribute_set_id`,`sort_order`),
+  KEY `EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_ID` (`attribute_id`),
+  CONSTRAINT `EAV_ENTITY_ATTRIBUTE_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE,
+  CONSTRAINT `EAV_ENTT_ATTR_ATTR_GROUP_ID_EAV_ATTR_GROUP_ATTR_GROUP_ID` FOREIGN KEY (`attribute_group_id`) REFERENCES `eav_attribute_group` (`attribute_group_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8 COMMENT='Eav Entity Attributes';
 
 INSERT INTO #__eav_entity_attribute VALUES ('1', '1', '1', '1', '1', '10');
@@ -437,9 +437,9 @@ CREATE TABLE `#__catalog_eav_attribute` (
   `is_required_in_admin_store` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Is Required In Admin Store',
   `search_weight` float NOT NULL DEFAULT '3' COMMENT 'Search Weight',
   PRIMARY KEY (`attribute_id`),
-  KEY `IDX_CATALOG_EAV_ATTRIBUTE_USED_FOR_SORT_BY` (`used_for_sort_by`),
-  KEY `IDX_CATALOG_EAV_ATTRIBUTE_USED_IN_PRODUCT_LISTING` (`used_in_product_listing`),
-  CONSTRAINT `FK_CATALOG_EAV_ATTRIBUTE_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE
+  KEY `CATALOG_EAV_ATTRIBUTE_USED_FOR_SORT_BY` (`used_for_sort_by`),
+  KEY `CATALOG_EAV_ATTRIBUTE_USED_IN_PRODUCT_LISTING` (`used_in_product_listing`),
+  CONSTRAINT `CATALOG_EAV_ATTRIBUTE_ATTRIBUTE_ID_EAV_ATTRIBUTE_ATTRIBUTE_ID` FOREIGN KEY (`attribute_id`) REFERENCES `#__eav_attribute` (`attribute_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catalog EAV Attribute Table';
 
 INSERT INTO #__catalog_eav_attribute VALUES ('41', null, '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', null, '0', '0', '0', '0', '0', '3');

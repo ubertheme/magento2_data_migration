@@ -53,10 +53,10 @@
  * @property string $base_shipping_discount_amount
  * @property string $subtotal_incl_tax
  * @property string $base_subtotal_total_incl_tax
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
- * @property string $shipping_hidden_tax_amount
- * @property string $base_shipping_hidden_tax_amnt
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
+ * @property string $shipping_discount_tax_compensation_amount
+ * @property string $base_shipping_discount_tax_compensation_amnt
  * @property string $shipping_incl_tax
  * @property string $base_shipping_incl_tax
  * @property integer $free_shipping
@@ -87,10 +87,12 @@ class Mage2SalesQuoteAddressPeer extends Mage2ActiveRecord
 		return array(
 			array('created_at', 'required'),
 			array('save_in_address_book, same_as_billing, collect_shipping_rates, free_shipping, vat_is_valid, vat_request_success, gift_message_id', 'numerical', 'integerOnly'=>true),
-			array('quote_id, customer_id, customer_address_id, region_id', 'length', 'max'=>10),
-			array('address_type, email, firstname, lastname, company, street, city, region, postcode, country_id, telephone, fax, shipping_method, shipping_description, discount_description', 'length', 'max'=>255),
-			array('prefix, middlename, suffix', 'length', 'max'=>40),
-			array('weight, subtotal, base_subtotal, subtotal_with_discount, base_subtotal_with_discount, tax_amount, base_tax_amount, shipping_amount, base_shipping_amount, shipping_tax_amount, base_shipping_tax_amount, discount_amount, base_discount_amount, grand_total, base_grand_total, shipping_discount_amount, base_shipping_discount_amount, subtotal_incl_tax, base_subtotal_total_incl_tax, hidden_tax_amount, base_hidden_tax_amount, shipping_hidden_tax_amount, base_shipping_hidden_tax_amnt, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
+			array('quote_id, customer_id, customer_address_id, address_type, region_id', 'length', 'max'=>10),
+			array('email, company, shipping_description, discount_description', 'length', 'max'=>255),
+			array('prefix, suffix, street, city, region, shipping_method', 'length', 'max'=>40),
+			array('firstname, middlename, lastname, postcode, telephone, fax', 'length', 'max'=>20),
+			array('country_id', 'length', 'max'=>30),
+			array('weight, subtotal, base_subtotal, subtotal_with_discount, base_subtotal_with_discount, tax_amount, base_tax_amount, shipping_amount, base_shipping_amount, shipping_tax_amount, base_shipping_tax_amount, discount_amount, base_discount_amount, grand_total, base_grand_total, shipping_discount_amount, base_shipping_discount_amount, subtotal_incl_tax, base_subtotal_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
 			array('updated_at, customer_notes, applied_taxes, vat_id, vat_request_id, vat_request_date', 'safe'),
 		);
 	}

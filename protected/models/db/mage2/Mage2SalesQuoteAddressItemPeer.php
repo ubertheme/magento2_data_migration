@@ -40,8 +40,8 @@
  * @property string $base_price_incl_tax
  * @property string $row_total_incl_tax
  * @property string $base_row_total_incl_tax
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
  * @property integer $free_shipping
  * @property integer $gift_message_id
  */
@@ -66,7 +66,7 @@ class Mage2SalesQuoteAddressItemPeer extends Mage2ActiveRecord
 			array('created_at', 'required'),
 			array('free_shipping, gift_message_id', 'numerical', 'integerOnly'=>true),
 			array('parent_item_id, quote_address_id, quote_item_id, product_id, super_product_id, parent_product_id, is_qty_decimal, no_discount', 'length', 'max'=>10),
-			array('weight, qty, discount_amount, tax_amount, row_total, base_row_total, row_total_with_discount, base_discount_amount, base_tax_amount, row_weight, price, discount_percent, tax_percent, base_price, base_cost, price_incl_tax, base_price_incl_tax, row_total_incl_tax, base_row_total_incl_tax, hidden_tax_amount, base_hidden_tax_amount', 'length', 'max'=>12),
+			array('weight, qty, discount_amount, tax_amount, row_total, base_row_total, row_total_with_discount, base_discount_amount, base_tax_amount, row_weight, price, discount_percent, tax_percent, base_price, base_cost, price_incl_tax, base_price_incl_tax, row_total_incl_tax, base_row_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount', 'length', 'max'=>12),
 			array('sku, image, name', 'length', 'max'=>255),
 			array('updated_at, applied_rule_ids, additional_data, description', 'safe'),
 		);

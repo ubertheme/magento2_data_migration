@@ -14,9 +14,9 @@ CREATE TABLE `#__tax_calculation_rate` (
   `zip_from` int(10) unsigned DEFAULT NULL COMMENT 'Zip From',
   `zip_to` int(10) unsigned DEFAULT NULL COMMENT 'Zip To',
   PRIMARY KEY (`tax_calculation_rate_id`),
-  KEY `IDX_TAX_CALC_RATE_TAX_COUNTRY_ID_TAX_REGION_ID_TAX_POSTCODE` (`tax_country_id`,`tax_region_id`,`tax_postcode`),
-  KEY `IDX_TAX_CALCULATION_RATE_CODE` (`code`),
-  KEY `CA799F1E2CB843495F601E56C84A626D` (`tax_calculation_rate_id`,`tax_country_id`,`tax_region_id`,`zip_is_range`,`tax_postcode`)
+  KEY `TAX_CALCULATION_RATE_TAX_COUNTRY_ID_TAX_REGION_ID_TAX_POSTCODE` (`tax_country_id`,`tax_region_id`,`tax_postcode`),
+  KEY `TAX_CALCULATION_RATE_CODE` (`code`),
+  KEY `IDX_CA799F1E2CB843495F601E56C84A626D` (`tax_calculation_rate_id`,`tax_country_id`,`tax_region_id`,`zip_is_range`,`tax_postcode`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Tax Calculation Rate';
 
 INSERT INTO tax_calculation_rate VALUES ('1', 'US', '12', '*', 'US-CA-*-Rate 1', '8.2500', null, null, null);
@@ -29,9 +29,9 @@ CREATE TABLE `#__tax_calculation_rate_title` (
   `store_id` smallint(5) unsigned NOT NULL COMMENT 'Store Id',
   `value` varchar(255) NOT NULL COMMENT 'Value',
   PRIMARY KEY (`tax_calculation_rate_title_id`),
-  KEY `IDX_TAX_CALCULATION_RATE_TITLE_TAX_CALCULATION_RATE_ID_STORE_ID` (`tax_calculation_rate_id`,`store_id`),
-  KEY `IDX_TAX_CALCULATION_RATE_TITLE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_TAX_CALCULATION_RATE_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
+  KEY `TAX_CALCULATION_RATE_TITLE_TAX_CALCULATION_RATE_ID_STORE_ID` (`tax_calculation_rate_id`,`store_id`),
+  KEY `TAX_CALCULATION_RATE_TITLE_STORE_ID` (`store_id`),
+  CONSTRAINT `TAX_CALCULATION_RATE_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
   CONSTRAINT `FK_37FB965F786AD5897BB3AE90470C42AB` FOREIGN KEY (`tax_calculation_rate_id`) REFERENCES `#__tax_calculation_rate` (`tax_calculation_rate_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tax Calculation Rate Title';
 
@@ -43,8 +43,8 @@ CREATE TABLE `#__tax_calculation_rule` (
   `position` int(11) NOT NULL COMMENT 'Position',
   `calculate_subtotal` int(11) NOT NULL COMMENT 'Calculate off subtotal option',
   PRIMARY KEY (`tax_calculation_rule_id`),
-  KEY `IDX_TAX_CALCULATION_RULE_PRIORITY_POSITION` (`priority`,`position`),
-  KEY `IDX_TAX_CALCULATION_RULE_CODE` (`code`)
+  KEY `TAX_CALCULATION_RULE_PRIORITY_POSITION` (`priority`,`position`),
+  KEY `TAX_CALCULATION_RULE_CODE` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tax Calculation Rule';
 
 DROP TABLE IF EXISTS `#__tax_calculation`;
@@ -76,9 +76,9 @@ CREATE TABLE `#__tax_order_aggregated_created` (
   `orders_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Orders Count',
   `tax_base_amount_sum` float DEFAULT NULL COMMENT 'Tax Base Amount Sum',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `FCA5E2C02689EB2641B30580D7AACF12` (`period`,`store_id`,`code`,`percent`,`order_status`),
-  KEY `IDX_TAX_ORDER_AGGREGATED_CREATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_TAX_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  UNIQUE KEY `TAX_ORDER_AGGRED_CREATED_PERIOD_STORE_ID_CODE_PERCENT_ORDER_STS` (`period`,`store_id`,`code`,`percent`,`order_status`),
+  KEY `TAX_ORDER_AGGREGATED_CREATED_STORE_ID` (`store_id`),
+  CONSTRAINT `TAX_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tax Order Aggregation';
 
 DROP TABLE IF EXISTS `#__tax_order_aggregated_updated`;
@@ -92,9 +92,9 @@ CREATE TABLE `#__tax_order_aggregated_updated` (
   `orders_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Orders Count',
   `tax_base_amount_sum` float DEFAULT NULL COMMENT 'Tax Base Amount Sum',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `DB0AF14011199AA6CD31D5078B90AA8D` (`period`,`store_id`,`code`,`percent`,`order_status`),
-  KEY `IDX_TAX_ORDER_AGGREGATED_UPDATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_TAX_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  UNIQUE KEY `TAX_ORDER_AGGRED_UPDATED_PERIOD_STORE_ID_CODE_PERCENT_ORDER_STS` (`period`,`store_id`,`code`,`percent`,`order_status`),
+  KEY `TAX_ORDER_AGGREGATED_UPDATED_STORE_ID` (`store_id`),
+  CONSTRAINT `TAX_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tax Order Aggregated Updated';
 
 DROP TABLE IF EXISTS `#__catalogrule`;
@@ -115,23 +115,17 @@ CREATE TABLE `#__catalogrule` (
   `sub_simple_action` varchar(32) DEFAULT NULL COMMENT 'Simple Action For Subitems',
   `sub_discount_amount` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Discount Amount For Subitems',
   PRIMARY KEY (`rule_id`),
-  KEY `IDX_CATALOGRULE_IS_ACTIVE_SORT_ORDER_TO_DATE_FROM_DATE` (`is_active`,`sort_order`,`to_date`,`from_date`)
+  KEY `CATALOGRULE_IS_ACTIVE_SORT_ORDER_TO_DATE_FROM_DATE` (`is_active`,`sort_order`,`to_date`,`from_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule';
-
-DROP TABLE IF EXISTS `#__catalogrule_affected_product`;
-CREATE TABLE `#__catalogrule_affected_product` (
-  `product_id` int(10) unsigned NOT NULL COMMENT 'Product Id',
-  PRIMARY KEY (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule Affected Product';
 
 DROP TABLE IF EXISTS `#__catalogrule_customer_group`;
 CREATE TABLE `#__catalogrule_customer_group` (
   `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
   `customer_group_id` smallint(5) unsigned NOT NULL COMMENT 'Customer Group Id',
   PRIMARY KEY (`rule_id`,`customer_group_id`),
-  KEY `IDX_CATALOGRULE_CUSTOMER_GROUP_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  CONSTRAINT `FK_CATALOGRULE_CUSTOMER_GROUP_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_CATRULE_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
+  KEY `CATALOGRULE_CUSTOMER_GROUP_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  CONSTRAINT `CATALOGRULE_CUSTOMER_GROUP_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `CATRULE_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catalog Rules To Customer Groups Relations';
 
 DROP TABLE IF EXISTS `#__catalogrule_group_website`;
@@ -140,11 +134,11 @@ CREATE TABLE `#__catalogrule_group_website` (
   `customer_group_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Customer Group Id',
   `website_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Website Id',
   PRIMARY KEY (`rule_id`,`customer_group_id`,`website_id`),
-  KEY `IDX_CATALOGRULE_GROUP_WEBSITE_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  KEY `IDX_CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID` (`website_id`),
-  CONSTRAINT `FK_CATRULE_GROUP_WS_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_CATALOGRULE_GROUP_WEBSITE_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  KEY `CATALOGRULE_GROUP_WEBSITE_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  KEY `CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID` (`website_id`),
+  CONSTRAINT `CATRULE_GROUP_WS_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
+  CONSTRAINT `CATALOGRULE_GROUP_WEBSITE_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule Group Website';
 
 DROP TABLE IF EXISTS `#__catalogrule_product`;
@@ -163,12 +157,12 @@ CREATE TABLE `#__catalogrule_product` (
   `sub_simple_action` varchar(32) DEFAULT NULL COMMENT 'Simple Action For Subitems',
   `sub_discount_amount` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Discount Amount For Subitems',
   PRIMARY KEY (`rule_product_id`),
-  UNIQUE KEY `EAA51B56FF092A0DCB795D1CEF812B7B` (`rule_id`,`from_time`,`to_time`,`website_id`,`customer_group_id`,`product_id`,`sort_order`),
-  KEY `IDX_CATALOGRULE_PRODUCT_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  KEY `IDX_CATALOGRULE_PRODUCT_WEBSITE_ID` (`website_id`),
-  KEY `IDX_CATALOGRULE_PRODUCT_FROM_TIME` (`from_time`),
-  KEY `IDX_CATALOGRULE_PRODUCT_TO_TIME` (`to_time`),
-  KEY `IDX_CATALOGRULE_PRODUCT_PRODUCT_ID` (`product_id`)
+  UNIQUE KEY `IDX_EAA51B56FF092A0DCB795D1CEF812B7B` (`rule_id`,`from_time`,`to_time`,`website_id`,`customer_group_id`,`product_id`,`sort_order`),
+  KEY `CATALOGRULE_PRODUCT_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  KEY `CATALOGRULE_PRODUCT_WEBSITE_ID` (`website_id`),
+  KEY `CATALOGRULE_PRODUCT_FROM_TIME` (`from_time`),
+  KEY `CATALOGRULE_PRODUCT_TO_TIME` (`to_time`),
+  KEY `CATALOGRULE_PRODUCT_PRODUCT_ID` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule Product';
 
 DROP TABLE IF EXISTS `#__catalogrule_product_price`;
@@ -182,10 +176,10 @@ CREATE TABLE `#__catalogrule_product_price` (
   `latest_start_date` date DEFAULT NULL COMMENT 'Latest StartDate',
   `earliest_end_date` date DEFAULT NULL COMMENT 'Earliest EndDate',
   PRIMARY KEY (`rule_product_price_id`),
-  UNIQUE KEY `UNQ_CATRULE_PRD_PRICE_RULE_DATE_WS_ID_CSTR_GROUP_ID_PRD_ID` (`rule_date`,`website_id`,`customer_group_id`,`product_id`),
-  KEY `IDX_CATALOGRULE_PRODUCT_PRICE_CUSTOMER_GROUP_ID` (`customer_group_id`),
-  KEY `IDX_CATALOGRULE_PRODUCT_PRICE_WEBSITE_ID` (`website_id`),
-  KEY `IDX_CATALOGRULE_PRODUCT_PRICE_PRODUCT_ID` (`product_id`)
+  UNIQUE KEY `CATRULE_PRD_PRICE_RULE_DATE_WS_ID_CSTR_GROUP_ID_PRD_ID` (`rule_date`,`website_id`,`customer_group_id`,`product_id`),
+  KEY `CATALOGRULE_PRODUCT_PRICE_CUSTOMER_GROUP_ID` (`customer_group_id`),
+  KEY `CATALOGRULE_PRODUCT_PRICE_WEBSITE_ID` (`website_id`),
+  KEY `CATALOGRULE_PRODUCT_PRICE_PRODUCT_ID` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule Product Price';
 
 DROP TABLE IF EXISTS `#__catalogrule_website`;
@@ -193,9 +187,9 @@ CREATE TABLE `#__catalogrule_website` (
   `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id',
   `website_id` smallint(5) unsigned NOT NULL COMMENT 'Website Id',
   PRIMARY KEY (`rule_id`,`website_id`),
-  KEY `IDX_CATALOGRULE_WEBSITE_WEBSITE_ID` (`website_id`),
-  CONSTRAINT `FK_CATALOGRULE_WEBSITE_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_CATALOGRULE_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  KEY `CATALOGRULE_WEBSITE_WEBSITE_ID` (`website_id`),
+  CONSTRAINT `CATALOGRULE_WEBSITE_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
+  CONSTRAINT `CATALOGRULE_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catalog Rules To Websites Relations';
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -10,6 +10,25 @@
  * @property string $created_at
  * @property string $updated_at
  * @property integer $is_active
+ * @property string $city
+ * @property string $company
+ * @property string $country_id
+ * @property string $fax
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $middlename
+ * @property string $postcode
+ * @property string $prefix
+ * @property string $region
+ * @property string $region_id
+ * @property string $street
+ * @property string $suffix
+ * @property string $telephone
+ * @property string $vat_id
+ * @property string $vat_is_valid
+ * @property string $vat_request_date
+ * @property string $vat_request_id
+ * @property string $vat_request_success
  */
 class Mage2CustomerAddressEntityPeer extends Mage2ActiveRecord
 {
@@ -29,10 +48,12 @@ class Mage2CustomerAddressEntityPeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('created_at, updated_at', 'required'),
+			array('created_at, updated_at, city, country_id, firstname, lastname, street, telephone', 'required'),
 			array('is_active', 'numerical', 'integerOnly'=>true),
 			array('increment_id', 'length', 'max'=>50),
-			array('parent_id', 'length', 'max'=>10),
+			array('parent_id, region_id, vat_is_valid, vat_request_success', 'length', 'max'=>10),
+			array('city, company, country_id, fax, firstname, lastname, middlename, postcode, region, telephone, vat_id, vat_request_date, vat_request_id', 'length', 'max'=>255),
+			array('prefix, suffix', 'length', 'max'=>40),
 		);
 	}
 

@@ -11,8 +11,8 @@ CREATE TABLE `#__review_entity_summary` (
   `rating_summary` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Summarized rating',
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store id',
   PRIMARY KEY (`primary_id`),
-  KEY `IDX_REVIEW_ENTITY_SUMMARY_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_REVIEW_ENTITY_SUMMARY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `REVIEW_ENTITY_SUMMARY_STORE_ID` (`store_id`),
+  CONSTRAINT `REVIEW_ENTITY_SUMMARY_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Review aggregates';
 
 DROP TABLE IF EXISTS `#__review`;
@@ -40,12 +40,12 @@ CREATE TABLE `#__review_detail` (
   `nickname` varchar(128) NOT NULL COMMENT 'User nickname',
   `customer_id` int(10) unsigned DEFAULT NULL COMMENT 'Customer Id',
   PRIMARY KEY (`detail_id`),
-  KEY `IDX_REVIEW_DETAIL_REVIEW_ID` (`review_id`),
-  KEY `IDX_REVIEW_DETAIL_STORE_ID` (`store_id`),
-  KEY `IDX_REVIEW_DETAIL_CUSTOMER_ID` (`customer_id`),
-  CONSTRAINT `FK_REVIEW_DETAIL_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_REVIEW_DETAIL_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_REVIEW_DETAIL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
+  KEY `REVIEW_DETAIL_REVIEW_ID` (`review_id`),
+  KEY `REVIEW_DETAIL_STORE_ID` (`store_id`),
+  KEY `REVIEW_DETAIL_CUSTOMER_ID` (`customer_id`),
+  CONSTRAINT `REVIEW_DETAIL_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID` FOREIGN KEY (`customer_id`) REFERENCES `#__customer_entity` (`entity_id`) ON DELETE SET NULL,
+  CONSTRAINT `REVIEW_DETAIL_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE,
+  CONSTRAINT `REVIEW_DETAIL_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Review detail information';
 
 DROP TABLE IF EXISTS `#__review_store`;
@@ -53,9 +53,9 @@ CREATE TABLE `#__review_store` (
   `review_id` bigint(20) unsigned NOT NULL COMMENT 'Review Id',
   `store_id` smallint(5) unsigned NOT NULL COMMENT 'Store Id',
   PRIMARY KEY (`review_id`,`store_id`),
-  KEY `IDX_REVIEW_STORE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_REVIEW_STORE_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_REVIEW_STORE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `REVIEW_STORE_STORE_ID` (`store_id`),
+  CONSTRAINT `REVIEW_STORE_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE,
+  CONSTRAINT `REVIEW_STORE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Review Store';
 
 DROP TABLE IF EXISTS `#__rating_option_vote`;
@@ -71,10 +71,10 @@ CREATE TABLE `#__rating_option_vote` (
   `percent` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Percent amount',
   `value` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Vote option value',
   PRIMARY KEY (`vote_id`),
-  KEY `IDX_RATING_OPTION_VOTE_OPTION_ID` (`option_id`),
-  KEY `FK_RATING_OPTION_VOTE_REVIEW_ID_REVIEW_REVIEW_ID` (`review_id`),
-  CONSTRAINT `FK_RATING_OPTION_VOTE_OPTION_ID_RATING_OPTION_OPTION_ID` FOREIGN KEY (`option_id`) REFERENCES `#__rating_option` (`option_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_RATING_OPTION_VOTE_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE
+  KEY `RATING_OPTION_VOTE_OPTION_ID` (`option_id`),
+  KEY `RATING_OPTION_VOTE_REVIEW_ID_REVIEW_REVIEW_ID` (`review_id`),
+  CONSTRAINT `RATING_OPTION_VOTE_OPTION_ID_RATING_OPTION_OPTION_ID` FOREIGN KEY (`option_id`) REFERENCES `#__rating_option` (`option_id`) ON DELETE CASCADE,
+  CONSTRAINT `RATING_OPTION_VOTE_REVIEW_ID_REVIEW_REVIEW_ID` FOREIGN KEY (`review_id`) REFERENCES `#__review` (`review_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Rating option values';
 
 DROP TABLE IF EXISTS `#__rating_option_vote_aggregated`;
@@ -88,10 +88,10 @@ CREATE TABLE `#__rating_option_vote_aggregated` (
   `percent_approved` smallint(6) DEFAULT '0' COMMENT 'Vote percent approved by admin',
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store Id',
   PRIMARY KEY (`primary_id`),
-  KEY `IDX_RATING_OPTION_VOTE_AGGREGATED_RATING_ID` (`rating_id`),
-  KEY `IDX_RATING_OPTION_VOTE_AGGREGATED_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_RATING_OPTION_VOTE_AGGREGATED_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_RATING_OPTION_VOTE_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `RATING_OPTION_VOTE_AGGREGATED_RATING_ID` (`rating_id`),
+  KEY `RATING_OPTION_VOTE_AGGREGATED_STORE_ID` (`store_id`),
+  CONSTRAINT `RATING_OPTION_VOTE_AGGREGATED_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE,
+  CONSTRAINT `RATING_OPTION_VOTE_AGGREGATED_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Rating vote aggregated';
 
 DROP TABLE IF EXISTS `#__rating_store`;
@@ -99,9 +99,9 @@ CREATE TABLE `#__rating_store` (
   `rating_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Rating id',
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store id',
   PRIMARY KEY (`rating_id`,`store_id`),
-  KEY `IDX_RATING_STORE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_RATING_STORE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_RATING_STORE_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE
+  KEY `RATING_STORE_STORE_ID` (`store_id`),
+  CONSTRAINT `RATING_STORE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
+  CONSTRAINT `RATING_STORE_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Rating Store';
 
 DROP TABLE IF EXISTS `#__rating_title`;
@@ -110,9 +110,9 @@ CREATE TABLE `#__rating_title` (
   `store_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Store Id',
   `value` varchar(255) NOT NULL COMMENT 'Rating Label',
   PRIMARY KEY (`rating_id`,`store_id`),
-  KEY `IDX_RATING_TITLE_STORE_ID` (`store_id`),
-  CONSTRAINT `FK_RATING_TITLE_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_RATING_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
+  KEY `RATING_TITLE_STORE_ID` (`store_id`),
+  CONSTRAINT `RATING_TITLE_RATING_ID_RATING_RATING_ID` FOREIGN KEY (`rating_id`) REFERENCES `#__rating` (`rating_id`) ON DELETE CASCADE,
+  CONSTRAINT `RATING_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Rating Title';
 
 SET FOREIGN_KEY_CHECKS=1;

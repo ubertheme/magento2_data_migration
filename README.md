@@ -1,7 +1,7 @@
 <h3>Supported versions</h3>
-We support the following versions for migration:
+We are going to support the following versions for migration:
 - Magento Community Edition (CE) versions: 1.6.x, 1.7.x, 1.8.x, CE 1.9.x
-- Magento 2 version 0.74.0 beta x
+- Magento 2 version 0.74.0 beta x and Merchant Beta versions.
 
 <h3>To use this migration tool, follow the steps below:</h3>
 
@@ -26,7 +26,7 @@ We support the following versions for migration:
 <h4># Step 3: Run this tool in your browser to migrate your data</h4>
 - Open your browser and type in the url to run this tool.
 For example: go to http://localhost/migrate-data-tool/ and press Enter key.
-- Follow step by step to migrate needed Data from Magento 1 website to Magento2 website.
+- Follow step by step to migrate needed Data from Magento 1 website to Magento 2 website.
 
 Some step screenshots will go here...
 
@@ -37,8 +37,8 @@ Some step screenshots will go here...
     - In Window: Open the command line window and go to the folder: <strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell </strong>
     and type in the command line: php indexer.php reindexall
     then press enter key to re-index all data in your Magento 2 website.
-    - Note: If you are using <strong> Magento 2 version 0.74.0 - beta 9 or later</strong>: To reindex all data, run following command line:
-    <strong> php -f PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\bin\magento indexer:reindex </strong
+    - <strong>Important Note:</strong> If you are using <strong> Magento 2 version 0.74.0 - beta 9 or later</strong>: To reindex all data, run following command line:
+    <strong> php -f PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\bin\magento indexer:reindex </strong>
 <div class="center">
 <p align="center"><img src="http://joomlart.s3.amazonaws.com/images/userguide/jm_tips/migrationData/img-2.jpg?v=20150401144700" alt="Magento 2 Migration Data Tool" /></p>
 </div>
@@ -46,6 +46,7 @@ Some step screenshots will go here...
 - Copy media files to complete migration:<br/>
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
-- Clean the Magento 2 cache.
+- Remove all folders and files in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\var</strong> but take the .htaccess file.
+- Remove all folders and files in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\static\</strong> but take the .htaccess file.
 
 <h4># Step 5: Now you can test the data which have been migrated into your Magento 2 website from the browser.</h4>

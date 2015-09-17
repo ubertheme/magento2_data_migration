@@ -129,14 +129,14 @@
  * @property string $updated_at
  * @property integer $total_item_count
  * @property integer $customer_gender
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
- * @property string $shipping_hidden_tax_amount
- * @property string $base_shipping_hidden_tax_amnt
- * @property string $hidden_tax_invoiced
- * @property string $base_hidden_tax_invoiced
- * @property string $hidden_tax_refunded
- * @property string $base_hidden_tax_refunded
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
+ * @property string $shipping_discount_tax_compensation_amount
+ * @property string $base_shipping_discount_tax_compensation_amnt
+ * @property string $discount_tax_compensation_invoiced
+ * @property string $base_discount_tax_compensation_invoiced
+ * @property string $discount_tax_compensation_refunded
+ * @property string $base_discount_tax_compensation_refunded
  * @property string $shipping_incl_tax
  * @property string $base_shipping_incl_tax
  * @property string $coupon_rule_name
@@ -162,12 +162,12 @@ class Mage2SalesOrderPeer extends Mage2ActiveRecord
 		return array(
 			array('created_at', 'required'),
 			array('is_virtual, store_id, can_ship_partially, can_ship_partially_item, customer_is_guest, customer_note_notify, billing_address_id, customer_group_id, edit_increment, email_sent, send_email, forced_shipment_with_invoice, payment_auth_expiration, quote_address_id, quote_id, shipping_address_id, total_item_count, customer_gender, gift_message_id', 'numerical', 'integerOnly'=>true),
-			array('state, status, relation_child_id, relation_child_real_id, relation_parent_id, relation_parent_real_id', 'length', 'max'=>32),
-			array('coupon_code, protect_code, shipping_description, applied_rule_ids, customer_email, customer_firstname, customer_lastname, customer_middlename, customer_prefix, customer_suffix, customer_taxvat, discount_description, ext_customer_id, ext_order_id, hold_before_state, hold_before_status, order_currency_code, remote_ip, shipping_method, store_name, x_forwarded_for, coupon_rule_name', 'length', 'max'=>255),
+			array('state, status, increment_id, customer_prefix, customer_suffix, customer_taxvat, ext_customer_id, ext_order_id, hold_before_state, hold_before_status, original_increment_id, relation_child_id, relation_child_real_id, relation_parent_id, relation_parent_real_id, remote_ip, shipping_method, store_name, x_forwarded_for', 'length', 'max'=>32),
+			array('coupon_code, protect_code, shipping_description, discount_description, coupon_rule_name', 'length', 'max'=>255),
 			array('customer_id', 'length', 'max'=>10),
-			array('base_discount_amount, base_discount_canceled, base_discount_invoiced, base_discount_refunded, base_grand_total, base_shipping_amount, base_shipping_canceled, base_shipping_invoiced, base_shipping_refunded, base_shipping_tax_amount, base_shipping_tax_refunded, base_subtotal, base_subtotal_canceled, base_subtotal_invoiced, base_subtotal_refunded, base_tax_amount, base_tax_canceled, base_tax_invoiced, base_tax_refunded, base_to_global_rate, base_to_order_rate, base_total_canceled, base_total_invoiced, base_total_invoiced_cost, base_total_offline_refunded, base_total_online_refunded, base_total_paid, base_total_qty_ordered, base_total_refunded, discount_amount, discount_canceled, discount_invoiced, discount_refunded, grand_total, shipping_amount, shipping_canceled, shipping_invoiced, shipping_refunded, shipping_tax_amount, shipping_tax_refunded, store_to_base_rate, store_to_order_rate, subtotal, subtotal_canceled, subtotal_invoiced, subtotal_refunded, tax_amount, tax_canceled, tax_invoiced, tax_refunded, total_canceled, total_invoiced, total_offline_refunded, total_online_refunded, total_paid, total_qty_ordered, total_refunded, adjustment_negative, adjustment_positive, base_adjustment_negative, base_adjustment_positive, base_shipping_discount_amount, base_subtotal_incl_tax, base_total_due, payment_authorization_amount, shipping_discount_amount, subtotal_incl_tax, total_due, weight, hidden_tax_amount, base_hidden_tax_amount, shipping_hidden_tax_amount, base_shipping_hidden_tax_amnt, hidden_tax_invoiced, base_hidden_tax_invoiced, hidden_tax_refunded, base_hidden_tax_refunded, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
-			array('increment_id, original_increment_id', 'length', 'max'=>50),
-			array('base_currency_code, global_currency_code, store_currency_code', 'length', 'max'=>3),
+			array('base_discount_amount, base_discount_canceled, base_discount_invoiced, base_discount_refunded, base_grand_total, base_shipping_amount, base_shipping_canceled, base_shipping_invoiced, base_shipping_refunded, base_shipping_tax_amount, base_shipping_tax_refunded, base_subtotal, base_subtotal_canceled, base_subtotal_invoiced, base_subtotal_refunded, base_tax_amount, base_tax_canceled, base_tax_invoiced, base_tax_refunded, base_to_global_rate, base_to_order_rate, base_total_canceled, base_total_invoiced, base_total_invoiced_cost, base_total_offline_refunded, base_total_online_refunded, base_total_paid, base_total_qty_ordered, base_total_refunded, discount_amount, discount_canceled, discount_invoiced, discount_refunded, grand_total, shipping_amount, shipping_canceled, shipping_invoiced, shipping_refunded, shipping_tax_amount, shipping_tax_refunded, store_to_base_rate, store_to_order_rate, subtotal, subtotal_canceled, subtotal_invoiced, subtotal_refunded, tax_amount, tax_canceled, tax_invoiced, tax_refunded, total_canceled, total_invoiced, total_offline_refunded, total_online_refunded, total_paid, total_qty_ordered, total_refunded, adjustment_negative, adjustment_positive, base_adjustment_negative, base_adjustment_positive, base_shipping_discount_amount, base_subtotal_incl_tax, base_total_due, payment_authorization_amount, shipping_discount_amount, subtotal_incl_tax, total_due, weight, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, discount_tax_compensation_invoiced, base_discount_tax_compensation_invoiced, discount_tax_compensation_refunded, base_discount_tax_compensation_refunded, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
+			array('applied_rule_ids, customer_email, customer_firstname, customer_lastname, customer_middlename', 'length', 'max'=>128),
+			array('base_currency_code, global_currency_code, order_currency_code, store_currency_code', 'length', 'max'=>3),
 			array('customer_dob, customer_note, updated_at', 'safe'),
 		);
 	}

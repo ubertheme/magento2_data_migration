@@ -44,8 +44,8 @@
  * @property string $base_price_incl_tax
  * @property string $row_total_incl_tax
  * @property string $base_row_total_incl_tax
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
  * @property integer $free_shipping
  * @property integer $gift_message_id
  * @property string $weee_tax_applied
@@ -76,11 +76,12 @@ class Mage2SalesQuoteItemPeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+			array('created_at', 'required'),
 			array('store_id, is_virtual, is_qty_decimal, no_discount, free_shipping, gift_message_id', 'numerical', 'integerOnly'=>true),
 			array('quote_id, product_id, parent_item_id', 'length', 'max'=>10),
 			array('sku, name, product_type, redirect_url', 'length', 'max'=>255),
-			array('weight, qty, price, base_price, custom_price, discount_percent, discount_amount, base_discount_amount, tax_percent, tax_amount, base_tax_amount, row_total, base_row_total, row_total_with_discount, row_weight, base_tax_before_discount, tax_before_discount, original_custom_price, base_cost, price_incl_tax, base_price_incl_tax, row_total_incl_tax, base_row_total_incl_tax, hidden_tax_amount, base_hidden_tax_amount, weee_tax_applied_amount, weee_tax_applied_row_amount, weee_tax_disposition, weee_tax_row_disposition, base_weee_tax_applied_amount, base_weee_tax_applied_row_amnt, base_weee_tax_disposition, base_weee_tax_row_disposition', 'length', 'max'=>12),
-			array('created_at, updated_at, description, applied_rule_ids, additional_data, weee_tax_applied', 'safe'),
+			array('weight, qty, price, base_price, custom_price, discount_percent, discount_amount, base_discount_amount, tax_percent, tax_amount, base_tax_amount, row_total, base_row_total, row_total_with_discount, row_weight, base_tax_before_discount, tax_before_discount, original_custom_price, base_cost, price_incl_tax, base_price_incl_tax, row_total_incl_tax, base_row_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount, weee_tax_applied_amount, weee_tax_applied_row_amount, weee_tax_disposition, weee_tax_row_disposition, base_weee_tax_applied_amount, base_weee_tax_applied_row_amnt, base_weee_tax_disposition, base_weee_tax_row_disposition', 'length', 'max'=>12),
+			array('updated_at, description, applied_rule_ids, additional_data, weee_tax_applied', 'safe'),
 		);
 	}
 

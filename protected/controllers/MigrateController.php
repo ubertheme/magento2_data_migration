@@ -3418,19 +3418,6 @@ class MigrateController extends Controller
                                 }
                             }
                         }
-                        //catalogrule_affected_product
-                        $models = Mage1CatalogruleAffectedProduct::model()->findAll();
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2CatalogruleAffectedProduct();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
-                                    }
-                                }
-                                $model2->save();
-                            }
-                        }
 
                         //catalogrule_group_website
                         $conditions = array();

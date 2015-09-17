@@ -47,11 +47,11 @@
  * @property string $created_at
  * @property string $updated_at
  * @property string $customer_note
- * @property string $customer_note_notify
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
- * @property string $shipping_hidden_tax_amount
- * @property string $base_shipping_hidden_tax_amnt
+ * @property integer $customer_note_notify
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
+ * @property string $shipping_discount_tax_compensation_amount
+ * @property string $base_shipping_discount_tax_compensation_amnt
  * @property string $shipping_incl_tax
  * @property string $base_shipping_incl_tax
  * @property string $discount_description
@@ -75,13 +75,13 @@ class Mage2SalesCreditmemoPeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('order_id', 'required'),
-			array('store_id, email_sent, send_email, creditmemo_status, state, shipping_address_id, billing_address_id, invoice_id', 'numerical', 'integerOnly'=>true),
-			array('adjustment_positive, base_shipping_tax_amount, store_to_order_rate, base_discount_amount, base_to_order_rate, grand_total, base_adjustment_negative, base_subtotal_incl_tax, shipping_amount, subtotal_incl_tax, adjustment_negative, base_shipping_amount, store_to_base_rate, base_to_global_rate, base_adjustment, base_subtotal, discount_amount, subtotal, adjustment, base_grand_total, base_adjustment_positive, base_tax_amount, shipping_tax_amount, tax_amount, hidden_tax_amount, base_hidden_tax_amount, shipping_hidden_tax_amount, base_shipping_hidden_tax_amnt, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
+			array('store_id, email_sent, send_email, creditmemo_status, state, shipping_address_id, billing_address_id, invoice_id, customer_note_notify', 'numerical', 'integerOnly'=>true),
+			array('adjustment_positive, base_shipping_tax_amount, store_to_order_rate, base_discount_amount, base_to_order_rate, grand_total, base_adjustment_negative, base_subtotal_incl_tax, shipping_amount, subtotal_incl_tax, adjustment_negative, base_shipping_amount, store_to_base_rate, base_to_global_rate, base_adjustment, base_subtotal, discount_amount, subtotal, adjustment, base_grand_total, base_adjustment_positive, base_tax_amount, shipping_tax_amount, tax_amount, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
 			array('order_id', 'length', 'max'=>10),
 			array('store_currency_code, order_currency_code, base_currency_code, global_currency_code', 'length', 'max'=>3),
 			array('transaction_id, discount_description', 'length', 'max'=>255),
 			array('increment_id', 'length', 'max'=>50),
-			array('created_at, updated_at', 'safe'),
+			array('created_at, updated_at, customer_note', 'safe'),
 		);
 	}
 

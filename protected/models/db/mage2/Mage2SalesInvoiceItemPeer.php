@@ -26,8 +26,8 @@
  * @property string $description
  * @property string $sku
  * @property string $name
- * @property string $hidden_tax_amount
- * @property string $base_hidden_tax_amount
+ * @property string $discount_tax_compensation_amount
+ * @property string $base_discount_tax_compensation_amount
  * @property string $tax_ratio
  * @property string $weee_tax_applied
  * @property string $weee_tax_applied_amount
@@ -60,7 +60,7 @@ class Mage2SalesInvoiceItemPeer extends Mage2ActiveRecord
 			array('parent_id', 'required'),
 			array('product_id, order_item_id', 'numerical', 'integerOnly'=>true),
 			array('parent_id', 'length', 'max'=>10),
-			array('base_price, tax_amount, base_row_total, discount_amount, row_total, base_discount_amount, price_incl_tax, base_tax_amount, base_price_incl_tax, qty, base_cost, price, base_row_total_incl_tax, row_total_incl_tax, hidden_tax_amount, base_hidden_tax_amount, weee_tax_applied_amount, weee_tax_applied_row_amount, weee_tax_disposition, weee_tax_row_disposition, base_weee_tax_applied_amount, base_weee_tax_applied_row_amnt, base_weee_tax_disposition, base_weee_tax_row_disposition', 'length', 'max'=>12),
+			array('base_price, tax_amount, base_row_total, discount_amount, row_total, base_discount_amount, price_incl_tax, base_tax_amount, base_price_incl_tax, qty, base_cost, price, base_row_total_incl_tax, row_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount, weee_tax_applied_amount, weee_tax_applied_row_amount, weee_tax_disposition, weee_tax_row_disposition, base_weee_tax_applied_amount, base_weee_tax_applied_row_amnt, base_weee_tax_disposition, base_weee_tax_row_disposition', 'length', 'max'=>12),
 			array('sku, name', 'length', 'max'=>255),
 			array('additional_data, description, tax_ratio, weee_tax_applied', 'safe'),
 		);
