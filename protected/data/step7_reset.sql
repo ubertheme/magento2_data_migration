@@ -15,8 +15,11 @@ INSERT INTO #__sales_order_status VALUES ('complete', 'Complete');
 INSERT INTO #__sales_order_status VALUES ('fraud', 'Suspected Fraud');
 INSERT INTO #__sales_order_status VALUES ('holded', 'On Hold');
 INSERT INTO #__sales_order_status VALUES ('payment_review', 'Payment Review');
+INSERT INTO `#__sales_order_status` VALUES ('paypal_canceled_reversal', 'PayPal Canceled Reversal');
+INSERT INTO `#__sales_order_status` VALUES ('paypal_reversed', 'PayPal Reversed');
 INSERT INTO #__sales_order_status VALUES ('pending', 'Pending');
 INSERT INTO #__sales_order_status VALUES ('pending_payment', 'Pending Payment');
+INSERT INTO `#__sales_order_status` VALUES ('pending_paypal', 'Pending PayPal');
 INSERT INTO #__sales_order_status VALUES ('processing', 'Processing');
 
 DROP TABLE IF EXISTS `#__sales_order_status_label`;
@@ -188,6 +191,7 @@ CREATE TABLE `#__sales_order` (
   `shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Shipping Incl Tax',
   `base_shipping_incl_tax` decimal(12,4) DEFAULT NULL COMMENT 'Base Shipping Incl Tax',
   `coupon_rule_name` varchar(255) DEFAULT NULL COMMENT 'Coupon Sales Rule Name',
+  `paypal_ipn_customer_notified` int(11) DEFAULT '0' COMMENT 'Paypal Ipn Customer Notified',
   `gift_message_id` int(11) DEFAULT NULL COMMENT 'Gift Message Id',
   PRIMARY KEY (`entity_id`),
   UNIQUE KEY `SALES_ORDER_INCREMENT_ID_STORE_ID` (`increment_id`,`store_id`),
@@ -751,6 +755,9 @@ CREATE TABLE `#__quote_payment` (
   `additional_data` text COMMENT 'Additional Data',
   `cc_ss_issue` varchar(255) DEFAULT NULL COMMENT 'Cc Ss Issue',
   `additional_information` text COMMENT 'Additional Information',
+  `paypal_payer_id` varchar(255) DEFAULT NULL COMMENT 'Paypal Payer Id',
+  `paypal_payer_status` varchar(255) DEFAULT NULL COMMENT 'Paypal Payer Status',
+  `paypal_correlation_id` varchar(255) DEFAULT NULL COMMENT 'Paypal Correlation Id',
   PRIMARY KEY (`payment_id`),
   KEY `QUOTE_PAYMENT_QUOTE_ID` (`quote_id`),
   CONSTRAINT `QUOTE_PAYMENT_QUOTE_ID_QUOTE_ENTITY_ID` FOREIGN KEY (`quote_id`) REFERENCES `#__quote` (`entity_id`) ON DELETE CASCADE
