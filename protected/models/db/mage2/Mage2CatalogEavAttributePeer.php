@@ -23,6 +23,9 @@
  * @property integer $is_wysiwyg_enabled
  * @property integer $is_used_for_promo_rules
  * @property integer $is_required_in_admin_store
+ * @property integer $is_used_in_grid
+ * @property integer $is_visible_in_grid
+ * @property integer $is_filterable_in_grid
  * @property integer $search_weight
  */
 class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
@@ -44,7 +47,7 @@ class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('attribute_id', 'required'),
-			array('attribute_id, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store, search_weight', 'numerical', 'integerOnly'=>true),
+			array('attribute_id, is_global, is_visible, is_searchable, is_filterable, is_comparable, is_visible_on_front, is_html_allowed_on_front, is_used_for_price_rules, is_filterable_in_search, used_in_product_listing, used_for_sort_by, is_visible_in_advanced_search, position, is_wysiwyg_enabled, is_used_for_promo_rules, is_required_in_admin_store, is_used_in_grid, is_visible_in_grid, is_filterable_in_grid, search_weight', 'numerical', 'integerOnly'=>true),
 			array('frontend_input_renderer, apply_to', 'length', 'max'=>255),
 		);
 	}

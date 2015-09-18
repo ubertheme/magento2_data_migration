@@ -31,7 +31,7 @@ For example: go to http://localhost/migrate-data-tool/ and press Enter key.
 Some step screenshots will go here...
 
 <h4># Step 4: Complete the tasks below to finish the data migration process.</h4>
-- Re-save all the Attribute Sets (Stores/Attributes/Product Template) migrated in the back-end of your Magento 2 website. (Open the attribute set, edit it if needed and click the save button)
+- Re-save all the Product Templates (Stores/Attributes/Product Template) migrated in the back-end of your Magento 2 website. (Open the Product Template, edit it if needed and click the save button)
 - Reindex all data:
     - In Linux: Run command line: php -f PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell\indexer.php --reindexall
     - In Window: Open the command line window and go to the folder: <strong> PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\dev\shell </strong>
@@ -46,6 +46,7 @@ Some step screenshots will go here...
 - Copy media files to complete migration:<br/>
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\catalog and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
   - Copy the folder at PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento1_folder\media\downloadable and paste replace to PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\media\
+  - Make recursive write able to catalog and downloadable recursive which you have just copied.
 - Remove all folders and files in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\var</strong> but take the .htaccess file.
 - Remove all folders and files in <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\your_magento2_folder\pub\static\</strong> but take the .htaccess file.
 

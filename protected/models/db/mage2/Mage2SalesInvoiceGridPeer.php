@@ -5,21 +5,30 @@
  *
  * The followings are the available columns in table 'sales_invoice_grid':
  * @property string $entity_id
- * @property integer $store_id
- * @property string $base_grand_total
- * @property string $grand_total
- * @property string $order_id
+ * @property string $increment_id
  * @property integer $state
+ * @property integer $store_id
+ * @property string $store_name
+ * @property string $order_id
+ * @property string $order_increment_id
+ * @property string $order_created_at
+ * @property string $customer_name
+ * @property string $customer_email
+ * @property integer $customer_group_id
+ * @property string $payment_method
  * @property string $store_currency_code
  * @property string $order_currency_code
  * @property string $base_currency_code
  * @property string $global_currency_code
- * @property string $increment_id
- * @property string $order_increment_id
+ * @property string $billing_name
+ * @property string $billing_address
+ * @property string $shipping_address
+ * @property string $shipping_information
+ * @property string $subtotal
+ * @property string $shipping_and_handling
+ * @property string $grand_total
  * @property string $created_at
  * @property string $updated_at
- * @property string $order_created_at
- * @property string $billing_name
  */
 class Mage2SalesInvoiceGridPeer extends Mage2ActiveRecord
 {
@@ -40,13 +49,14 @@ class Mage2SalesInvoiceGridPeer extends Mage2ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('entity_id, order_id', 'required'),
-			array('store_id, state', 'numerical', 'integerOnly'=>true),
+			array('state, store_id, customer_group_id', 'numerical', 'integerOnly'=>true),
 			array('entity_id, order_id', 'length', 'max'=>10),
-			array('base_grand_total, grand_total', 'length', 'max'=>12),
-			array('store_currency_code, order_currency_code, base_currency_code, global_currency_code', 'length', 'max'=>3),
 			array('increment_id, order_increment_id', 'length', 'max'=>50),
-			array('billing_name', 'length', 'max'=>255),
-			array('created_at, updated_at, order_created_at', 'safe'),
+			array('store_name, customer_name, customer_email, billing_name, billing_address, shipping_address, shipping_information', 'length', 'max'=>255),
+			array('payment_method', 'length', 'max'=>128),
+			array('store_currency_code, order_currency_code, base_currency_code, global_currency_code', 'length', 'max'=>3),
+			array('subtotal, shipping_and_handling, grand_total', 'length', 'max'=>12),
+			array('order_created_at, created_at, updated_at', 'safe'),
 		);
 	}
 

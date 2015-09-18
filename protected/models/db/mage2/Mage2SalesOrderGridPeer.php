@@ -20,6 +20,16 @@
  * @property string $billing_name
  * @property string $created_at
  * @property string $updated_at
+ * @property string $billing_address
+ * @property string $shipping_address
+ * @property string $shipping_information
+ * @property string $customer_email
+ * @property string $customer_group
+ * @property string $subtotal
+ * @property string $shipping_and_handling
+ * @property string $customer_name
+ * @property string $payment_method
+ * @property string $total_refunded
  */
 class Mage2SalesOrderGridPeer extends Mage2ActiveRecord
 {
@@ -43,8 +53,8 @@ class Mage2SalesOrderGridPeer extends Mage2ActiveRecord
 			array('store_id', 'numerical', 'integerOnly'=>true),
 			array('entity_id, customer_id', 'length', 'max'=>10),
 			array('status', 'length', 'max'=>32),
-			array('store_name, order_currency_code, shipping_name, billing_name', 'length', 'max'=>255),
-			array('base_grand_total, base_total_paid, grand_total, total_paid', 'length', 'max'=>12),
+			array('store_name, order_currency_code, shipping_name, billing_name, billing_address, shipping_address, shipping_information, customer_email, customer_group, customer_name, payment_method', 'length', 'max'=>255),
+			array('base_grand_total, base_total_paid, grand_total, total_paid, subtotal, shipping_and_handling, total_refunded', 'length', 'max'=>12),
 			array('increment_id', 'length', 'max'=>50),
 			array('base_currency_code', 'length', 'max'=>3),
 			array('created_at, updated_at', 'safe'),

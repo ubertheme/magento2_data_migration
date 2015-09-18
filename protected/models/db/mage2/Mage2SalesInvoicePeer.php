@@ -41,8 +41,6 @@
  * @property string $increment_id
  * @property string $created_at
  * @property string $updated_at
- * @property string $customer_note
- * @property integer $customer_note_notify
  * @property string $discount_tax_compensation_amount
  * @property string $base_discount_tax_compensation_amount
  * @property string $shipping_discount_tax_compensation_amount
@@ -51,6 +49,8 @@
  * @property string $base_shipping_incl_tax
  * @property string $base_total_refunded
  * @property string $discount_description
+ * @property string $customer_note
+ * @property integer $customer_note_notify
  */
 class Mage2SalesInvoicePeer extends Mage2ActiveRecord
 {
@@ -70,14 +70,14 @@ class Mage2SalesInvoicePeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('order_id', 'required'),
+			array('order_id, created_at, updated_at', 'required'),
 			array('store_id, billing_address_id, is_used_for_refund, email_sent, send_email, can_void_flag, state, shipping_address_id, customer_note_notify', 'numerical', 'integerOnly'=>true),
 			array('base_grand_total, shipping_tax_amount, tax_amount, base_tax_amount, store_to_order_rate, base_shipping_tax_amount, base_discount_amount, base_to_order_rate, grand_total, shipping_amount, subtotal_incl_tax, base_subtotal_incl_tax, store_to_base_rate, base_shipping_amount, total_qty, base_to_global_rate, subtotal, base_subtotal, discount_amount, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, shipping_incl_tax, base_shipping_incl_tax, base_total_refunded', 'length', 'max'=>12),
 			array('order_id', 'length', 'max'=>10),
 			array('store_currency_code, order_currency_code, base_currency_code, global_currency_code', 'length', 'max'=>3),
 			array('transaction_id, discount_description', 'length', 'max'=>255),
 			array('increment_id', 'length', 'max'=>50),
-			array('created_at, updated_at, customer_note', 'safe'),
+			array('customer_note', 'safe'),
 		);
 	}
 

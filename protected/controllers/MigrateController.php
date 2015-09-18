@@ -1530,25 +1530,26 @@ class MigrateController extends Controller
                                             }
                                         }
 
-                                        //catalog_product_super_attribute_pricing
-                                        $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
-                                        if ($migrated_website_ids) {
-                                            $str_website_ids = implode(',', $migrated_website_ids);
-                                            $condition .= " AND website_id IN ({$str_website_ids})";
-                                        }
-                                        $super_attribute_pricing_models = Mage1CatalogProductSuperAttributePricing::model()->findAll($condition);
-                                        if ($super_attribute_pricing_models) {
-                                            foreach ($super_attribute_pricing_models as $super_attribute_pricing) {
-                                                $super_attribute_pricing2 = new Mage2CatalogProductSuperAttributePricing();
-                                                $super_attribute_pricing2->value_id = $super_attribute_pricing->value_id;
-                                                $super_attribute_pricing2->product_super_attribute_id = $super_attribute_pricing->product_super_attribute_id;
-                                                $super_attribute_pricing2->value_index = $super_attribute_pricing->value_index;
-                                                $super_attribute_pricing2->is_percent = $super_attribute_pricing->is_percent;
-                                                $super_attribute_pricing2->pricing_value = $super_attribute_pricing->pricing_value;
-                                                $super_attribute_pricing2->website_id = $super_attribute_pricing->website_id;
-                                                $super_attribute_pricing2->save();
-                                            }
-                                        }
+                                        //catalog_product_super_attribute_pricing 
+                                        //This was not used from merchant beta 100
+//                                        $condition = "product_super_attribute_id = {$model2->product_super_attribute_id}";
+//                                        if ($migrated_website_ids) {
+//                                            $str_website_ids = implode(',', $migrated_website_ids);
+//                                            $condition .= " AND website_id IN ({$str_website_ids})";
+//                                        }
+//                                        $super_attribute_pricing_models = Mage1CatalogProductSuperAttributePricing::model()->findAll($condition);
+//                                        if ($super_attribute_pricing_models) {
+//                                            foreach ($super_attribute_pricing_models as $super_attribute_pricing) {
+//                                                $super_attribute_pricing2 = new Mage2CatalogProductSuperAttributePricing();
+//                                                $super_attribute_pricing2->value_id = $super_attribute_pricing->value_id;
+//                                                $super_attribute_pricing2->product_super_attribute_id = $super_attribute_pricing->product_super_attribute_id;
+//                                                $super_attribute_pricing2->value_index = $super_attribute_pricing->value_index;
+//                                                $super_attribute_pricing2->is_percent = $super_attribute_pricing->is_percent;
+//                                                $super_attribute_pricing2->pricing_value = $super_attribute_pricing->pricing_value;
+//                                                $super_attribute_pricing2->website_id = $super_attribute_pricing->website_id;
+//                                                $super_attribute_pricing2->save();
+//                                            }
+//                                        }
                                     }
                                 }
                             }

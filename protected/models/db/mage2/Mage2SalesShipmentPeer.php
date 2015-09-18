@@ -18,9 +18,10 @@
  * @property string $increment_id
  * @property string $created_at
  * @property string $updated_at
- * @property string $customer_note
- * @property string $customer_note_notify
+ * @property string $packages
  * @property string $shipping_label
+ * @property string $customer_note
+ * @property integer $customer_note_notify
  */
 class Mage2SalesShipmentPeer extends Mage2ActiveRecord
 {
@@ -40,12 +41,12 @@ class Mage2SalesShipmentPeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('order_id', 'required'),
-			array('store_id, email_sent, send_email, customer_id, shipping_address_id, billing_address_id, shipment_status', 'numerical', 'integerOnly'=>true),
+			array('order_id, created_at, updated_at', 'required'),
+			array('store_id, email_sent, send_email, customer_id, shipping_address_id, billing_address_id, shipment_status, customer_note_notify', 'numerical', 'integerOnly'=>true),
 			array('total_weight, total_qty', 'length', 'max'=>12),
 			array('order_id', 'length', 'max'=>10),
 			array('increment_id', 'length', 'max'=>50),
-			array('created_at, updated_at, packages, shipping_label', 'safe'),
+			array('packages, shipping_label, customer_note', 'safe'),
 		);
 	}
 

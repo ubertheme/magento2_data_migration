@@ -5,27 +5,29 @@
  *
  * The followings are the available columns in table 'sales_creditmemo_grid':
  * @property string $entity_id
- * @property integer $store_id
- * @property string $store_to_order_rate
- * @property string $base_to_order_rate
- * @property string $grand_total
- * @property string $store_to_base_rate
- * @property string $base_to_global_rate
- * @property string $base_grand_total
- * @property string $order_id
- * @property integer $creditmemo_status
- * @property integer $state
- * @property integer $invoice_id
- * @property string $store_currency_code
- * @property string $order_currency_code
- * @property string $base_currency_code
- * @property string $global_currency_code
  * @property string $increment_id
- * @property string $order_increment_id
  * @property string $created_at
  * @property string $updated_at
+ * @property string $order_id
+ * @property string $order_increment_id
  * @property string $order_created_at
  * @property string $billing_name
+ * @property integer $state
+ * @property string $base_grand_total
+ * @property string $order_status
+ * @property integer $store_id
+ * @property string $billing_address
+ * @property string $shipping_address
+ * @property string $customer_name
+ * @property string $customer_email
+ * @property integer $customer_group_id
+ * @property string $payment_method
+ * @property string $shipping_information
+ * @property string $subtotal
+ * @property string $shipping_and_handling
+ * @property string $adjustment_positive
+ * @property string $adjustment_negative
+ * @property string $order_base_grand_total
  */
 class Mage2SalesCreditmemoGridPeer extends Mage2ActiveRecord
 {
@@ -45,13 +47,14 @@ class Mage2SalesCreditmemoGridPeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('entity_id, order_id', 'required'),
-			array('store_id, creditmemo_status, state, invoice_id', 'numerical', 'integerOnly'=>true),
+			array('entity_id, order_id, customer_name', 'required'),
+			array('state, store_id, customer_group_id', 'numerical', 'integerOnly'=>true),
 			array('entity_id, order_id', 'length', 'max'=>10),
-			array('store_to_order_rate, base_to_order_rate, grand_total, store_to_base_rate, base_to_global_rate, base_grand_total', 'length', 'max'=>12),
-			array('store_currency_code, order_currency_code, base_currency_code, global_currency_code', 'length', 'max'=>3),
 			array('increment_id, order_increment_id', 'length', 'max'=>50),
-			array('billing_name', 'length', 'max'=>255),
+			array('billing_name, billing_address, shipping_address, shipping_information', 'length', 'max'=>255),
+			array('base_grand_total, subtotal, shipping_and_handling, adjustment_positive, adjustment_negative, order_base_grand_total', 'length', 'max'=>12),
+			array('order_status, payment_method', 'length', 'max'=>32),
+			array('customer_name, customer_email', 'length', 'max'=>128),
 			array('created_at, updated_at, order_created_at', 'safe'),
 		);
 	}
