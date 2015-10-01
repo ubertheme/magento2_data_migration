@@ -3,7 +3,7 @@ We are going to support the following versions for migration:
 - Magento Community Edition (CE) versions: 1.6.x, 1.7.x, 1.8.x, CE 1.9.x
 - Magento 2 version 0.74.0 beta x and Merchant Beta versions.
 
-<h3>To use this migration tool, follow the steps below:</h3>
+<h3>To use this migration tool, follow the steps bellow:</h3>
 
 <h4># Step1: Install Magento 2</h4>
 - Download the latest version of Magento2 from Github
