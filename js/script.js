@@ -78,12 +78,7 @@
             if (!$(this).hasClass('need-validate-form')){
                 $.showProcessorBox();
                 $(this).addClass("disabled");
-                if ($(this).prop("tagName") == 'A'){
-                    $(this).attr('disabled', true)
-                }
-                else if ($(this).prop("tagName") == 'BUTTON') {
-                    $(this).prop('disabled', true);
-                }
+                return true;
             }
         });
 
