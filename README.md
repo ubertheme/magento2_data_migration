@@ -20,9 +20,10 @@ We are going to support the following versions for migration:
 - Make writeable permission for folders at:
     - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\assets </strong>
     - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\runtime </strong>
-- Make writeable permission for config file at:
+- Make writeable permission for files at:
     - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\config\config.php </strong>
-
+    - <strong>PATH_TO_YOUR_WEB_ROOT_FOLDER\migrate-data-tool\protected\data\ub_tool.db </strong>
+    
 <h4># Step 3: Run this tool in your browser to migrate your data</h4>
 - Open your browser and type in the url to run this tool.
 For example: go to http://localhost/migrate-data-tool/ and press Enter key.
