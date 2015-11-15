@@ -56,6 +56,9 @@ return CMap::mergeArray(
             'db'=>array(
                 'connectionString' => 'sqlite:protected/data/ub_tool.db',
                 'tablePrefix' => 'ub_',
+            ),
+            'cache'=>array( 
+                'class' => 'CFileCache'
             )
         ),
 
