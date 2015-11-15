@@ -242,10 +242,18 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage1EntityTypeId($entity_type_code){
         $id = null;
         if ($entity_type_code){
-            $db = Yii::app()->mage1;
-            $tablePrefix = $db->tablePrefix;
-            $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
-            $id = $db->createCommand($query)->queryScalar();
+            $cacheId = "{$entity_type_code}_mage1__type_id";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val):
+                $db = Yii::app()->mage1;
+                $tablePrefix = $db->tablePrefix;
+                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+                $id = $db->createCommand($query)->queryScalar();
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            else:
+                $id = $val;
+            endif;
         }
 
         return $id;
@@ -254,10 +262,18 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2EntityTypeId($entity_type_code){
         $id = null;
         if ($entity_type_code){
-            $db = Yii::app()->mage2;
-            $tablePrefix = $db->tablePrefix;
-            $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
-            $id = $db->createCommand($query)->queryScalar();
+            $cacheId = "{$entity_type_code}_mage2_type_id";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val):
+                $db = Yii::app()->mage2;
+                $tablePrefix = $db->tablePrefix;
+                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+                $id = $db->createCommand($query)->queryScalar();
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            else:
+                $id = $val;
+            endif;
         }
 
         return $id;
@@ -266,16 +282,25 @@ class MigrateSteps extends MigrateStepsPeer
     public static function _getMage2EntityTypeId($entity_type_id1){
         $id = null;
         if ($entity_type_id1){
-            $db = Yii::app()->mage1;
-            $tablePrefix = $db->tablePrefix;
-            $query = "SELECT entity_type_code FROM {$tablePrefix}eav_entity_type WHERE entity_type_id = {$entity_type_id1}";
-            $entity_type_code = $db->createCommand($query)->queryScalar();
+            $cacheId = "mage1_type_code_by_id_{$entity_type_id1}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val):
+                $db = Yii::app()->mage1;
+                $tablePrefix = $db->tablePrefix;
+                $query = "SELECT entity_type_code FROM {$tablePrefix}eav_entity_type WHERE entity_type_id = {$entity_type_id1}";
+                $entity_type_code = $db->createCommand($query)->queryScalar();
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $entity_type_code, 86400); // one day
+            else:
+                $entity_type_code = $val;
+            endif;
 
             if ($entity_type_code){
-                $db = Yii::app()->mage2;
-                $tablePrefix = $db->tablePrefix;
-                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
-                $id = $db->createCommand($query)->queryScalar();
+//                $db = Yii::app()->mage2;
+//                $tablePrefix = $db->tablePrefix;
+//                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
+//                $id = $db->createCommand($query)->queryScalar();
+                $id = self::getMage2EntityTypeId($entity_type_code);
             }
         }
 
