@@ -10,6 +10,7 @@
  * @property string $label
  * @property string $position
  * @property integer $disabled
+ * @property integer $record_id
  */
 class Mage2CatalogProductEntityMediaGalleryValuePeer extends Mage2ActiveRecord
 {

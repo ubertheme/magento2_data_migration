@@ -1,23 +1,20 @@
 <?php
 
 /**
- * This is the model class for table "catalog_product_entity_media_gallery".
+ * This is the model class for table "catalog_product_entity_media_gallery_value_to_entity".
  *
- * The followings are the available columns in table 'catalog_product_entity_media_gallery':
+ * The followings are the available columns in table 'catalog_product_entity_media_gallery_value_to_entity':
  * @property string $value_id
- * @property integer $attribute_id
- * @property string $value
- * @property string $media_type
- * @property string $disabled
+ * @property string $entity_id
  */
-class Mage2CatalogProductEntityMediaGalleryPeer extends Mage2ActiveRecord
+class Mage2CatalogProductEntityMediaGalleryValueToEntityPeer extends Mage2ActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return '{{catalog_product_entity_media_gallery}}';
+		return '{{catalog_product_entity_media_gallery_value_to_entity}}';
 	}
 
 	/**
@@ -28,8 +25,7 @@ class Mage2CatalogProductEntityMediaGalleryPeer extends Mage2ActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('attribute_id', 'numerical', 'integerOnly'=>true),
-			array('value', 'length', 'max'=>255),
+			array('value_id, entity_id', 'length', 'max'=>10),
 		);
 	}
 
@@ -37,7 +33,7 @@ class Mage2CatalogProductEntityMediaGalleryPeer extends Mage2ActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return Mage2CatalogProductEntityMediaGalleryPeer the static model class
+	 * @return Mage2CatalogProductEntityMediaGalleryValueToEntityPeer the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

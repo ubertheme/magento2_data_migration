@@ -31,8 +31,8 @@ CREATE TABLE `#__tax_calculation_rate_title` (
   PRIMARY KEY (`tax_calculation_rate_title_id`),
   KEY `TAX_CALCULATION_RATE_TITLE_TAX_CALCULATION_RATE_ID_STORE_ID` (`tax_calculation_rate_id`,`store_id`),
   KEY `TAX_CALCULATION_RATE_TITLE_STORE_ID` (`store_id`),
-  CONSTRAINT `TAX_CALCULATION_RATE_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_37FB965F786AD5897BB3AE90470C42AB` FOREIGN KEY (`tax_calculation_rate_id`) REFERENCES `#__tax_calculation_rate` (`tax_calculation_rate_id`) ON DELETE CASCADE
+  CONSTRAINT `FK_37FB965F786AD5897BB3AE90470C42AB` FOREIGN KEY (`tax_calculation_rate_id`) REFERENCES `#__tax_calculation_rate` (`tax_calculation_rate_id`) ON DELETE CASCADE,
+  CONSTRAINT `TAX_CALCULATION_RATE_TITLE_STORE_ID_STORE_STORE_ID` FOREIGN KEY (`store_id`) REFERENCES `#__store` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tax Calculation Rate Title';
 
 DROP TABLE IF EXISTS `#__tax_calculation_rule`;
@@ -136,9 +136,9 @@ CREATE TABLE `#__catalogrule_group_website` (
   PRIMARY KEY (`rule_id`,`customer_group_id`,`website_id`),
   KEY `CATALOGRULE_GROUP_WEBSITE_CUSTOMER_GROUP_ID` (`customer_group_id`),
   KEY `CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID` (`website_id`),
-  CONSTRAINT `CATRULE_GROUP_WS_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE,
   CONSTRAINT `CATALOGRULE_GROUP_WEBSITE_RULE_ID_CATALOGRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__catalogrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  CONSTRAINT `CATALOGRULE_GROUP_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE,
+  CONSTRAINT `CATRULE_GROUP_WS_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID` FOREIGN KEY (`customer_group_id`) REFERENCES `#__customer_group` (`customer_group_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatalogRule Group Website';
 
 DROP TABLE IF EXISTS `#__catalogrule_product`;

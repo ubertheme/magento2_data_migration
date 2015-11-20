@@ -12,6 +12,10 @@
  * @property integer $is_system
  * @property string $sort_order
  * @property string $data_model
+ * @property integer $is_used_in_grid
+ * @property integer $is_visible_in_grid
+ * @property integer $is_filterable_in_grid
+ * @property integer $is_searchable_in_grid
  */
 class Mage2CustomerEavAttributePeer extends Mage2ActiveRecord
 {

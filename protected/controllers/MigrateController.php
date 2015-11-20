@@ -1160,11 +1160,11 @@ class MigrateController extends Controller
                                         foreach ($models as $model){
                                             //we have to get correct attribute_id migrated
                                             $attribute_id2 = MigrateSteps::getMage2AttributeId($model->attribute_id, 4);
-                                            if ($attribute_id2){
+                                            if ($attribute_id2) {
                                                 $model2 = new Mage2CatalogProductEntityMediaGallery();
                                                 $model2->value_id = $model->value_id;
                                                 $model2->attribute_id = $attribute_id2;
-                                                $model2->entity_id = $model->entity_id;
+                                                //$model2->entity_id = $model->entity_id; //This field not use in CE 2.0.0
                                                 $model2->value = $model->value;
                                                 if ($model2->save()){
                                                     //catalog_product_entity_media_gallery_value
@@ -1185,6 +1185,11 @@ class MigrateController extends Controller
                                                             }
                                                         }
                                                     }
+                                                    //catalog_product_entity_media_gallery_value_to_entity
+                                                    $gallery_value_to_entity = new Mage2CatalogProductEntityMediaGalleryValueToEntity();
+                                                    $gallery_value_to_entity->value_id = $model->value_id;
+                                                    $gallery_value_to_entity->entity_id = $model->entity_id;
+                                                    $gallery_value_to_entity->save();
                                                 }
                                             }
                                         }
@@ -3602,6 +3607,9 @@ class MigrateController extends Controller
 
             //delete url related data in url_rewrite table and catalog_url_rewrite_product_category table
             Mage2UrlRewrite::model()->deleteAll("entity_type = 'product'");
+            
+            //flush cached
+            Yii::app()->cache->flush();
 
             Yii::app()->user->setFlash('success', Yii::t('frontend', "Reset all successfully."));
             //Redirect to next step
@@ -3631,6 +3639,9 @@ class MigrateController extends Controller
                     $step->status = MigrateSteps::STATUS_NOT_DONE;
                     $step->migrated_data = null;
                     $step->update();
+                    
+                    //flush cached
+                    Yii::app()->cache->flush();
                 }
             }
         }

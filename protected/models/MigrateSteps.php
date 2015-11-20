@@ -68,14 +68,23 @@ class MigrateSteps extends MigrateStepsPeer
             if (is_null($mage1StoreId)){
                 $id = 'NULL';
             } else {
-                $store1 = Mage1Store::model()->find("store_id = {$mage1StoreId}");
-                if ($store1){
-                    $store2 = Mage2Store::model()->find("code = '{$store1->code}'");
-                    if ($store2) {
-                        $id = $store2->store_id;
+                $cacheId = "store_id2_{$mage1StoreId}";
+                $val = Yii::app()->cache->get($cacheId);
+                if (!$val) {
+                    $store1 = Mage1Store::model()->find("store_id = {$mage1StoreId}");
+                    if ($store1){
+                        $store2 = Mage2Store::model()->find("code = '{$store1->code}'");
+                        if ($store2) {
+                            $id = $store2->store_id;
+                        }
+                    } else{
+                        $id = $mage1StoreId;
                     }
-                } else{
-                    $id = $mage1StoreId;
+                    
+                    //save to cache for later
+                    Yii::app()->cache->set($cacheId, $id, 86400); // one day
+                } else {
+                    $id = $val;
                 }
             }
 
@@ -87,16 +96,24 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2AttributeSetId($mage1AttrSetId, $entity_type_code = null){
         $id = null;
         if (isset($mage1AttrSetId)){
-            $model1 = Mage1AttributeSet::model()->findByPk($mage1AttrSetId);
-            if ($model1){
-                if (!$entity_type_code){
-                    $entity_type_code = self::PRODUCT_TYPE_CODE;
+            $cacheId = "attribute_set_id2_{$mage1AttrSetId}_{$entity_type_code}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val) {
+                $model1 = Mage1AttributeSet::model()->findByPk($mage1AttrSetId);
+                if ($model1){
+                    if (!$entity_type_code){
+                        $entity_type_code = self::PRODUCT_TYPE_CODE;
+                    }
+                    $entity_type_id2 = MigrateSteps::getMage2EntityTypeId($entity_type_code);
+                    $model2 = Mage2AttributeSet::model()->find("entity_type_id = {$entity_type_id2} AND attribute_set_name = '{$model1->attribute_set_name}'");
+                    if ($model2) {
+                        $id = $model2->attribute_set_id;
+                    }
                 }
-                $entity_type_id2 = MigrateSteps::getMage2EntityTypeId($entity_type_code);
-                $model2 = Mage2AttributeSet::model()->find("entity_type_id = {$entity_type_id2} AND attribute_set_name = '{$model1->attribute_set_name}'");
-                if ($model2) {
-                    $id = $model2->attribute_set_id;
-                }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            } else {
+                $id = $val;
             }
         }
 
@@ -106,13 +123,21 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2AttributeGroupId($mage1AttrGroupId){
         $id = null;
         if (isset($mage1AttrGroupId)){
-            $model1 = Mage1AttributeGroup::model()->findByPk($mage1AttrGroupId);
-            if ($model1){
-                $attr_set_id2 = self::getMage2AttributeSetId($model1->attribute_set_id, self::PRODUCT_TYPE_CODE);
-                $model2 = Mage2AttributeGroup::model()->find("attribute_set_id = {$attr_set_id2} AND attribute_group_name = '{$model1->attribute_group_name}'");
-                if ($model2) {
-                    $id = $model2->attribute_group_id;
+            $cacheId = "attribute_group_id2_{$mage1AttrGroupId}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val){
+                $model1 = Mage1AttributeGroup::model()->findByPk($mage1AttrGroupId);
+                if ($model1){
+                    $attr_set_id2 = self::getMage2AttributeSetId($model1->attribute_set_id, self::PRODUCT_TYPE_CODE);
+                    $model2 = Mage2AttributeGroup::model()->find("attribute_set_id = {$attr_set_id2} AND attribute_group_name = '{$model1->attribute_group_name}'");
+                    if ($model2) {
+                        $id = $model2->attribute_group_id;
+                    }
                 }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            }else {
+                $id = $val;
             }
         }
 
@@ -122,17 +147,25 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2AttributeId($mage1AttrId, $entityTypeId = 3){
         $id = null;
         if (isset($mage1AttrId)){
-            $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
-            if ($attr1){
-                //msrp_enabled was changed to msrp in magento2
-                if ($attr1->attribute_code == 'msrp_enabled')
-                    $attribute_code2 = 'msrp';
-                else
-                    $attribute_code2 = $attr1->attribute_code;
-                $attr2 = Mage2Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_code = '{$attribute_code2}'");
-                if ($attr2) {
-                    $id = $attr2->attribute_id;
+            $cacheId = "attrubute_id2_{$entityTypeId}_{$mage1AttrId}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val) { 
+                $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
+                if ($attr1){
+                    //msrp_enabled was changed to msrp in magento2
+                    if ($attr1->attribute_code == 'msrp_enabled')
+                        $attribute_code2 = 'msrp';
+                    else
+                        $attribute_code2 = $attr1->attribute_code;
+                    $attr2 = Mage2Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_code = '{$attribute_code2}'");
+                    if ($attr2) {
+                        $id = $attr2->attribute_id;
+                    }
                 }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            } else {
+                $id = $val;
             }
         }
 
@@ -142,20 +175,37 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage1AttributeCode($mage1AttrId){
         $code = null;
         if (isset($mage1AttrId)){
-            $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
-            if ($attr1){
-                $code = $attr1->attribute_code;
+            $cacheId = "attribute_code1_{$mage1AttrId}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val) {
+                $attr1 = Mage1Attribute::model()->findByPk($mage1AttrId);
+                if ($attr1){
+                    $code = $attr1->attribute_code;
+                }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $code, 86400); // one day
+            } else {
+                $code = $val;
             }
         }
+        
         return $code;
     }
 
     public static function getMage1AttributeId($mage1AttrCode, $entityTypeId){
         $id = null;
         if ($mage1AttrCode && $entityTypeId){
-            $attr1 = Mage1Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_code = '{$mage1AttrCode}'");
-            if ($attr1){
-                $id = $attr1->attribute_id;
+            $cacheId = "attribute_id1_{$mage1AttrCode}_{$entityTypeId}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val) {
+                $attr1 = Mage1Attribute::model()->find("entity_type_id = {$entityTypeId} AND attribute_code = '{$mage1AttrCode}'");
+                if ($attr1){
+                    $id = $attr1->attribute_id;
+                }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $id, 86400); // one day
+            } else {
+                $id = $val;
             }
         }
 
@@ -228,11 +278,19 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage1CategoryName($category_id){
         $name = null;
         if ($category_id){
-            $entity_type_id = MigrateSteps::getMage1EntityTypeId(self::CATEGORY_TYPE_CODE);
-            $attribute_id = MigrateSteps::getMage1AttributeId('name', $entity_type_id);
-            $model = Mage1CatalogCategoryEntityVarchar::model()->find("entity_id = {$category_id} AND attribute_id = {$attribute_id}");
-            if ($model){
-                $name = $model->value;
+            $cacheId = "category_name1_{$category_id}";
+            $val = Yii::app()->cache->get($cacheId);
+            if (!$val) {
+                $entity_type_id = MigrateSteps::getMage1EntityTypeId(self::CATEGORY_TYPE_CODE);
+                $attribute_id = MigrateSteps::getMage1AttributeId('name', $entity_type_id);
+                $model = Mage1CatalogCategoryEntityVarchar::model()->find("entity_id = {$category_id} AND attribute_id = {$attribute_id}");
+                if ($model){
+                    $name = $model->value;
+                }
+                //save to cache for later
+                Yii::app()->cache->set($cacheId, $name, 86400); // one day
+            } else {
+                $name = $val;
             }
         }
 
@@ -242,7 +300,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage1EntityTypeId($entity_type_code){
         $id = null;
         if ($entity_type_code){
-            $cacheId = "{$entity_type_code}_mage1__type_id";
+            $cacheId = "entity_type_id1_by_code_{$entity_type_code}";
             $val = Yii::app()->cache->get($cacheId);
             if (!$val):
                 $db = Yii::app()->mage1;
@@ -262,7 +320,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function getMage2EntityTypeId($entity_type_code){
         $id = null;
         if ($entity_type_code){
-            $cacheId = "{$entity_type_code}_mage2_type_id";
+            $cacheId = "entity_type_id2_by_code_{$entity_type_code}";
             $val = Yii::app()->cache->get($cacheId);
             if (!$val):
                 $db = Yii::app()->mage2;
@@ -282,7 +340,7 @@ class MigrateSteps extends MigrateStepsPeer
     public static function _getMage2EntityTypeId($entity_type_id1){
         $id = null;
         if ($entity_type_id1){
-            $cacheId = "mage1_type_code_by_id_{$entity_type_id1}";
+            $cacheId = "entity_type_id2_by_id1_{$entity_type_id1}";
             $val = Yii::app()->cache->get($cacheId);
             if (!$val):
                 $db = Yii::app()->mage1;
@@ -296,10 +354,6 @@ class MigrateSteps extends MigrateStepsPeer
             endif;
 
             if ($entity_type_code){
-//                $db = Yii::app()->mage2;
-//                $tablePrefix = $db->tablePrefix;
-//                $query = "SELECT entity_type_id FROM {$tablePrefix}eav_entity_type WHERE entity_type_code = '{$entity_type_code}'";
-//                $id = $db->createCommand($query)->queryScalar();
                 $id = self::getMage2EntityTypeId($entity_type_code);
             }
         }

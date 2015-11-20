@@ -27,6 +27,7 @@
  * @property integer $is_visible_in_grid
  * @property integer $is_filterable_in_grid
  * @property integer $search_weight
+ * @property string $additional_data
  */
 class Mage2CatalogEavAttributePeer extends Mage2ActiveRecord
 {
