@@ -1,7 +1,7 @@
 <h3>Supported versions</h3>
 We are going to support the following versions for migration:
 - Magento Community Edition (CE) versions: 1.6.x, 1.7.x, 1.8.x, CE 1.9.x
-- Magento 2 version 0.74.0 beta x and Merchant Beta versions.
+- Magento 2 version 0.74.0 beta x, Merchant Beta versions, CE 2.0.0 and later
 
 <h3>To use this migration tool, follow the steps bellow:</h3>
 
