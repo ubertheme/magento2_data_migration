@@ -32,13 +32,12 @@ For example: http://localhost/migrate-data-tool/ and press Enter key.
 - Follow step by step to migrate needed data from Magento 1 website to Magento 2 website.
 
 <h4># Step 4: Complete the tasks bellow to finish the data migration process.</h4>
-- Re-save all the Product Templates (Stores/Attributes/Product Template) migrated in the back-end of your Magento 2 website. (Open the Product Template, edit it if needed and click the save button)
+- Re-save all the Attribute Sets (Stores/Attributes/Attribute Set) migrated in the back-end of your Magento 2 website. (Open the Attribute Set, edit information of it if needed and click the save button)
 - Reindex all data via SSH or Command line in window:
     - In Linux: run command line:
         + `php -f WEB_ROOT_PATH\your_magento2_folder\bin\magento indexer:reindex`
     - In Window: Open the command line window and run the command line:
         + `php -f WEB_ROOT_PATH\your_magento2_folder\bin\magento indexer:reindex`
-
 - Copy media files to complete migration:<br/>
   - Copy the folder at WEB_ROOT_PATH\your_magento1_folder\media\catalog and paste replace to WEB_ROOT_PATH\your_magento2_folder\pub\media\
   - Copy the folder at WEB_ROOT_PATH\your_magento1_folder\media\downloadable and paste replace to WEB_ROOT_PATH\your_magento2_folder\pub\media\
