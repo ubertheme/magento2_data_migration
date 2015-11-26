@@ -17,19 +17,24 @@
         </div>
         <!--// Form Buttons-->
 
+         <?php
+        //get migrated category ids
+        $migrated_category_ids = isset(Yii::app()->session['migrated_category_ids']) ? Yii::app()->session['migrated_category_ids'] : array();
+
+        //get all root categories from magento1
+        $rootCategories = Mage1CatalogCategoryEntity::model()->findAll("level = 1");
+        ?>
+        
         <ul class="list-group">
             <li class="list-group-item">
                 <h3 class="list-group-item-heading">
                     <?php echo Yii::t('frontend', 'Total Categories'); ?> (<?php echo sizeof($categories); ?>)
                 </h3>
-
-                <?php
-                //get migrated category ids
-                $migrated_category_ids = isset(Yii::app()->session['migrated_category_ids']) ? Yii::app()->session['migrated_category_ids'] : array();
-
-                //get all root categories from magento1
-                $rootCategories = Mage1CatalogCategoryEntity::model()->findAll("level = 1");
-                ?>
+                <h4>
+                    <?php $checked = ( sizeof($categories) == sizeof($migrated_category_ids) ) ? true : false;  ?>
+                    <input type="checkbox" <?php echo ($checked) ? "checked" : ''; ?> id="select_all_categories" name="select_all_categories" />
+                    <span> <?php echo Yii::t('frontend', 'Select All');?> </span>
+                </h4>
 
                 <?php if ($rootCategories): ?>
 
@@ -185,6 +190,12 @@
                     $parent.prop("checked", value);
                 }
             }
+        });
+        
+        $('INPUT[name="select_all_categories"]').on('change', function(){
+            var value = this.checked;
+            $('.tree INPUT[name="category_ids[]"]').prop("checked", value);
+            $('.tree INPUT[name="category_ids[]"]').trigger('change');
         });
 
     })(jQuery);

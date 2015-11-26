@@ -168,9 +168,26 @@ class MigrateController extends Controller
             }else{
                 Yii::app()->user->setFlash('error', implode('</br>', $err_msg));
             }
+        } else {
+            if ($step->status == MigrateSteps::STATUS_NOT_DONE) {
+                //load database 1 settings in magento 1 website config app/etc/local.xml
+                $configFilePath = Yii::app()->basePath ."/../../app/etc/local.xml";
+                if (file_exists($configFilePath)){
+                    $configData = simplexml_load_file($configFilePath);
+                    $settings = (object)json_decode($step->migrated_data);
+                    $settings->mg1_host = $configData->global->resources->default_setup->connection->host;
+                    $settings->mg1_db_user = $configData->global->resources->default_setup->connection->username;
+                    $settings->mg1_db_pass = $configData->global->resources->default_setup->connection->password;
+                    $settings->mg1_db_name = $configData->global->resources->default_setup->connection->dbname;
+                    $settings->mg1_db_prefix = $configData->global->resources->db->table_prefix;
+                }
+            }
         }
 
-        $settings = (object)json_decode($step->migrated_data);
+        if (!isset($settings)){
+            $settings = (object)json_decode($step->migrated_data);
+        }
+        
         $assign_data = array(
             'step' => $step,
             'settings' => $settings
@@ -666,13 +683,14 @@ class MigrateController extends Controller
 
                 //handle selected category ids
                 $category_ids = Yii::app()->request->getPost('category_ids', array());
+                $isCheckAll = Yii::app()->request->getPost('select_all_categories');
 
                 //catalog_category_entity
                 // if has selected category to migrate
-                if ($category_ids){
+                if ($isCheckAll || $category_ids){
                     if ($categories){
                         foreach ($categories as $category){
-                            if (in_array($category->entity_id, $category_ids)){
+                            if ( $isCheckAll || in_array($category->entity_id, $category_ids) ){
                                 $condition = "entity_id = {$category->entity_id}";
                                 $category2 = Mage2CatalogCategoryEntity::model()->find($condition);
                                 if (!$category2){
