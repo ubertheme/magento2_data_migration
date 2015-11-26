@@ -395,7 +395,8 @@ class MigrateController extends Controller
                                     $attribute_group2->sort_order = $attribute_group->sort_order;
                                     $attribute_group2->default_id = $attribute_group->default_id;
                                     //NOTE: this values is new added in Magento2, we will update after migrated in back-end of Magento2
-                                    $attribute_group2->attribute_group_code = null;
+                                    $attributeGroupCode = trim(preg_replace('/[^a-z0-9]+/', '-', strtolower($attribute_group->attribute_group_name)), '-');
+                                    $attribute_group2->attribute_group_code = $attributeGroupCode;
                                     $attribute_group2->tab_group_code = null;
                                 }
                                 if ($attribute_group2->save()) {
