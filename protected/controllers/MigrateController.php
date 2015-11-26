@@ -1313,7 +1313,7 @@ class MigrateController extends Controller
                                                         if ($stock_item){
                                                             $stock_item2 = new Mage2StockItem();
                                                             foreach ($stock_item2->attributes as $key => $value){
-                                                                if (isset($stock_item->$key)){
+                                                                if ($key != 'item_id' && isset($stock_item->$key)){
                                                                     $stock_item2->$key = $stock_item->$key;
                                                                 }
                                                             }
