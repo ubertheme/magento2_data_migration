@@ -11,9 +11,9 @@
             }
         }
         //set timeout to hide the message
-        setTimeout(function(){
-            $.hideMessage();
-        }, 30000);
+//        setTimeout(function(){
+//            $.hideMessage();
+//        }, 30000);
 
         //show/hide loading mask function
         $.showProcessorBox = function(){

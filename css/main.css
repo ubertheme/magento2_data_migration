@@ -188,3 +188,10 @@ blockquote{font-size: 12px;}
     border-radius:5px;
 }
 #message ul{text-align: left;}
+.guide-banner{margin: 10px 0px;}
+.guide-banner img {
+    height: auto !important;
+    max-width: 100% !important;
+    text-align: center;
+    width: auto !important;
+}

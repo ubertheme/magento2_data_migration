@@ -8,6 +8,8 @@ class MigrateController extends Controller
 
         //increase the max execution time
         @ini_set('max_execution_time', -1);
+        //memory_limit
+        @ini_set('memory_limit', '-1');
 
         //initial needed session variables
         $migrated_data = array(
@@ -2218,7 +2220,15 @@ class MigrateController extends Controller
                                 $sales_order2 = new Mage2SalesOrder();
                                 foreach ($sales_order2->attributes as $key => $value){
                                     if (isset($sales_order->$key)){
-                                        $sales_order2->$key = $sales_order->$key;
+                                        /**
+                                         * Magento 2 only accept max length of store name = 32 chars
+                                         * So we have to check length of store name here to split
+                                         */
+                                        $val = $sales_order->$key;
+                                        if ( in_array($key, array('store_name')) && strlen($val) > 32) {
+                                            $val = substr($val, 0, 32);
+                                        }
+                                        $sales_order2->$key = $val;
                                     }
                                 }
                                 //we have changed store_id in magento2
@@ -2317,7 +2327,10 @@ class MigrateController extends Controller
                                             }
                                         }
                                     }
-                                }//end save a sales order
+                                } else {
+                                    $errors = MigrateSteps::getStringErrors($sales_order2->getErrors());
+                                    Yii::app()->user->setFlash('error', $errors);
+                                } //end save a sales order
                             }
                         }
 

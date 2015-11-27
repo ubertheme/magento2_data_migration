@@ -533,4 +533,17 @@ class MigrateSteps extends MigrateStepsPeer
 
         return $data;
     }
+    
+    public static function getStringErrors($errors = array()){
+        $strs = array();
+        if ($errors) {
+            foreach ($errors as $error){
+                foreach ($error as $strError){
+                    $strs[] = $strError;
+                }
+            }
+        }
+        
+        return implode('<br/>- ', $strs);
+    }
 }

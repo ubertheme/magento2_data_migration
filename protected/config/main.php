@@ -34,7 +34,8 @@ return CMap::mergeArray(
                     array(
                         'class'=>'CFileLogRoute',
                         //'levels'=>'error, warning, info',
-                        'levels'=>'error',
+                        'levels'=>'error, warning',
+                        //'levels'=>'error',
                     ),
                     // uncomment the following to show log messages on web pages
 //                    array(
