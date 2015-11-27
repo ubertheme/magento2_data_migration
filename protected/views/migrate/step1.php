@@ -17,7 +17,7 @@
                             <select class="form-control" id="mg1-version" name="mg1_version">
                                 <?php $options = MigrateSteps::getMG1VersionOptions()?>
                                 <?php foreach ($options as $value => $label):?>
-                                    <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+                                <option value="<?php echo $value; ?>" <?php echo (isset($settings->mg1_version) && $settings->mg1_version == $value) ? 'selected="selected"' : ''?>><?php echo $label; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

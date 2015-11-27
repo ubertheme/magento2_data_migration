@@ -173,6 +173,7 @@ class MigrateController extends Controller
                 //load database 1 settings in magento 1 website config app/etc/local.xml
                 $configFilePath = Yii::app()->basePath ."/../../app/etc/local.xml";
                 if (file_exists($configFilePath)){
+                    
                     $configData = simplexml_load_file($configFilePath);
                     $settings = (object)json_decode($step->migrated_data);
                     $settings->mg1_host = $configData->global->resources->default_setup->connection->host;
@@ -180,6 +181,19 @@ class MigrateController extends Controller
                     $settings->mg1_db_pass = $configData->global->resources->default_setup->connection->password;
                     $settings->mg1_db_name = $configData->global->resources->default_setup->connection->dbname;
                     $settings->mg1_db_prefix = $configData->global->resources->db->table_prefix;
+                    
+                    $mageFilename = Yii::app()->basePath ."/../../app/Mage.php";
+                    require_once $mageFilename;
+                    $mageVersion = Mage::getVersionInfo();
+                    if ($mageVersion['minor'] == '6'){
+                        $settings->mg1_version = 'mage16x';
+                    } elseif ($mageVersion['minor'] == '7'){
+                        $settings->mg1_version = 'mage17x';
+                    } elseif ($mageVersion['minor'] == '8'){
+                        $settings->mg1_version = 'mage18x';
+                    } else {
+                        $settings->mg1_version = 'mage19x';
+                    }
                 }
             }
         }
@@ -653,7 +667,10 @@ class MigrateController extends Controller
             $migrated_store_ids = isset(Yii::app()->session['migrated_store_ids']) ? Yii::app()->session['migrated_store_ids'] : array();
 
             //get all categories from magento1 with level > 0
-            $categories = Mage1CatalogCategoryEntity::model()->findAll("level > 0");
+            //$categories = Mage1CatalogCategoryEntity::model()->findAll("level > 0");
+            
+            //get all categories from magento1
+            $categories = Mage1CatalogCategoryEntity::model()->findAll();
 
             if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
@@ -661,7 +678,7 @@ class MigrateController extends Controller
                 Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
 
                 //get all categories from magento1
-                $categories = Mage1CatalogCategoryEntity::model()->findAll();
+                //$categories = Mage1CatalogCategoryEntity::model()->findAll();
 
                 /*
                  * Get black list attribute ids
