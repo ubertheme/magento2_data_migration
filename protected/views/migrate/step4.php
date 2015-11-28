@@ -1,6 +1,6 @@
 <?php $this->pageTitle = $step->title . ' - ' . Yii::app()->name; ?>
 
-<h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
+<h1 class="page-header"> Step <?php echo $step->sorder?>: <?php echo $step->title?> </h1>
 
 <form role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
     <div id="step-content">

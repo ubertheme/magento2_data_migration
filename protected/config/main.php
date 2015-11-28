@@ -5,7 +5,7 @@ return CMap::mergeArray(
     require(dirname(__FILE__) . '/config.php'), array(
 
         'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-        'name'=>'Migrate Data Tool: Allow migrate data from Magento community 1.x to Magento 2.x',
+        'name'=>'Migrate Data Tool: Allow migrate data from Magento CE 1.x to Magento CE 2.x',
 
         // preloading 'log' component
         'preload'=>array('log'),

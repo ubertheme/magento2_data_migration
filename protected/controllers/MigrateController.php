@@ -35,7 +35,8 @@ class MigrateController extends Controller
         );
         $migratedObj = (object) $migrated_data;
         //update migrated data
-        $steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
+        //$steps = MigrateSteps::model()->findAll("status = " . MigrateSteps::STATUS_DONE);
+        $steps = MigrateSteps::model()->findAll();
         if ($steps){
             foreach ($steps as $step) {
                 $migrated_data = json_decode($step->migrated_data);
@@ -2133,9 +2134,17 @@ class MigrateController extends Controller
             );
 
             //variables to log
-            $migrated_sales_object_ids = array();
-            $migrated_order_ids = $migrated_quote_ids = $migrated_payment_ids = $migrated_invoice_ids = $migrated_shipment_ids = $migrated_credit_ids = array();
-            $migrated_order_statuses = $migrated_sales_rule_ids = $migrated_sales_coupon_ids = array();
+            $errors = array();
+            $migrated_sales_object_ids = isset(Yii::app()->session['migrated_sales_object_ids']) ? Yii::app()->session['migrated_sales_object_ids'] : array();
+            $migrated_order_ids = isset(Yii::app()->session['migrated_sales_order_ids']) ? Yii::app()->session['migrated_sales_order_ids'] : array();
+            $migrated_quote_ids = isset(Yii::app()->session['migrated_sales_quote_ids']) ? Yii::app()->session['migrated_sales_quote_ids'] : array();
+            $migrated_payment_ids = isset(Yii::app()->session['migrated_sales_payment_ids']) ? Yii::app()->session['migrated_sales_payment_ids'] : array();
+            $migrated_invoice_ids = isset(Yii::app()->session['migrated_sales_invoice_ids']) ? Yii::app()->session['migrated_sales_invoice_ids'] : array();
+            $migrated_shipment_ids = isset(Yii::app()->session['migrated_sales_shipment_ids']) ? Yii::app()->session['migrated_sales_shipment_ids'] : array();
+            $migrated_credit_ids = isset(Yii::app()->session['migrated_sales_credit_ids']) ? Yii::app()->session['migrated_sales_credit_ids'] : array();
+            $migrated_order_statuses = isset(Yii::app()->session['migrated_order_statuses']) ? Yii::app()->session['migrated_order_statuses'] : array();
+            $migrated_sales_rule_ids = isset(Yii::app()->session['migrated_sales_rule_ids']) ? Yii::app()->session['migrated_sales_rule_ids'] : array();
+            $migrated_sales_coupon_ids = isset(Yii::app()->session['migrated_sales_coupon_ids']) ? Yii::app()->session['migrated_sales_coupon_ids'] : array();
 
             if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
 
@@ -2159,7 +2168,7 @@ class MigrateController extends Controller
                     $migrated_product_ids = isset(Yii::app()->session['migrated_product_ids']) ? Yii::app()->session['migrated_product_ids'] : array();
                     $str_product_ids = implode(',', $migrated_product_ids);
 
-                    if (in_array('order', $selected_objects)){
+                    if (in_array('order', $selected_objects) && !in_array('order', $migrated_sales_object_ids)){
                         //sales_order_status
                         $models = Mage1SalesOrderStatus::model()->findAll();
                         if ($models) {
@@ -2273,7 +2282,15 @@ class MigrateController extends Controller
                                             $model2 = new Mage2SalesOrderItem();
                                             foreach ($model2->attributes as $key => $value){
                                                 if (isset($model->$key)){
-                                                    $model2->$key = $model->$key;
+                                                    $val = $model->$key;
+                                                    /**
+                                                     * Because Magento2 was change method to save weee_tax_applied to database:
+                                                     * So we have to make convert this
+                                                     */
+                                                    if ($key == 'weee_tax_applied'){
+                                                        $val = json_encode(unserialize($val));
+                                                    }
+                                                    $model2->$key = $val;
                                                 }
                                             }
                                             $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
@@ -2368,8 +2385,8 @@ class MigrateController extends Controller
                         $migrated_sales_object_ids[] = 'order';
                     }//end migrate orders
 
-                    //Sales Quote
-                    if (in_array('quote', $selected_objects)){
+                    //Sales quote
+                    if (in_array('quote', $selected_objects) && !in_array('quote', $migrated_sales_object_ids)){
                         //quote
                         //$condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL ) AND ( customer_id IN ({$str_customer_ids}) OR customer_id IS NULL )";
                         $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
@@ -2475,7 +2492,8 @@ class MigrateController extends Controller
                         $migrated_sales_object_ids[] = 'quote';
                     }//end sales quote
 
-                    if (in_array('payment', $selected_objects)){
+                    //Sales payment
+                    if (in_array('payment', $selected_objects) && !in_array('payment', $migrated_sales_object_ids)){
                         if ($migrated_order_ids){
                             $str_order_ids = implode(',', $migrated_order_ids);
                             $condition = "parent_id IN ({$str_order_ids})";
@@ -2508,42 +2526,46 @@ class MigrateController extends Controller
                                     }
                                 }
                             }
-                        }
-                        //sales_refunded_aggregated
-                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
-                        $models = Mage1SalesRefundedAggregated::model()->findAll($condition);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2SalesRefundedAggregated();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
+                            
+                            //sales_refunded_aggregated
+                            $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                            $models = Mage1SalesRefundedAggregated::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesRefundedAggregated();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
                                     }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    $model2->save();
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                $model2->save();
                             }
-                        }
-                        //sales_refunded_aggregated_order
-                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
-                        $models = Mage1SalesRefundedAggregatedOrder::model()->findAll($condition);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2SalesRefundedAggregatedOrder();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
+                            //sales_refunded_aggregated_order
+                            $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                            $models = Mage1SalesRefundedAggregatedOrder::model()->findAll($condition);
+                            if ($models){
+                                foreach ($models as $model){
+                                    $model2 = new Mage2SalesRefundedAggregatedOrder();
+                                    foreach ($model2->attributes as $key => $value){
+                                        if (isset($model->$key)){
+                                            $model2->$key = $model->$key;
+                                        }
                                     }
+                                    $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                    $model2->save();
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                $model2->save();
                             }
+                            
+                            $migrated_sales_object_ids[] = 'payment';
+                        } else {
+                            Yii::app()->user->setFlash('note', Yii::t('frontend', "Before migrate the Sales Payments, you have to migrate the Sales Orders first."));
                         }
-
-                        $migrated_sales_object_ids[] = 'payment';
                     }//end sales payment
 
-                    if (in_array('invoice', $selected_objects)){
+                    //Sales invoice
+                    if (in_array('invoice', $selected_objects) && !in_array('invoice', $migrated_sales_object_ids)){
                         if ($migrated_order_ids){
                             $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
                             $str_order_ids = implode(',', $migrated_order_ids);
@@ -2588,7 +2610,15 @@ class MigrateController extends Controller
                                                 $model2 = new Mage2SalesInvoiceItem();
                                                 foreach ($model2->attributes as $key => $value){
                                                     if (isset($model->$key)){
-                                                        $model2->$key = $model->$key;
+                                                        $val = $model->$key;
+                                                        /**
+                                                         * Because Magento2 was change method to save weee_tax_applied to database:
+                                                         * So we have to make convert this
+                                                         */
+                                                        if ($key == 'weee_tax_applied'){
+                                                            $val = json_encode(unserialize($val));
+                                                        }
+                                                        $model2->$key = $val;
                                                     }
                                                 }
                                                 //this field was not exists in Magento1
@@ -2612,44 +2642,47 @@ class MigrateController extends Controller
                                         }
                                     }
                                 }
-                            }
-                        }
-                        //sales_invoiced_aggregated
-                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
-                        $models = Mage1SalesInvoicedAggregated::model()->findAll($condition);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2SalesInvoicedAggregated();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
+                                
+                                //sales_invoiced_aggregated
+                                $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                                $models = Mage1SalesInvoicedAggregated::model()->findAll($condition);
+                                if ($models){
+                                    foreach ($models as $model){
+                                        $model2 = new Mage2SalesInvoicedAggregated();
+                                        foreach ($model2->attributes as $key => $value){
+                                            if (isset($model->$key)){
+                                                $model2->$key = $model->$key;
+                                            }
+                                        }
+                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                        $model2->save();
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                $model2->save();
-                            }
-                        }
-                        //sales_invoiced_aggregated_order
-                        $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
-                        $models = Mage1SalesInvoicedAggregatedOrder::model()->findAll($condition);
-                        if ($models){
-                            foreach ($models as $model){
-                                $model2 = new Mage2SalesInvoicedAggregatedOrder();
-                                foreach ($model2->attributes as $key => $value){
-                                    if (isset($model->$key)){
-                                        $model2->$key = $model->$key;
+                                //sales_invoiced_aggregated_order
+                                $condition = "store_id IN ({$str_store_ids}) OR store_id IS NULL";
+                                $models = Mage1SalesInvoicedAggregatedOrder::model()->findAll($condition);
+                                if ($models){
+                                    foreach ($models as $model){
+                                        $model2 = new Mage2SalesInvoicedAggregatedOrder();
+                                        foreach ($model2->attributes as $key => $value){
+                                            if (isset($model->$key)){
+                                                $model2->$key = $model->$key;
+                                            }
+                                        }
+                                        $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
+                                        $model2->save();
                                     }
                                 }
-                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                $model2->save();
                             }
+                            
+                            $migrated_sales_object_ids[] = 'invoice';    
+                        } else {
+                            Yii::app()->user->setFlash('note', Yii::t('frontend', "Before migrate the Sales Invoices, you have to migrate the Sales Orders first."));
                         }
-
-                        $migrated_sales_object_ids[] = 'invoice';
                     }//end sales invoice migration
 
-                    //Sales shipments migration
-                    if (in_array('shipment', $selected_objects)){
+                    //Sales shipment
+                    if (in_array('shipment', $selected_objects) && !in_array('shipment', $migrated_sales_object_ids)){
                         if ($migrated_order_ids){
                             $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
                             $str_order_ids = implode(',', $migrated_order_ids);
@@ -2680,9 +2713,12 @@ class MigrateController extends Controller
                                                     }
                                                 }
                                                 $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                                //this field was not exists in Magento 1
+                                                //some new fields and required in Magento 2
                                                 $model2->updated_at = null;
-                                                $model2->save();
+                                                $model2->customer_name = $model->shipping_name;
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                         //sales_shipment_item
@@ -2695,7 +2731,9 @@ class MigrateController extends Controller
                                                         $model2->$key = $model->$key;
                                                     }
                                                 }
-                                                $model2->save();
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                         //sales_shipment_track
@@ -2708,7 +2746,9 @@ class MigrateController extends Controller
                                                         $model2->$key = $model->$key;
                                                     }
                                                 }
-                                                $model2->save();
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                         //sales_shipment_comment
@@ -2721,7 +2761,9 @@ class MigrateController extends Controller
                                                         $model2->$key = $model->$key;
                                                     }
                                                 }
-                                                $model2->save();
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                     }
@@ -2739,7 +2781,9 @@ class MigrateController extends Controller
                                         }
                                     }
                                     $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                    $model2->save();
+                                    if (!$model2->save()){
+                                        $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                    }
                                 }
                             }
                             //sales_shipping_aggregated_order
@@ -2754,16 +2798,19 @@ class MigrateController extends Controller
                                         }
                                     }
                                     $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                    $model2->save();
+                                    if (!$model2->save()){
+                                        $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                    }
                                 }
                             }
+                            $migrated_sales_object_ids[] = 'shipment';
+                        }else {
+                            Yii::app()->user->setFlash('note', Yii::t('frontend', "Before migrate the Sales Shipments, you have to migrate the Sales Orders first."));
                         }
-
-                        $migrated_sales_object_ids[] = 'shipment';
                     }//end sales shipment migration
 
-                    //Sales credit memo migration
-                    if (in_array('credit', $selected_objects)){
+                    //Sales credit memo
+                    if (in_array('credit', $selected_objects) && !in_array('credit', $migrated_sales_object_ids)){
                         if ($migrated_order_ids){
                             $condition = "( store_id IN ({$str_store_ids}) OR store_id IS NULL )";
                             $str_order_ids = implode(',', $migrated_order_ids);
@@ -2794,10 +2841,12 @@ class MigrateController extends Controller
                                                         $model2->$key = $model->$key;
                                                     }
                                                 }
-                                                $model2->store_id = MigrateSteps::getMage2StoreId($model->store_id);
-                                                //this field was not exists in Magento 1
+                                                //some new fields and required in Magento 2
                                                 $model2->updated_at = null;
-                                                $model2->save();
+                                                $model2->customer_name = $model->billing_name;
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                         //sales_creditmemo_item
@@ -2807,12 +2856,22 @@ class MigrateController extends Controller
                                                 $model2 = new Mage2SalesCreditmemoItem();
                                                 foreach ($model2->attributes as $key => $value){
                                                     if (isset($model->$key)){
-                                                        $model2->$key = $model->$key;
+                                                        $val = $model->$key;
+                                                        /**
+                                                         * Because Magento2 was change method to save weee_tax_applied to database:
+                                                         * So we have to make convert this
+                                                         */
+                                                        if ($key == 'weee_tax_applied'){
+                                                            $val = json_encode(unserialize($val));
+                                                        }
+                                                        $model2->$key = $val;
                                                     }
                                                 }
                                                 //this field was not exists in Magento1
                                                 $model2->tax_ratio = null;
-                                                $model2->save();
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                         //sales_creditmemo_comment
@@ -2825,18 +2884,22 @@ class MigrateController extends Controller
                                                         $model2->$key = $model->$key;
                                                     }
                                                 }
-                                                $model2->save();
+                                                if (!$model2->save()){
+                                                    $errors[] = MigrateSteps::getStringErrors($model2->getErrors());
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                            $migrated_sales_object_ids[] = 'credit';
+                        } else {
+                            Yii::app()->user->setFlash('note', Yii::t('frontend', "Before migrate the Sales Credit Memo, you have to migrate the Sales Orders first."));
                         }
-                        $migrated_sales_object_ids[] = 'credit';
                     }//End Sales credit memo migration
 
-                    //sales bestsellers
-                    if (in_array('bestseller', $selected_objects)){
+                    //Sales bestsellers
+                    if (in_array('bestseller', $selected_objects) && !in_array('bestseller', $migrated_sales_object_ids)){
                         if ($migrated_store_ids && $migrated_product_ids){
                             $condition = "store_id IN ({$str_store_ids}) AND product_id IN ({$str_product_ids})";
 
@@ -2884,13 +2947,12 @@ class MigrateController extends Controller
                                     $model2->save();
                                 }
                             }
-
                             $migrated_sales_object_ids[] = 'bestseller';
                         }
                     }//end sales bestsellers
 
-                    //sales rules & coupons
-                    if (in_array('rule_coupon', $selected_objects)){
+                    //Sales rules & coupons
+                    if (in_array('rule_coupon', $selected_objects) && !in_array('rule_coupon', $migrated_sales_object_ids)){
                         if ($migrated_store_ids && $migrated_product_ids){
                             //salesrule
                             $models = Mage1Salesrule::model()->findAll();
@@ -3016,21 +3078,29 @@ class MigrateController extends Controller
                             $migrated_sales_object_ids[] = 'rule_coupon';
                         }
                     }//end sales rules & coupons
-
                 }else{
-                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object.'));
+                    Yii::app()->user->setFlash('note', Yii::t('frontend', 'You have not selected any Object yet.'));
                 }
 
                 //Update step status
-                if ($migrated_sales_object_ids){
-                    $step->status = MigrateSteps::STATUS_DONE;
+                if (sizeof($migrated_sales_object_ids) > sizeof(Yii::app()->session['migrated_sales_object_ids'])) {
+                    if (sizeof($migrated_sales_object_ids) == sizeof($sales_objects)){
+                        $step->status = MigrateSteps::STATUS_DONE;
+                    } else {
+                        $step->status = MigrateSteps::STATUS_NOT_DONE;
+                    }
+                    
                     $step->migrated_data = json_encode(array(
+                        'order_statuses' => $migrated_order_statuses,
                         'sales_object_ids' => $migrated_sales_object_ids,
                         'sales_order_ids' => $migrated_order_ids,
                         'sales_quote_ids' => $migrated_quote_ids,
+                        'sales_payment_ids' => $migrated_payment_ids,
                         'sales_invoice_ids' => $migrated_invoice_ids,
                         'sales_shipment_ids' => $migrated_shipment_ids,
-                        'sales_credit_ids' => $migrated_credit_ids
+                        'sales_credit_ids' => $migrated_credit_ids,
+                        'sales_rule_ids' => $migrated_sales_rule_ids,
+                        'sales_coupon_ids' => $migrated_sales_coupon_ids
                     ));
                     if ($step->update()) {
 
@@ -3038,23 +3108,45 @@ class MigrateController extends Controller
                         Yii::app()->mage2->createCommand("SET FOREIGN_KEY_CHECKS=1")->execute();
 
                         //update session
+                        Yii::app()->session['migrated_order_statuses'] = $migrated_order_statuses;
                         Yii::app()->session['migrated_sales_object_ids'] = $migrated_sales_object_ids;
                         Yii::app()->session['migrated_sales_order_ids'] = $migrated_order_ids;
+                        Yii::app()->session['migrated_sales_quote_ids'] = $migrated_quote_ids;
+                        Yii::app()->session['migrated_sales_payment_ids'] = $migrated_payment_ids;
+                        Yii::app()->session['migrated_sales_invoice_ids'] = $migrated_invoice_ids;
+                        Yii::app()->session['migrated_sales_shipment_ids'] = $migrated_shipment_ids;
+                        Yii::app()->session['migrated_sales_credit_ids'] = $migrated_credit_ids;
+                        Yii::app()->session['migrated_sales_rule_ids'] = $migrated_sales_rule_ids;
+                        Yii::app()->session['migrated_sales_coupon_ids'] = $migrated_sales_coupon_ids;
 
                         $message = '<ul>';
                         $message .= '<li>'.Yii::t('frontend', 'Migrated successfully.').'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Rules migrated: %s7.", array('%s7' => sizeof($migrated_sales_rule_ids))).'</li>';
-                        $message .= '<li>'. Yii::t('frontend', "Total Sales Coupons migrated: %s8.", array('%s8' => sizeof($migrated_sales_coupon_ids))).'</li>';
+                        if ($migrated_order_statuses)
+                            $message .= '<li>'. Yii::t('frontend', "Total Orders Statuses migrated: %s2.", array('%s2' => sizeof($migrated_order_statuses))).'</li>';
+                        if ($migrated_order_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Orders migrated: %s1.", array('%s1' => sizeof($migrated_order_ids))).'</li>';
+                        if ($migrated_quote_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Quote migrated: %s3.", array('%s3' => sizeof($migrated_quote_ids))).'</li>';
+                        if ($migrated_invoice_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Invoices migrated: %s4.", array('%s4' => sizeof($migrated_invoice_ids))).'</li>';
+                        if ($migrated_shipment_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Shipments migrated: %s5.", array('%s5' => sizeof($migrated_shipment_ids))).'</li>';
+                        if ($migrated_credit_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Credit Memo migrated: %s6.", array('%s6' => sizeof($migrated_credit_ids))).'</li>';
+                        if ($migrated_sales_rule_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Rules migrated: %s7.", array('%s7' => sizeof($migrated_sales_rule_ids))).'</li>';
+                        if ($migrated_sales_coupon_ids)
+                            $message .= '<li>'. Yii::t('frontend', "Total Sales Coupons migrated: %s8.", array('%s8' => sizeof($migrated_sales_coupon_ids))).'</li>';
                         $message .= '</ul>';
 
                         Yii::app()->user->setFlash('success', $message);
                     }
+                }
+                
+                //alert errors if exists
+                if ($errors){
+                    $strErrors = implode('<br/>', $errors);
+                    Yii::app()->user->setFlash('error', $strErrors);
                 }
             }//end post request
             else{

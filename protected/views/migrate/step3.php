@@ -1,6 +1,6 @@
 <?php $this->pageTitle = $step->title . ' - ' . Yii::app()->name; ?>
 
-<h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
+<h1 class="page-header"> Step <?php echo $step->sorder?>: <?php echo $step->title?> </h1>
 
 <form role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
 
@@ -51,7 +51,7 @@
                     <li class="list-group-item">
                         <h5 class="list-group-item-heading">
                             <label class="checkbox-inline">
-                                <input type="checkbox" id="attribute-group-<?php echo $attribute_group->attribute_group_id; ?>" name="attribute_group_ids[<?php echo $attribute_set->attribute_set_id; ?>][]" class="attribute-group-<?php echo $attribute_set->attribute_set_id; ?>" value="<?=$attribute_group->attribute_group_id?>" />
+                                <input type="checkbox" id="attribute-group-<?php echo $attribute_group->attribute_group_id; ?>" name="attribute_group_ids[<?php echo $attribute_set->attribute_set_id; ?>][]" class="attribute-group-<?php echo $attribute_set->attribute_set_id; ?>" value="<?php echo $attribute_group->attribute_group_id?>" />
                                 <?php echo $attribute_group->attribute_group_name; ?>
                             </label>
                         </h5>

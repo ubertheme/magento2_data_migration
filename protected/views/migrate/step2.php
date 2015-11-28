@@ -1,6 +1,6 @@
 <?php $this->pageTitle = $step->title . ' - ' . Yii::app()->name; ?>
 
-<h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
+<h1 class="page-header"> Step <?php echo $step->sorder?>: <?php echo $step->title?> </h1>
 
 <form role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
 
@@ -21,7 +21,7 @@
                     <span class="glyphicon glyphicon-ok-sign text-success"></span>
                 <?php endif; ?>
                 <label class="checkbox-inline">
-                    <input type="checkbox" id="website-<?php echo $website->website_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="website_ids[]" value="<?=$website->website_id?>" />
+                    <input type="checkbox" id="website-<?php echo $website->website_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="website_ids[]" value="<?php echo $website->website_id?>" />
                     <?php echo $website->name; ?>
                 </label>
             </h4>
@@ -42,7 +42,7 @@
                                 <span class="glyphicon glyphicon-ok-sign text-success"></span>
                             <?php endif; ?>
                             <label class="checkbox-inline">
-                                <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?=$storeGroup->group_id?>" />
+                                <input type="checkbox" id="store-group-<?php echo $storeGroup->group_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_group_ids[<?php echo $website->website_id; ?>][]" class="store-group-<?php echo $website->website_id; ?>" value="<?php echo $storeGroup->group_id?>" />
                                 <?php echo $storeGroup->name; ?>
                             </label>
                         </h5>
@@ -61,7 +61,7 @@
                                             <span class="glyphicon glyphicon-ok-sign text-success"></span>
                                         <?php endif; ?>
                                         <label class="checkbox-inline">
-                                            <input type="checkbox" id="store-<?php echo $store->store_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_ids[<?php echo $storeGroup->group_id; ?>][]" class="store-<?php echo $storeGroup->group_id; ?>" value="<?=$store->store_id?>" />
+                                            <input type="checkbox" id="store-<?php echo $store->store_id; ?>" <?php echo ($checked) ? "checked" : ''; ?> name="store_ids[<?php echo $storeGroup->group_id; ?>][]" class="store-<?php echo $storeGroup->group_id; ?>" value="<?php echo $store->store_id?>" />
                                             <?php echo $store->name; ?>
                                         </label>
                                     </li>

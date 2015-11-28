@@ -1,9 +1,9 @@
 <?php $this->pageTitle = $step->title . ' - ' . Yii::app()->name; ?>
 
-<h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
+<h1 class="page-header"> Step <?php echo $step->sorder?>: <?php echo $step->title?> </h1>
 
 <?php
-//get migrated category ids
+//get migrated sales objects ids
 $migrated_sales_object_ids = isset(Yii::app()->session['migrated_sales_object_ids']) ? Yii::app()->session['migrated_sales_object_ids'] : array();
 ?>
 
@@ -16,9 +16,13 @@ $migrated_sales_object_ids = isset(Yii::app()->session['migrated_sales_object_id
         <ul class="list-group">
             <li class="list-group-item">
                 <h3 class="list-group-item-heading">
-                    <input type="checkbox" id="select-all" style="visibility: hidden;" name="select_all_sales_object" title="<?php echo Yii::t('frontend', 'Click here to select all sales objects.')?>" />
-                    <?php echo Yii::t('frontend', 'Sales Data Objects'); ?>
+                    <?php echo Yii::t('frontend', 'Sales Data Objects'); ?><br/>
                 </h3>
+                <h4>
+                    <?php $checked = (sizeof($migrated_sales_object_ids) == sizeof($sale_objects)) ? true : false; ?>
+                    <input type="checkbox" <?php echo ($checked) ? 'checked="checked"' : ''; ?> id="select-all" name="select_all_sales_object" title="<?php echo Yii::t('frontend', 'Click here to select all sales objects.')?>" />
+                    <label for="select-all">Select all</label>
+                </h4>
                 <?php if (isset($sale_objects) && $sale_objects): ?>
                 <ul class="list-group">
                     <?php foreach ($sale_objects as $id => $label): ?>
@@ -28,7 +32,7 @@ $migrated_sales_object_ids = isset(Yii::app()->session['migrated_sales_object_id
                                     <?php if ($checked = in_array($id, $migrated_sales_object_ids)): ?>
                                     <span class="glyphicon glyphicon-ok-sign text-success"></span>
                                     <?php endif; ?>
-                                    <input type="checkbox" style="<?php echo ($id != 'rule_coupon') ? 'visibility: hidden;' : ''; ?>" <?php echo ($checked) ? "checked" : ''; ?> id="sales_object_<?php echo $id; ?>" name="selected_objects[]" value="<?php echo $id; ?>" />
+                                    <input type="checkbox" <?php echo ($checked) ? "checked" : ''; ?> id="sales_object_<?php echo $id; ?>" name="selected_objects[]" value="<?php echo $id; ?>" />
                                     <span> <?php echo $label . " (". MigrateSteps::getTotalSalesChildObject($id) .")"; ?> </span>
                                 </h4>
                             </li>

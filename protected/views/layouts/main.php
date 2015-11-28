@@ -20,13 +20,15 @@
     <div class="row">
         <div id="header">
             <div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
-        </div><!-- header -->
+        </div>
+        <!--// header -->
         <?php echo $content; ?>
+        
         <div id="footer">
             Copyright &copy; <?php echo date('Y'); ?> by <a href="http://www.ubertheme.com/" target="_blank">UberTheme</a>.<br/>
             All Rights Reserved.<br/>
             <?php echo Yii::powered(); ?>
-            <div id="report-bugs"><a target="_blank" href="https://github.com/ubertheme/magento2_data_migration/issues" title="<?php echo Yii::t('frontend', 'Report Bugs')?>"><?php echo Yii::t('frontend', 'Report Bugs')?></a></div>
+            <div id="report-bugs"><a target="_blank" href="https://bitbucket.org/ubertheme/module-ubdatamigration/issues" title="<?php echo Yii::t('frontend', 'Report Bugs')?>"><?php echo Yii::t('frontend', 'Report Bugs')?></a></div>
         </div><!-- footer -->
     </div>
 </div><!-- page -->
@@ -38,6 +40,7 @@
                 <div>
                     <img src="<?php echo Yii::app()->request->baseUrl; ?>/css/images/loading.gif"/>
                     <?php echo Yii::t('frontend', 'Data processing. Please wait…'); ?>
+                    <i>(<?php echo Yii::t('frontend', 'If your data up to 2000+ records, this task can take some hours to finished.'); ?>)</i>
                 </div>
             </div>
         </div>

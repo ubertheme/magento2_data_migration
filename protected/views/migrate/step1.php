@@ -1,6 +1,6 @@
 <?php $this->pageTitle = $step->title . ' - ' . Yii::app()->name; ?>
 
-<h1 class="page-header"> Step <?=$step->sorder?>: <?=$step->title?> </h1>
+<h1 class="page-header"> Step <?php echo $step->sorder?>: <?php echo $step->title?> </h1>
 
 <form id="frm-settings" data-toggle="validator" role="form" method="post" action="<?php echo Yii::app()->createUrl("migrate/step{$step->sorder}"); ?>">
 
@@ -79,10 +79,10 @@
         <!-- Form Buttons-->
         <div class="step-controls">
             <?php if ($step->status == MigrateSteps::STATUS_NOT_DONE): ?>
-                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-primary need-validate-form"><?php echo Yii::t('frontend', 'Save'); ?></button>
+                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-primary need-validate-form"><span class="glyphicon glyphicon-save"></span> <?php echo Yii::t('frontend', 'Save'); ?></button>
             <?php else: ?>
-                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><?php echo Yii::t('frontend', 'Update'); ?></button>
-                <a href="<?php echo Yii::app()->createUrl("migrate/step" . ($step->sorder+1)); ?>" class="btn btn-primary"><?php echo Yii::t('frontend', 'Next Step'); ?></a>
+                <button type="submit" id="step-<?php echo $step->sorder; ?>" class="btn btn-danger need-validate-form"><span class="glyphicon glyphicon-save"></span> <?php echo Yii::t('frontend', 'Update'); ?></button>
+                <a href="<?php echo Yii::app()->createUrl("migrate/step" . ($step->sorder+1)); ?>" class="btn btn-primary"><span class="glyphicon glyphicon-forward"></span> <?php echo Yii::t('frontend', 'Next Step'); ?></a>
             <?php endif; ?>
         </div>
         <!--// Form Buttons-->

@@ -58,7 +58,7 @@
         $('INPUT[name="select_all_sales_object"]').on('change', function(){
             $('INPUT[name="selected_objects[]"]').prop('checked', this.checked);
         });
-        $('INPUT[name="select_all_sales_object"]').prop('checked', true).trigger('change');
+        //$('INPUT[name="select_all_sales_object"]').prop('checked', true).trigger('change');
 
         //check/un-check review/rating objects
         $('INPUT[name="select_all_object"]').on('change', function(){
