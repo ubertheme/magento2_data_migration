@@ -9,18 +9,18 @@ CREATE TABLE `#__sales_order_status` (
   PRIMARY KEY (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Status Table';
 
-INSERT INTO #__sales_order_status VALUES ('canceled', 'Canceled');
-INSERT INTO #__sales_order_status VALUES ('closed', 'Closed');
-INSERT INTO #__sales_order_status VALUES ('complete', 'Complete');
-INSERT INTO #__sales_order_status VALUES ('fraud', 'Suspected Fraud');
-INSERT INTO #__sales_order_status VALUES ('holded', 'On Hold');
-INSERT INTO #__sales_order_status VALUES ('payment_review', 'Payment Review');
+INSERT INTO `#__sales_order_status` VALUES ('canceled', 'Canceled');
+INSERT INTO `#__sales_order_status` VALUES ('closed', 'Closed');
+INSERT INTO `#__sales_order_status` VALUES ('complete', 'Complete');
+INSERT INTO `#__sales_order_status` VALUES ('fraud', 'Suspected Fraud');
+INSERT INTO `#__sales_order_status` VALUES ('holded', 'On Hold');
+INSERT INTO `#__sales_order_status` VALUES ('payment_review', 'Payment Review');
 INSERT INTO `#__sales_order_status` VALUES ('paypal_canceled_reversal', 'PayPal Canceled Reversal');
 INSERT INTO `#__sales_order_status` VALUES ('paypal_reversed', 'PayPal Reversed');
-INSERT INTO #__sales_order_status VALUES ('pending', 'Pending');
-INSERT INTO #__sales_order_status VALUES ('pending_payment', 'Pending Payment');
+INSERT INTO `#__sales_order_status` VALUES ('pending', 'Pending');
+INSERT INTO `#__sales_order_status` VALUES ('pending_payment', 'Pending Payment');
 INSERT INTO `#__sales_order_status` VALUES ('pending_paypal', 'Pending PayPal');
-INSERT INTO #__sales_order_status VALUES ('processing', 'Processing');
+INSERT INTO `#__sales_order_status` VALUES ('processing', 'Processing');
 
 DROP TABLE IF EXISTS `#__sales_order_status_label`;
 CREATE TABLE `#__sales_order_status_label` (
@@ -43,15 +43,16 @@ CREATE TABLE `#__sales_order_status_state` (
   CONSTRAINT `SALES_ORDER_STATUS_STATE_STATUS_SALES_ORDER_STATUS_STATUS` FOREIGN KEY (`status`) REFERENCES `#__sales_order_status` (`status`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Order Status Table';
 
-INSERT INTO #__sales_order_status_state VALUES ('canceled', 'canceled', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('closed', 'closed', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('complete', 'complete', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('fraud', 'payment_review', '0', '1');
-INSERT INTO #__sales_order_status_state VALUES ('holded', 'holded', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('payment_review', 'payment_review', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('pending', 'new', '1', '1');
-INSERT INTO #__sales_order_status_state VALUES ('pending_payment', 'pending_payment', '1', '0');
-INSERT INTO #__sales_order_status_state VALUES ('processing', 'processing', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('canceled', 'canceled', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('closed', 'closed', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('complete', 'complete', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('fraud', 'payment_review', '0', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('fraud', 'processing', '0', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('holded', 'holded', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('payment_review', 'payment_review', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('pending', 'new', '1', '1');
+INSERT INTO `#__sales_order_status_state` VALUES ('pending_payment', 'pending_payment', '1', '0');
+INSERT INTO `#__sales_order_status_state` VALUES ('processing', 'processing', '1', '1');
 
 DROP TABLE IF EXISTS `#__sales_order`;
 CREATE TABLE `#__sales_order` (
@@ -148,33 +149,33 @@ CREATE TABLE `#__sales_order` (
   `total_due` decimal(12,4) DEFAULT NULL COMMENT 'Total Due',
   `weight` decimal(12,4) DEFAULT NULL COMMENT 'Weight',
   `customer_dob` datetime DEFAULT NULL COMMENT 'Customer Dob',
-  `increment_id` varchar(50) DEFAULT NULL COMMENT 'Increment Id',
-  `applied_rule_ids` varchar(255) DEFAULT NULL COMMENT 'Applied Rule Ids',
+  `increment_id` varchar(32) DEFAULT NULL COMMENT 'Increment Id',
+  `applied_rule_ids` varchar(128) DEFAULT NULL COMMENT 'Applied Rule Ids',
   `base_currency_code` varchar(3) DEFAULT NULL COMMENT 'Base Currency Code',
-  `customer_email` varchar(255) DEFAULT NULL COMMENT 'Customer Email',
-  `customer_firstname` varchar(255) DEFAULT NULL COMMENT 'Customer Firstname',
-  `customer_lastname` varchar(255) DEFAULT NULL COMMENT 'Customer Lastname',
-  `customer_middlename` varchar(255) DEFAULT NULL COMMENT 'Customer Middlename',
-  `customer_prefix` varchar(255) DEFAULT NULL COMMENT 'Customer Prefix',
-  `customer_suffix` varchar(255) DEFAULT NULL COMMENT 'Customer Suffix',
-  `customer_taxvat` varchar(255) DEFAULT NULL COMMENT 'Customer Taxvat',
+  `customer_email` varchar(128) DEFAULT NULL COMMENT 'Customer Email',
+  `customer_firstname` varchar(128) DEFAULT NULL COMMENT 'Customer Firstname',
+  `customer_lastname` varchar(128) DEFAULT NULL COMMENT 'Customer Lastname',
+  `customer_middlename` varchar(128) DEFAULT NULL COMMENT 'Customer Middlename',
+  `customer_prefix` varchar(32) DEFAULT NULL COMMENT 'Customer Prefix',
+  `customer_suffix` varchar(32) DEFAULT NULL COMMENT 'Customer Suffix',
+  `customer_taxvat` varchar(32) DEFAULT NULL COMMENT 'Customer Taxvat',
   `discount_description` varchar(255) DEFAULT NULL COMMENT 'Discount Description',
-  `ext_customer_id` varchar(255) DEFAULT NULL COMMENT 'Ext Customer Id',
-  `ext_order_id` varchar(255) DEFAULT NULL COMMENT 'Ext Order Id',
+  `ext_customer_id` varchar(32) DEFAULT NULL COMMENT 'Ext Customer Id',
+  `ext_order_id` varchar(32) DEFAULT NULL COMMENT 'Ext Order Id',
   `global_currency_code` varchar(3) DEFAULT NULL COMMENT 'Global Currency Code',
-  `hold_before_state` varchar(255) DEFAULT NULL COMMENT 'Hold Before State',
-  `hold_before_status` varchar(255) DEFAULT NULL COMMENT 'Hold Before Status',
-  `order_currency_code` varchar(255) DEFAULT NULL COMMENT 'Order Currency Code',
-  `original_increment_id` varchar(50) DEFAULT NULL COMMENT 'Original Increment Id',
+  `hold_before_state` varchar(32) DEFAULT NULL COMMENT 'Hold Before State',
+  `hold_before_status` varchar(32) DEFAULT NULL COMMENT 'Hold Before Status',
+  `order_currency_code` varchar(3) DEFAULT NULL COMMENT 'Order Currency Code',
+  `original_increment_id` varchar(32) DEFAULT NULL COMMENT 'Original Increment Id',
   `relation_child_id` varchar(32) DEFAULT NULL COMMENT 'Relation Child Id',
   `relation_child_real_id` varchar(32) DEFAULT NULL COMMENT 'Relation Child Real Id',
   `relation_parent_id` varchar(32) DEFAULT NULL COMMENT 'Relation Parent Id',
   `relation_parent_real_id` varchar(32) DEFAULT NULL COMMENT 'Relation Parent Real Id',
-  `remote_ip` varchar(255) DEFAULT NULL COMMENT 'Remote Ip',
-  `shipping_method` varchar(255) DEFAULT NULL COMMENT 'Shipping Method',
+  `remote_ip` varchar(32) DEFAULT NULL COMMENT 'Remote Ip',
+  `shipping_method` varchar(32) DEFAULT NULL COMMENT 'Shipping Method',
   `store_currency_code` varchar(3) DEFAULT NULL COMMENT 'Store Currency Code',
-  `store_name` varchar(255) DEFAULT NULL COMMENT 'Store Name',
-  `x_forwarded_for` varchar(255) DEFAULT NULL COMMENT 'X Forwarded For',
+  `store_name` varchar(32) DEFAULT NULL COMMENT 'Store Name',
+  `x_forwarded_for` varchar(32) DEFAULT NULL COMMENT 'X Forwarded For',
   `customer_note` text COMMENT 'Customer Note',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Created At',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated At',
@@ -553,25 +554,25 @@ CREATE TABLE `#__quote_address` (
   `customer_id` int(10) unsigned DEFAULT NULL COMMENT 'Customer Id',
   `save_in_address_book` smallint(6) DEFAULT '0' COMMENT 'Save In Address Book',
   `customer_address_id` int(10) unsigned DEFAULT NULL COMMENT 'Customer Address Id',
-  `address_type` varchar(255) DEFAULT NULL COMMENT 'Address Type',
+  `address_type` varchar(10) DEFAULT NULL COMMENT 'Address Type',
   `email` varchar(255) DEFAULT NULL COMMENT 'Email',
   `prefix` varchar(40) DEFAULT NULL COMMENT 'Prefix',
-  `firstname` varchar(255) DEFAULT NULL COMMENT 'Firstname',
-  `middlename` varchar(40) DEFAULT NULL COMMENT 'Middlename',
-  `lastname` varchar(255) DEFAULT NULL COMMENT 'Lastname',
+  `firstname` varchar(20) DEFAULT NULL COMMENT 'Firstname',
+  `middlename` varchar(20) DEFAULT NULL COMMENT 'Middlename',
+  `lastname` varchar(20) DEFAULT NULL COMMENT 'Lastname',
   `suffix` varchar(40) DEFAULT NULL COMMENT 'Suffix',
   `company` varchar(255) DEFAULT NULL COMMENT 'Company',
-  `street` varchar(255) DEFAULT NULL COMMENT 'Street',
-  `city` varchar(255) DEFAULT NULL COMMENT 'City',
-  `region` varchar(255) DEFAULT NULL COMMENT 'Region',
+  `street` varchar(40) DEFAULT NULL COMMENT 'Street',
+  `city` varchar(40) DEFAULT NULL COMMENT 'City',
+  `region` varchar(40) DEFAULT NULL COMMENT 'Region',
   `region_id` int(10) unsigned DEFAULT NULL COMMENT 'Region Id',
-  `postcode` varchar(255) DEFAULT NULL COMMENT 'Postcode',
-  `country_id` varchar(255) DEFAULT NULL COMMENT 'Country Id',
-  `telephone` varchar(255) DEFAULT NULL COMMENT 'Phone Number',
-  `fax` varchar(255) DEFAULT NULL COMMENT 'Fax',
+  `postcode` varchar(20) DEFAULT NULL COMMENT 'Postcode',
+  `country_id` varchar(30) DEFAULT NULL COMMENT 'Country Id',
+  `telephone` varchar(20) DEFAULT NULL COMMENT 'Phone Number',
+  `fax` varchar(20) DEFAULT NULL COMMENT 'Fax',
   `same_as_billing` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Same As Billing',
   `collect_shipping_rates` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Collect Shipping Rates',
-  `shipping_method` varchar(255) DEFAULT NULL COMMENT 'Shipping Method',
+  `shipping_method` varchar(40) DEFAULT NULL COMMENT 'Shipping Method',
   `shipping_description` varchar(255) DEFAULT NULL COMMENT 'Shipping Description',
   `weight` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Weight',
   `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000' COMMENT 'Subtotal',
@@ -814,37 +815,37 @@ CREATE TABLE `#__sales_order_payment` (
   `base_amount_canceled` decimal(12,4) DEFAULT NULL COMMENT 'Base Amount Canceled',
   `quote_payment_id` int(11) DEFAULT NULL COMMENT 'Quote Payment Id',
   `additional_data` text COMMENT 'Additional Data',
-  `cc_exp_month` varchar(255) DEFAULT NULL COMMENT 'Cc Exp Month',
-  `cc_ss_start_year` varchar(255) DEFAULT NULL COMMENT 'Cc Ss Start Year',
-  `echeck_bank_name` varchar(255) DEFAULT NULL COMMENT 'Echeck Bank Name',
-  `method` varchar(255) DEFAULT NULL COMMENT 'Method',
-  `cc_debug_request_body` varchar(255) DEFAULT NULL COMMENT 'Cc Debug Request Body',
-  `cc_secure_verify` varchar(255) DEFAULT NULL COMMENT 'Cc Secure Verify',
-  `protection_eligibility` varchar(255) DEFAULT NULL COMMENT 'Protection Eligibility',
-  `cc_approval` varchar(255) DEFAULT NULL COMMENT 'Cc Approval',
+  `cc_exp_month` varchar(12) DEFAULT NULL COMMENT 'Cc Exp Month',
+  `cc_ss_start_year` varchar(12) DEFAULT NULL COMMENT 'Cc Ss Start Year',
+  `echeck_bank_name` varchar(128) DEFAULT NULL COMMENT 'Echeck Bank Name',
+  `method` varchar(128) DEFAULT NULL COMMENT 'Method',
+  `cc_debug_request_body` varchar(32) DEFAULT NULL COMMENT 'Cc Debug Request Body',
+  `cc_secure_verify` varchar(32) DEFAULT NULL COMMENT 'Cc Secure Verify',
+  `protection_eligibility` varchar(32) DEFAULT NULL COMMENT 'Protection Eligibility',
+  `cc_approval` varchar(32) DEFAULT NULL COMMENT 'Cc Approval',
   `cc_last_4` varchar(100) DEFAULT NULL COMMENT 'Cc Last 4',
-  `cc_status_description` varchar(255) DEFAULT NULL COMMENT 'Cc Status Description',
-  `echeck_type` varchar(255) DEFAULT NULL COMMENT 'Echeck Type',
-  `cc_debug_response_serialized` varchar(255) DEFAULT NULL COMMENT 'Cc Debug Response Serialized',
-  `cc_ss_start_month` varchar(255) DEFAULT NULL COMMENT 'Cc Ss Start Month',
+  `cc_status_description` varchar(32) DEFAULT NULL COMMENT 'Cc Status Description',
+  `echeck_type` varchar(32) DEFAULT NULL COMMENT 'Echeck Type',
+  `cc_debug_response_serialized` varchar(32) DEFAULT NULL COMMENT 'Cc Debug Response Serialized',
+  `cc_ss_start_month` varchar(128) DEFAULT NULL COMMENT 'Cc Ss Start Month',
   `echeck_account_type` varchar(255) DEFAULT NULL COMMENT 'Echeck Account Type',
-  `last_trans_id` varchar(255) DEFAULT NULL COMMENT 'Last Trans Id',
-  `cc_cid_status` varchar(255) DEFAULT NULL COMMENT 'Cc Cid Status',
-  `cc_owner` varchar(255) DEFAULT NULL COMMENT 'Cc Owner',
-  `cc_type` varchar(255) DEFAULT NULL COMMENT 'Cc Type',
-  `po_number` varchar(255) DEFAULT NULL COMMENT 'Po Number',
-  `cc_exp_year` varchar(255) DEFAULT NULL COMMENT 'Cc Exp Year',
-  `cc_status` varchar(255) DEFAULT NULL COMMENT 'Cc Status',
-  `echeck_routing_number` varchar(255) DEFAULT NULL COMMENT 'Echeck Routing Number',
-  `account_status` varchar(255) DEFAULT NULL COMMENT 'Account Status',
-  `anet_trans_method` varchar(255) DEFAULT NULL COMMENT 'Anet Trans Method',
-  `cc_debug_response_body` varchar(255) DEFAULT NULL COMMENT 'Cc Debug Response Body',
-  `cc_ss_issue` varchar(255) DEFAULT NULL COMMENT 'Cc Ss Issue',
-  `echeck_account_name` varchar(255) DEFAULT NULL COMMENT 'Echeck Account Name',
-  `cc_avs_status` varchar(255) DEFAULT NULL COMMENT 'Cc Avs Status',
-  `cc_number_enc` varchar(255) DEFAULT NULL COMMENT 'Cc Number Enc',
-  `cc_trans_id` varchar(255) DEFAULT NULL COMMENT 'Cc Trans Id',
-  `address_status` varchar(255) DEFAULT NULL COMMENT 'Address Status',
+  `last_trans_id` varchar(32) DEFAULT NULL COMMENT 'Last Trans Id',
+  `cc_cid_status` varchar(32) DEFAULT NULL COMMENT 'Cc Cid Status',
+  `cc_owner` varchar(128) DEFAULT NULL COMMENT 'Cc Owner',
+  `cc_type` varchar(32) DEFAULT NULL COMMENT 'Cc Type',
+  `po_number` varchar(32) DEFAULT NULL COMMENT 'Po Number',
+  `cc_exp_year` varchar(4) DEFAULT NULL COMMENT 'Cc Exp Year',
+  `cc_status` varchar(4) DEFAULT NULL COMMENT 'Cc Status',
+  `echeck_routing_number` varchar(32) DEFAULT NULL COMMENT 'Echeck Routing Number',
+  `account_status` varchar(32) DEFAULT NULL COMMENT 'Account Status',
+  `anet_trans_method` varchar(32) DEFAULT NULL COMMENT 'Anet Trans Method',
+  `cc_debug_response_body` varchar(32) DEFAULT NULL COMMENT 'Cc Debug Response Body',
+  `cc_ss_issue` varchar(32) DEFAULT NULL COMMENT 'Cc Ss Issue',
+  `echeck_account_name` varchar(32) DEFAULT NULL COMMENT 'Echeck Account Name',
+  `cc_avs_status` varchar(32) DEFAULT NULL COMMENT 'Cc Avs Status',
+  `cc_number_enc` varchar(32) DEFAULT NULL COMMENT 'Cc Number Enc',
+  `cc_trans_id` varchar(32) DEFAULT NULL COMMENT 'Cc Trans Id',
+  `address_status` varchar(32) DEFAULT NULL COMMENT 'Address Status',
   `additional_information` text COMMENT 'Additional Information',
   PRIMARY KEY (`entity_id`),
   KEY `SALES_ORDER_PAYMENT_PARENT_ID` (`parent_id`),
@@ -1589,7 +1590,7 @@ CREATE TABLE `#__salesrule_website` (
   PRIMARY KEY (`rule_id`,`website_id`),
   KEY `SALESRULE_WEBSITE_WEBSITE_ID` (`website_id`),
   CONSTRAINT `SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `#__salesrule` (`rule_id`) ON DELETE CASCADE,
-  CONSTRAINT `SALESRULE_WEBSITE_WEBSITE_ID_CORE/WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
+  CONSTRAINT `SALESRULE_WEBSITE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID` FOREIGN KEY (`website_id`) REFERENCES `#__store_website` (`website_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sales Rules To Websites Relations';
 
 SET FOREIGN_KEY_CHECKS=1;

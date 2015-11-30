@@ -94,10 +94,13 @@ class Mage2SalesQuoteAddressPeer extends Mage2ActiveRecord
 			array('country_id', 'length', 'max'=>30),
 			array('weight, subtotal, base_subtotal, subtotal_with_discount, base_subtotal_with_discount, tax_amount, base_tax_amount, shipping_amount, base_shipping_amount, shipping_tax_amount, base_shipping_tax_amount, discount_amount, base_discount_amount, grand_total, base_grand_total, shipping_discount_amount, base_shipping_discount_amount, subtotal_incl_tax, base_subtotal_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, shipping_incl_tax, base_shipping_incl_tax', 'length', 'max'=>12),
 			array('updated_at, customer_notes, applied_taxes, vat_id, vat_request_id, vat_request_date', 'safe'),
+			// The following rule is used by search().
+			// @todo Please remove those attributes that should not be searched.
+			array('address_id, quote_id, created_at, updated_at, customer_id, save_in_address_book, customer_address_id, address_type, email, prefix, firstname, middlename, lastname, suffix, company, street, city, region, region_id, postcode, country_id, telephone, fax, same_as_billing, collect_shipping_rates, shipping_method, shipping_description, weight, subtotal, base_subtotal, subtotal_with_discount, base_subtotal_with_discount, tax_amount, base_tax_amount, shipping_amount, base_shipping_amount, shipping_tax_amount, base_shipping_tax_amount, discount_amount, base_discount_amount, grand_total, base_grand_total, customer_notes, applied_taxes, discount_description, shipping_discount_amount, base_shipping_discount_amount, subtotal_incl_tax, base_subtotal_total_incl_tax, discount_tax_compensation_amount, base_discount_tax_compensation_amount, shipping_discount_tax_compensation_amount, base_shipping_discount_tax_compensation_amnt, shipping_incl_tax, base_shipping_incl_tax, free_shipping, vat_id, vat_is_valid, vat_request_id, vat_request_date, vat_request_success, gift_message_id', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
+    /**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.

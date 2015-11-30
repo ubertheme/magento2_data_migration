@@ -9,6 +9,10 @@
 + catalog_product_entity_media_gallery_value_video (NEW)
 + customer_eav_attribute
 
++ sales_order
++ quote_address
++ sales_order_payment
+
 ### Tables removed ###
 + catalog_product_entity_group_price
 + catalog_product_index_group_price

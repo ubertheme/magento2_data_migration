@@ -2230,11 +2230,11 @@ class MigrateController extends Controller
                                 foreach ($sales_order2->attributes as $key => $value){
                                     if (isset($sales_order->$key)){
                                         /**
-                                         * Magento 2 only accept max length of store name = 32 chars
+                                         * Magento 2 only accept max length of store_name = 32 chars
                                          * So we have to check length of store name here to split
                                          */
                                         $val = $sales_order->$key;
-                                        if ( in_array($key, array('store_name')) && strlen($val) > 32) {
+                                        if ( in_array($key, array('store_name', 'shipping_method', 'x_forwarded_for')) && strlen($val) > 32) {
                                             $val = substr($val, 0, 32);
                                         }
                                         $sales_order2->$key = $val;
