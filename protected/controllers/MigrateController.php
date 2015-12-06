@@ -105,32 +105,30 @@ class MigrateController extends Controller
 
             $step->migrated_data = json_encode($_POST);
 
-            //validate database
+            //validate databases
+            mysqli_report(MYSQLI_REPORT_STRICT);
             $err_msg = array();
-            $validate = @mysql_connect($_POST['mg1_host'], $_POST['mg1_db_user'], $_POST['mg1_db_pass']);
-            if (!$validate){
-                $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 1 database.");
-            }else{
-                if (!mysql_select_db( $_POST['mg1_db_name'], $validate)){
-                    $err_msg[] = Yii::t('frontend', "Database Name of Magento 1 was not found in database.");
-                    $validate = false;
-                }else{
-                    //validate magento2
-                    mysql_close($validate);
-                    $validate = @mysql_connect($_POST['mg2_host'], $_POST['mg2_db_user'], $_POST['mg2_db_pass']);
-                    if (!$validate){
-                        $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 2 database.");
-                    }else{
-                        if (!mysql_select_db( $_POST['mg2_db_name'], $validate)){
-                            $err_msg[] = Yii::t('frontend', "Database Name of Magento 2 was not found in database.");
-                            $validate = false;
-                        } else{
-                            mysql_close($validate);
-                        }
+            $validate = true;
+            //validate magento1 database
+            try {
+                $connection = mysqli_connect($_POST['mg1_host'], $_POST['mg1_db_user'], $_POST['mg1_db_pass'], $_POST['mg1_db_name']);
+                if ($connection) {
+                    //validate magento2 database
+                    try {
+                        $connection = mysqli_connect($_POST['mg2_host'], $_POST['mg2_db_user'], $_POST['mg2_db_pass'], $_POST['mg2_db_name']);
+                    } catch (Exception $e ) {
+                        $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 2 database: ".$e->getMessage());
+                        $validate = false;
                     }
                 }
+            } catch ( Exception $e ) {
+                $err_msg[] = Yii::t('frontend', "Couldn't connected to Magento 1 database: ".$e->getMessage());
+                $validate = false;
             }
-
+            if (isset($connection) AND $connection){
+                mysqli_close($connection);
+            }
+            
             if ($validate){
                 //save to config file
                 $configTemplate = Yii::app()->basePath .DIRECTORY_SEPARATOR. "config".DIRECTORY_SEPARATOR."config.template";
