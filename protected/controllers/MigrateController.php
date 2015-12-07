@@ -1951,6 +1951,10 @@ class MigrateController extends Controller
                                                             if (in_array($attribute_code1, $needed_update_attr)){
                                                                 if ($customer2->hasAttribute($attribute_code1)){
                                                                     $customer2->$attribute_code1 = $model->value;
+                                                                    //we have to do this, because the Magento CE 2.0.0 or later was change method to hash password: md5 -> sha256
+                                                                    if ($attribute_code1 == 'password_hash'){
+                                                                        $customer2->$attribute_code1 .= ":0"; // In Magento2: 0 = HASH_VERSION_MD5
+                                                                    }
                                                                     $customer2->update();
                                                                 }
                                                             }
