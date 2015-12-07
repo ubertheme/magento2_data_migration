@@ -44,5 +44,7 @@ For example: http://localhost/migrate-data-tool/ and press Enter key.
   - Make recursive write able to "catalog" and "downloadable" folders which you have just copied.
 - Remove all folders and files in <strong>WEB_ROOT_PATH\your_magento2_folder\var</strong> but take the .htaccess file.
 - Remove all folders and files in <strong>WEB_ROOT_PATH\your_magento2_folder\pub\static</strong> but take the .htaccess file.
+- Upgrade Customers Password Hash (New from Magento CE 2.0.0): (This for more security and this is optional task)
+    + Update by command: `php -f WEB_ROOT_PATH\your_magento2_folder\bin\magento customer:hash:upgrade`
 
 <h4># Step 5: Now you can test the data which have been migrated into your Magento 2 website from the browser.</h4>
