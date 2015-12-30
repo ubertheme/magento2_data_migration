@@ -3,7 +3,7 @@
 ## Author: <a href="http://www.ubertheme.com" target="_blank" title="UberTheme">UberTheme</a>
 
 ### Compatible: ###
-- We are going to support the following versions for migration:
+- We are going to support the following versions for magento 2 data migration:
     + Magento Community Edition (CE) versions: 1.6.x, 1.7.x, 1.8.x, CE 1.9.x
     + Magento 2 CE 2.0.0 and later
 
