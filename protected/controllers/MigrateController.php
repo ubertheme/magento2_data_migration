@@ -2399,6 +2399,9 @@ class MigrateController extends Controller
                                         if ( in_array($key, array('store_name', 'shipping_method', 'x_forwarded_for')) && strlen($val) > 32) {
                                             $val = substr($val, 0, 32);
                                         }
+                                        if ( in_array($key, array('applied_rule_ids')) && strlen($val) > 128) {
+                                            $val = substr($val, 0, 128);
+                                        }
                                         $sales_order2->$key = $val;
                                     }
                                 }
