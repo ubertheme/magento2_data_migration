@@ -3563,7 +3563,7 @@ class MigrateController extends Controller
             );
 
             //variables to log
-            $migrated_object_ids = array();
+            $migrated_object_ids = $migrated_tax_ids = array();
             $migrated_tax_rule_ids = $migrated_tax_rate_ids = $migrated_catalog_rule_ids = array();
 
             if (Yii::app()->request->isPostRequest && $step->status == MigrateSteps::STATUS_NOT_DONE){
